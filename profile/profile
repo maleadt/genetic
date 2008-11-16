@@ -1,0 +1,13 @@
+rm -rf usr
+rm -rf home
+rm -rf report
+
+sudo opcontrol --reset
+sudo opcontrol --setup --vmlinux=/home/tim/Development/oprofile/linux-2.6.27/vmlinux
+sudo opcontrol --start
+
+../bin/Debug/evolve
+
+opannotate --source --output-dir=. "../bin/Debug/evolve"
+opreport -l "../bin/Debug/evolve" -o report
+sudo opcontrol --stop
