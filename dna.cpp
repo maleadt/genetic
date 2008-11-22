@@ -156,10 +156,11 @@ bool DNA::is_valid()
 	while (it != dataGenes.end())
 	{
 		if (!((*it)->is_valid()))
+		{
 			return false;
+		}
 		++it;
 	}
-
 	return true;
 }
 
@@ -180,8 +181,12 @@ void DNA::mutate(unsigned int mutLevel)
 	{
 		unsigned int randChild = random_range(0, dataGenes.size()-1);
 		std::list<Gen*>::iterator it = dataGenes.begin();
+
 		for (unsigned int i = 0; i < randChild; i++)
+		{
 			++it;
+		}
+
 		(*it)->mutate(mutLevel-1);
 	}
 }
@@ -211,20 +216,21 @@ void DNA::mutateSelf()
 	// Mutate
 	switch (randomMutation)
 	{
+		// Deletion
 		case 1:
-			// Deletion
 			(*iteratorGen)->~Gen();
 			delete((*iteratorGen));
 			dataGenes.erase(iteratorGen);
 			break;
 
+		// Duplication
 		case 2:
-			// Duplication
 			dataGenes.push_back(new Gen((*(*iteratorGen))));
 			break;
 
+
+		// Inversion
 		case 3:
-			// Inversion
 			if (dataGenes.size() > 1)
 			{
 				Gen* temp = *iteratorGen;
@@ -233,8 +239,8 @@ void DNA::mutateSelf()
 			}
 			break;
 
+		// Amplification
 		case 4:
-			// Amplification
 			for (int i = 0; i < random_range(1, dataGenes.size()); i++)
 				dataGenes.insert(iteratorGen, new Gen(*(*iteratorGen)));;
 			break;

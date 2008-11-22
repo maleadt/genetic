@@ -199,33 +199,11 @@ void Gen::DeltaFromDirection(char inputDir, int &dx, int &dy)
 void Gen::execute()
 {
 	dataRepeat = true;
-	bool do_loop = true;
-	while (do_loop)
-	{
-		int a = parent->parent->credits;
-		int b = parent->parent->pointerWorld->creatureMaxCommands;
-		if (a <= b)
-		{
-			if (dataRepeat)
-			{
-				if (evaluateAll())
-				{
-					actAll();
-				} else {
-					do_loop = false;
-				}
-			} else {
-				do_loop = false;
-			}
-		} else {
-			do_loop = false;
-		}
-	}/*
 
 	while (parent->parent->credits <= parent->parent->pointerWorld->creatureMaxCommands && dataRepeat && evaluateAll())
 	{
 		actAll();
-	}*/
+	}
 }
 
 bool Gen::evaluateAll()
@@ -418,9 +396,10 @@ bool Gen::is_valid()
 	while (it != dataCommands.end())
 	{
 		if (! ((*it)->is_valid()))
+		{
 			return false;
+		}
 		++it;
 	}
-
 	return true;
 }

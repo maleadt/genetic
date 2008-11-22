@@ -30,8 +30,8 @@ using namespace std;
 const int WORLD_ROWS = 25;
 const int WORLD_COLUMNS = 25;
 const int WORLD_OBSTACLES = 10;
-const int WORLD_TESTS = 20;
-const int CREATURE_TESTS = 500;
+const int WORLD_TESTS = 3;
+const int CREATURE_TESTS = 10;
 string CREATURE_DNA = "3A2YA2X3A3YA3X1B2Y1B3Y1A1YA1X1B2Y1B3Y1A4YA4";
 
 void print_world(World &inputWorld)
@@ -79,7 +79,7 @@ int main()
 
 	// Preserve previous DNA
 	double prev_coeff = 0;
-	string prev_dna = CREATURE_DNA;
+	simCreature.BackupDNA();
 
 	// Simulate
 	cout << "* Simulating" << endl;
@@ -127,10 +127,10 @@ int main()
 			double coefficient = efficiency * 100 / (slowness * slowness);
 			if (coefficient > prev_coeff)
 			{
-				prev_dna = simCreature.outputTextual();
-				prev_coeff = coefficient;
+				simCreature.RemoveBackupDNA();
+				simCreature.BackupDNA();
 			} else {
-				simCreature.inputTextual(prev_dna);
+				simCreature.RestoreDNA();
 			}
 			cout << "-> Efficiency coefficient: " << coefficient << endl;
 		}
@@ -143,6 +143,7 @@ int main()
 
 	// Clean up
 	cout << "* Cleaning up" << endl;
+	simCreature.RemoveBackupDNA();
 
 
 	return 0;

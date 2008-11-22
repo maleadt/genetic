@@ -53,6 +53,7 @@ Simuleren van creature roept en execute functie aan in dna.h
 #include "dna.h"
 #include "generic.h"
 #include <iostream>
+#include <stack>
 
 
 //////////////////////
@@ -95,6 +96,7 @@ class Creature
 
 		void BackupDNA();
 		void RestoreDNA();
+		void RemoveBackupDNA();
 
 		// Code execution
 		bool is_valid();
@@ -107,9 +109,8 @@ class Creature
 	private:
 		// DNA specifics
 		DNA* dnaCode;
-		DNA* dnaBackup;
+		std::stack<DNA*> dnaBackup;
 		bool dnaIsSet;
-		bool dnaBackupIsSet;
 };
 
 

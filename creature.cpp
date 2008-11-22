@@ -199,7 +199,7 @@ void Creature::mutate()
 	int amount = random_range(1, 5);
 
 	// Backup DNA
-	std::string backup = dnaCode->outputTextual();
+	BackupDNA();
 
 	bool mutated_good = false;
 	while (!mutated_good)
@@ -217,30 +217,34 @@ void Creature::mutate()
 		if (!dnaCode->is_valid())
 		{
 			// Replace with backup
-			dnaCode->~DNA();
-			dnaCode->inputTextual(backup);
+			RestoreDNA();
 		} else {
 			mutated_good = true;
 		}
 	}
+
+	// Remove the backup
+	RemoveBackupDNA();
 }
 
 void Creature::BackupDNA()
 {
-	if (dnaBackupIsSet)
-	{
-		dnaBackup->~DNA();
-		delete dnaBackup;
-	}
-	dnaBackup = new DNA(*dnaCode);
-	dnaBackupIsSet = true;
+	DNA* tempDNA = new DNA(*dnaCode);
+	dnaBackup.push(tempDNA);
 }
 
 void Creature::RestoreDNA()
 {
 	dnaCode->~DNA();
 	delete dnaCode;
-	dnaCode = new DNA(*dnaBackup);
+	dnaCode = new DNA(*(dnaBackup.top()));
+}
+
+void Creature::RemoveBackupDNA()
+{
+	dnaBackup.top()->~DNA();
+	delete dnaBackup.top();
+	dnaBackup.pop();
 }
 
 void Creature::reset()
@@ -256,5 +260,6 @@ void Creature::reset()
 
 bool Creature::is_valid()
 {
+	std::cout << "creature: checking if dna is valid" << std::endl;
 	return dnaCode->is_valid();
 }
