@@ -53,8 +53,11 @@ DNA::DNA(const DNA &oldDNA)
 	std::list<Gen*>::const_iterator it = oldDNA.dataGenes.begin();
 	while (it != oldDNA.dataGenes.end())
 	{
-		// Copy all commands and save them
+		// Copy all genes and save them
 		dataGenes.push_back( new Gen( (*(*it)) ) );
+
+		// Update our children's parent-pointer
+		dataGenes.back()->parent = this;
 
 		++it;
 	}
