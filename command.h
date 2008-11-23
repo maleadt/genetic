@@ -1,5 +1,5 @@
 /*
- * codon.h
+ * command.h
  * Command class.
  *
  * Copyright (c) 2008 Tim Besard <tim.besard@gmail.com>
@@ -18,9 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *//*
-Eenvoudige klassen, louter datastructuur voor codon (voorwaardes, uitvoeringen. niet noozakelijk 1+1)
-*/
+ */
 
 ///////////////////
 // CONFIGURATION //

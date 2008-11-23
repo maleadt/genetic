@@ -1,5 +1,5 @@
 /*
- * codon.cpp
+ * command.cpp
  * Command class.
  *
  * Copyright (c) 2008 Tim Besard <tim.besard@gmail.com>
@@ -27,7 +27,6 @@
 //
 // Essential stuff
 //
-
 
 // Headers
 #include "command.h"

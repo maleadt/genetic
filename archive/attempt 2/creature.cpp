@@ -1,6 +1,6 @@
 /*
- * generic.h
- * Some generic all-around functions.
+ * creature.cpp
+ * Creature data structure.
  *
  * Copyright (c) 2008 Tim Besard <tim.besard@gmail.com>
  * All rights reserved.
@@ -20,46 +20,58 @@
  *
  */
 
-///////////////////
-// CONFIGURATION //
-///////////////////
-
-//
-// Essential stuff
-//
-
-// Include guard
-#ifndef __GENERIC
-#define __GENERIC
 
 
-// Headers
-#include <cstdlib>
-#include <ctime>
-#include <sstream>
-#include <string>
+
+/*
+ * Configuration
+ */
+
+// Include header
+#include "creature.h"
+
+// Constants
+const bool CREATURE_VERBOSE = false;
 
 
-//////////////
-// ROUTINES //
-//////////////
 
-// Swap two items through references
-template <class X> void swap(X &a, X &b);
 
-// Generate a number from lower up to (and with) upper
-int random_range(int lowest_number, int highest_number);
+/*
+ * Construction
+ */
 
-// Convert several types to a string
-template <typename X> std::string stringify(X input)
+Creature::Creature(DNA inputDNA, int inputIteration)
 {
-	std::string output;
-	std::stringstream convert;
-	convert << input;
-	output = convert.str();
-	return output;
+	// Call the subroutine
+	setDNA(inputDNA);
+	maxIteration = inputIteration;
+}
+
+Creature::Creature()
+{
+	haveDNA = false;
 }
 
 
-// Include guard
-#endif
+
+/*
+ * Basic IO
+ */
+
+void Creature::setDNA(DNA inputDNA)
+{
+	// Save DNA
+	dataDNA = inputDNA;
+	haveDNA = true;
+	if (CREATURE_VERBOSE) cout << "* Creature\tconfigured" << endl;
+}
+
+void Creature::setIteration(unsigned int inputIteration)
+{
+	maxIteration = inputIteration;
+}
+
+DNA Creature::getDNA()
+{
+	return dataDNA;
+}

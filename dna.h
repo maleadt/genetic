@@ -19,11 +19,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-/*
-Deze klasse is de basis voor de genetische code. Het bevat een vector met daarin alle genen.
-
-De uitvoer functie calt per gen een uitvoer functie in gen.H
-*/
 
 ///////////////////
 // CONFIGURATION //

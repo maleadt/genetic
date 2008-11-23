@@ -1,0 +1,7 @@
+Full-featured version, written in C only using elementary functions. Differences with Perl version:
+* Object oriented;
+* More advance mutation;
+* Sophisticated evolution model (box model);
+* A LOT faster.
+
+Contains some memory leaks though, which I can't seem to find.

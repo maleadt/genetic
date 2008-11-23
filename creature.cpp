@@ -28,7 +28,6 @@
 // Essential stuff
 //
 
-
 // Headers
 #include "creature.h"
 #include "world.h"

@@ -19,11 +19,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-/*
-Deze klassen implementeert een "wereld", die verschillende "creatures" in zijn object opgeslaan heeft.
-
-een World->Simulate call,simuleert alle creatures to een fixed limiet, zolang die niet dood zijn of einddoel bereikt hebben
-*/
 
 ///////////////////
 // CONFIGURATION //

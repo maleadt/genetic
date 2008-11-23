@@ -28,7 +28,6 @@
 // Essential stuff
 //
 
-
 // Headers
 #include "world.h"
 

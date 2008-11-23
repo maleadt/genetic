@@ -18,11 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *//*
-Deze klasse bevat een object met verschillende codons.
-
-De uitvoerfunctie evalueert alle codons, bewegingen vb is parent->parent->move(dx, dy)
-*/
+ */
 
 ///////////////////
 // CONFIGURATION //

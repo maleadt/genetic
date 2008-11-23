@@ -30,8 +30,8 @@ using namespace std;
 const int WORLD_ROWS = 25;
 const int WORLD_COLUMNS = 25;
 const int WORLD_OBSTACLES = 10;
-const int WORLD_TESTS = 3;
-const int CREATURE_TESTS = 10;
+const int WORLD_TESTS = 50;
+const int CREATURE_TESTS = 200;
 string CREATURE_DNA = "3A2YA2X3A3YA3X1B2Y1B3Y1A1YA1X1B2Y1B3Y1A4YA4";
 
 void print_world(World &inputWorld)

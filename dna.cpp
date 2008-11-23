@@ -28,7 +28,6 @@
 // Essential stuff
 //
 
-
 // Headers
 #include "dna.h"
 #include "creature.h"

@@ -19,19 +19,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-/*
-Deze klasse herbergt een creature, dewelke de volgende leden heeft:
-* DNA, de code die uitgevoert wordt
-* Locatie, coördinaten van de positie in de wereld
-
-Creature heeft ook een "move" functie, waarbij de locatie geupdate wordt, maar een checkup naar de parent eerst controleert
-of de zet wel geldig is (zoniet -> creature dood)
-ID is niet nodig om te kunnen refereren naar parent (parent->is_valid(dx, dy), aangezien move functie in creature zelf zit
-
-Biedt ook mutatie functies
-
-Simuleren van creature roept en execute functie aan in dna.h
-*/
 
 ///////////////////
 // CONFIGURATION //

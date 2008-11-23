@@ -1,6 +1,6 @@
 /*
- * generic.h
- * Some generic all-around functions.
+ * creature.cpp
+ * Creature data structure.
  *
  * Copyright (c) 2008 Tim Besard <tim.besard@gmail.com>
  * All rights reserved.
@@ -20,46 +20,53 @@
  *
  */
 
-///////////////////
-// CONFIGURATION //
-///////////////////
+#ifndef __CREATURE /* include guard */
+#define __CREATURE
 
-//
-// Essential stuff
-//
+/*
+ * Configuration
+ */
 
-// Include guard
-#ifndef __GENERIC
-#define __GENERIC
-
-
-// Headers
-#include <cstdlib>
-#include <ctime>
-#include <sstream>
-#include <string>
+// Needed headers
+#include <iostream>
+#include "dna.h"
+#include "gen.h"
 
 
-//////////////
-// ROUTINES //
-//////////////
+/*
+ * Class defenition
+ */
 
-// Swap two items through references
-template <class X> void swap(X &a, X &b);
-
-// Generate a number from lower up to (and with) upper
-int random_range(int lowest_number, int highest_number);
-
-// Convert several types to a string
-template <typename X> std::string stringify(X input)
+class Creature
 {
-	std::string output;
-	std::stringstream convert;
-	convert << input;
-	output = convert.str();
-	return output;
-}
+	// Public member data, can be viewed from anywhere
+	public:
+		// Construction
+		Creature();
+		Creature(DNA, int);
+		//~Creature();
+
+		// Basic IO
+		DNA getDNA();
+		void setDNA(DNA);
+		void setIteration(unsigned int);
 
 
-// Include guard
-#endif
+		// Creature details
+		unsigned int row;
+		unsigned int column;
+		int ID;
+		unsigned int iteration;
+		bool alive;
+		bool finished;
+		unsigned int maxIteration;
+
+	// Private member data, only for internal usage
+	private:
+		DNA dataDNA;
+		bool haveDNA;
+};
+
+
+
+#endif /* __CREATURE */
