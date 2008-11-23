@@ -39,7 +39,6 @@
 #include <string>
 #include "dna.h"
 #include "generic.h"
-#include <iostream>
 #include <stack>
 
 

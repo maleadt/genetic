@@ -79,4 +79,11 @@ int random_range(int lowest_number, int highest_number)
 	return lowest_number + range*(rand()/(RAND_MAX+1.0));
 }
 
+// Print a message
+void log(int level, std::string message)
+{
+	if (level <= VERBOSITY)
+		std::cout << message << std::endl;
+}
+
 

@@ -38,7 +38,6 @@
 #include "generic.h"
 #include "creature.h"
 #include <list>
-#include <iostream>
 
 
 //////////////////////
@@ -87,12 +86,19 @@ class World
 		unsigned int sizeColumns;
 		unsigned int sizeRows;
 
+		void cacheInvalidate();
+
 
 	private:
 		// Elements in the world
 		std::list<Obstacle*> dataObstacles;
 		std::list<Creature*> dataCreatures;
 		std::list<Obstacle*> dataFinishes;
+
+		// checkSpot cache
+		unsigned int cacheCheckSpotX;
+		unsigned int cacheCheckSpotY;
+		int cacheCheckSpotOut;
 };
 
 

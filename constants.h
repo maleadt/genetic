@@ -40,6 +40,9 @@
 // World
 //
 
+// Verbosity
+extern int VERBOSITY;
+
 // Block ID's
 extern int WORLD_INVALID;
 extern int WORLD_FREE;

@@ -43,11 +43,14 @@
 
 DNA::DNA()
 {
+	log(3, "dna: constructing");
 }
 
 // Copy constructor
 DNA::DNA(const DNA &oldDNA)
 {
+	log(3, "dna: constructing by given copy");
+
 	// Copy all genes
 	std::list<Gen*>::const_iterator it = oldDNA.dataGenes.begin();
 	while (it != oldDNA.dataGenes.end())
@@ -67,6 +70,8 @@ DNA::DNA(const DNA &oldDNA)
 
 DNA::~DNA()
 {
+	log(3, "dna: destructing");
+
 	// Remove all genes
 	std::list<Gen*>::iterator it_gene = dataGenes.begin();
 	while (it_gene != dataGenes.end())
@@ -86,6 +91,8 @@ DNA::~DNA()
 // Input textual data
 void DNA::inputTextual(std::string &inputText)
 {
+	log(1, "dna: inputting textual data");
+
 	// Detect genes, and create a new object for them
 	unsigned int index_start = 0;
 	while (index_start < inputText.length())
@@ -104,6 +111,8 @@ void DNA::inputTextual(std::string &inputText)
 // Output textual data
 std::string DNA::outputTextual()
 {
+	log(3, "dna: outputting textual data");
+
 	std::string outputTextual;
 
 	// Process all genes
@@ -122,6 +131,8 @@ std::string DNA::outputTextual()
 // Output code
 std::string DNA::outputCode()
 {
+	log(3, "dna: outputting code");
+
 	std::string outputCode;
 
 	// Process all genes
@@ -143,6 +154,8 @@ std::string DNA::outputCode()
 
 void DNA::execute()
 {
+	log(2, "dna: executing genes");
+
 	std::list<Gen*>::iterator it = dataGenes.begin();
 	while (it != dataGenes.end())
 	{
@@ -153,6 +166,8 @@ void DNA::execute()
 
 bool DNA::is_valid()
 {
+	log(3, "dna: checking validity");
+
 	// Process all genes
 	std::list<Gen*>::iterator it = dataGenes.begin();
 	while (it != dataGenes.end())
@@ -175,6 +190,8 @@ bool DNA::is_valid()
 
 void DNA::mutate(unsigned int mutLevel)
 {
+	log(2, "dna: checking mutation level");
+
 	if (mutLevel == 0)
 	{
 		mutateSelf();
@@ -195,6 +212,8 @@ void DNA::mutate(unsigned int mutLevel)
 
 void DNA::mutateSelf()
 {
+	log(2, "dna: mutating self");
+
 	// We need at least 1 gene
 	if (dataGenes.size() < 1)
 		return;
@@ -220,6 +239,7 @@ void DNA::mutateSelf()
 	{
 		// Deletion
 		case 1:
+			log(2, "dna: deletion");
 			(*iteratorGen)->~Gen();
 			delete((*iteratorGen));
 			dataGenes.erase(iteratorGen);
@@ -227,12 +247,14 @@ void DNA::mutateSelf()
 
 		// Duplication
 		case 2:
+			log(2, "dna: duplication");
 			dataGenes.push_back(new Gen((*(*iteratorGen))));
 			break;
 
 
 		// Inversion
 		case 3:
+			log(2, "dna: inversion");
 			if (dataGenes.size() > 1)
 			{
 				Gen* temp = *iteratorGen;
@@ -243,12 +265,14 @@ void DNA::mutateSelf()
 
 		// Amplification
 		case 4:
+			log(2, "dna: amplification");
 			for (int i = 0; i < random_range(1, dataGenes.size()); i++)
 				dataGenes.insert(iteratorGen, new Gen(*(*iteratorGen)));;
 			break;
 
 		// Translocation
 		case 5:
+			log(2, "dna: translocation");
 			if (dataGenes.size() > 1)
 			{
 				Gen* tempGen = *iteratorGen;

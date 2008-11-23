@@ -46,10 +46,13 @@
 
 Gen::Gen()
 {
+	log(3, "gen: constructing");
 }
 
 Gen::Gen(Gen const& oldGen)
 {
+	log(3, "gen: constructing by given copy");
+
 	// Copy all commands
 	std::list<Command*>::const_iterator it = oldGen.dataCommands.begin();
 	while (it != oldGen.dataCommands.end())
@@ -67,6 +70,8 @@ Gen::Gen(Gen const& oldGen)
 
 Gen::~Gen()
 {
+	log(3, "gen: destructing");
+
 	// Remove all commands
 	std::list<Command*>::iterator it_com = dataCommands.begin();
 	while (it_com != dataCommands.end())
@@ -84,6 +89,8 @@ Gen::~Gen()
 // Input textual data
 void Gen::inputTextual(std::string inputText)
 {
+	log(3, "gen: inputting textual data");
+
 	// Detect genes, and create a new object for them
 	unsigned int index_start = 0;
 	while (index_start < inputText.length())
@@ -103,6 +110,8 @@ void Gen::inputTextual(std::string inputText)
 // Output textual data
 std::string Gen::outputTextual()
 {
+	log(3, "gen: outputting textual data");
+
 	std::string outputTextual;
 
 	// Add all commands
@@ -121,6 +130,8 @@ std::string Gen::outputTextual()
 // Output code
 std::string Gen::outputCode()
 {
+	log(3, "gen: outputting code");
+
 	std::string outputCode;
 
 	// Add all conditions
@@ -163,6 +174,8 @@ std::string Gen::outputCode()
 
 void Gen::DeltaFromDirection(char inputDir, int &dx, int &dy)
 {
+	log(3, "gen: calculating direction delta");
+
 	if (inputDir == dnaParameters["up"])
 	{
 		dx = 0;
@@ -197,6 +210,8 @@ void Gen::DeltaFromDirection(char inputDir, int &dx, int &dy)
 
 void Gen::execute()
 {
+	log(2, "gen: executing commands");
+
 	dataRepeat = true;
 
 	while (parent->parent->credits <= parent->parent->pointerWorld->creatureMaxCommands && dataRepeat && evaluateAll())
@@ -207,6 +222,8 @@ void Gen::execute()
 
 bool Gen::evaluateAll()
 {
+	log(2, "gen: evaluating all commands");
+
 	// Essential stuff (an overhead credit)
 	parent->parent->credits++;
 
@@ -225,6 +242,8 @@ bool Gen::evaluateAll()
 
 bool Gen::evaluate(Command* inputCommand)
 {
+	log(3, "gen: evaluating a command");
+
 	// Do we have a repeating check (while / while not)?
 	dataRepeat = (	inputCommand->identifier == dnaConditions["while"]		||
 				   inputCommand->identifier == dnaConditions["while not"]	);
@@ -272,6 +291,8 @@ bool Gen::evaluate(Command* inputCommand)
 
 void Gen::actAll()
 {
+	log(2, "gen: executing all actions");
+
 	// Essential stuff (an overhead credit)
 	parent->parent->credits++;
 
@@ -288,6 +309,8 @@ void Gen::actAll()
 
 void Gen::act(Command* inputCommand)
 {
+	log(3, "gen: executing an action");
+
 	// Essential stuff
 	parent->parent->credits++;
 
@@ -311,6 +334,8 @@ void Gen::act(Command* inputCommand)
 
 void Gen::mutate(unsigned int mutLevel)
 {
+	log(2, "gen: checking mutation level");
+
 	if (mutLevel == 0)
 	{
 		mutateSelf();
@@ -326,6 +351,8 @@ void Gen::mutate(unsigned int mutLevel)
 
 void Gen::mutateSelf()
 {
+	log(2, "gen: mutating self");
+
 	// We need at least 1 command
 	if (dataCommands.size() < 1)
 		return;
@@ -351,17 +378,20 @@ void Gen::mutateSelf()
 	{
 		// Deletion
 		case 1:
+			log(2, "gen: deletion");
 			delete (*iteratorCommand);
 			dataCommands.erase(iteratorCommand);
 			break;
 
 		// Duplication
 		case 2:
+			log(2, "gen: duplication");
 			dataCommands.push_back( new Command(*(*iteratorCommand)) );
 			break;
 
 		// Inversion
 		case 3:
+			log(2, "gen: inversion");
 			if (dataCommands.size() > 1)
 			{
 				Command* temp = *iteratorCommand;
@@ -372,12 +402,14 @@ void Gen::mutateSelf()
 
 		// Amplification
 		case 4:
+			log(2, "gen: amplification");
 			for (int i = 0; i < random_range(1, dataCommands.size()); i++)
 				dataCommands.insert(iteratorCommand, new Command(*(*iteratorCommand)));;
 			break;
 
 		// Translocation
 		case 5:
+			log(2, "gen: translocation");
 			if (dataCommands.size() > 1)
 			{
 				Command* tempCommand = *iteratorCommand;
@@ -390,6 +422,8 @@ void Gen::mutateSelf()
 // Check if valid
 bool Gen::is_valid()
 {
+	log(3, "gen: checking validity");
+
 	// Add all commands
 	std::list<Command*>::iterator it = dataCommands.begin();
 	while (it != dataCommands.end())

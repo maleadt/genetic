@@ -39,11 +39,14 @@
 // Constructor
 Command::Command()
 {
+	log(3, "command: constructing");
 }
 
 // Copy constructor
 Command::Command(const Command& oldCommand)
 {
+	log(3, "command: constructing by given copy");
+
 	// Copy identifier
 	identifier = oldCommand.identifier;
 
@@ -62,6 +65,8 @@ Command::Command(const Command& oldCommand)
 
 void Command::mutate(unsigned int mutLevel)
 {
+	log(2, "command: checking mutation level");
+
 	if (mutLevel == 0)
 	{
 		mutateSelf();
@@ -70,6 +75,8 @@ void Command::mutate(unsigned int mutLevel)
 
 void Command::mutateSelf()
 {
+	log(2, "command: mutating self");
+
 	// We need at least 1 parameter
 	if (parameters.size() < 1)
 		return;
@@ -88,16 +95,19 @@ void Command::mutateSelf()
 	{
 		// Deletion
 		case 1:
+			log(2, "command: deletion");
 			parameters.erase(iteratorParameter);
 			break;
 
 		// Duplication
 		case 2:
+			log(2, "command: duplication");
 			parameters.push_back( parameters[randomParameter] );
 			break;
 
 		// Inversion
 		case 3:
+			log(2, "command: inversion");
 			if (parameters.size() > 1)
 			{
 				int randomParameter2 = randomParameter;
@@ -112,6 +122,7 @@ void Command::mutateSelf()
 
 		// Amplification
 		case 4:
+			log(2, "command: amplification");
 			for (int i = 0; i < random_range(1, parameters.size()); i++)
 				iteratorParameter = parameters.insert(iteratorParameter, (*iteratorParameter));
 				// Vector insertion invalidates all iterators
@@ -119,6 +130,7 @@ void Command::mutateSelf()
 
 		// Point-mutation
 		case 5:
+			log(2, "command: point-mutation");
 			int randType = random_range(0, 1);
 			if (randType == 0)
 			{
@@ -149,6 +161,8 @@ void Command::mutateSelf()
 // Input textual data
 void Command::inputTextual(std::string inputCommand)
 {
+	log(3, "command: inputting textual data");
+
 	// Detect instruction type
 	unsigned int tempType = 0;	// Condition = 1, Action = 2
 	std::map<std::string, char>::iterator it = dnaConditions.begin();
@@ -184,6 +198,8 @@ void Command::inputTextual(std::string inputCommand)
 // Output textual data
 std::string Command::outputTextual()
 {
+	log(3, "command: outputting textual data");
+
 	std::string outputTextual;
 
 	// Add identifier
@@ -203,6 +219,8 @@ std::string Command::outputTextual()
 // Output in code syntax
 std::string Command::outputCode()
 {
+	log(3, "command: outputting code");
+
 	std::string outputCode;
 
 	// Action intendations
@@ -263,6 +281,8 @@ std::string Command::outputCode()
 // Check if valid
 bool Command::is_valid()
 {
+	log(3, "command: checking validity");
+
 	// General conditions
 	if (	identifier == dnaConditions["if"] ||
 			identifier == dnaConditions["if not"] ||

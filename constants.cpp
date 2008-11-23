@@ -35,6 +35,13 @@
 // World
 //
 
+// Verbosity
+int VERBOSITY = 0;
+// Level 0: neutral messages (which everybody should read)
+// Level 1: verbose messages, most important application functions (spawn, mutate, ...)
+// Level 2: application function specifics (which mutation, etc)
+// Level 3: code specifics (construction & destruction)
+
 // Block ID's
 int WORLD_INVALID = -1;
 int WORLD_FREE = 0;

@@ -37,7 +37,6 @@
 #include <list>
 #include "command.h"
 #include <string>
-#include <iostream>
 
 
 //////////////////////

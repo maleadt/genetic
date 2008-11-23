@@ -43,6 +43,7 @@
 
 Creature::Creature()
 {
+	log(3, "creature: constructing");
 	dnaCode = new DNA;
 	dnaCode->parent = this;
 	reset();
@@ -50,6 +51,8 @@ Creature::Creature()
 
 Creature::~Creature()
 {
+	log(3, "creature: constructing by given copy");
+
 	// Clean and delete the DNA
 	dnaCode->~DNA();
 	delete dnaCode;
@@ -62,6 +65,8 @@ Creature::~Creature()
 // Spawn a creature in a random spot
 void Creature::spawnRandom()
 {
+	log(2, "creature: calculating random spawn place");
+
 	// Find a random coördinate
 	int tempX, tempY;
 	bool available = false;
@@ -81,6 +86,8 @@ void Creature::spawnRandom()
 //   input: x coördinate (unsigned int), y coördinate (unsigned int)
 void Creature::spawnSpecific(unsigned int inputX, unsigned int inputY)
 {
+	log(1, "creature: spawning at " + stringify(inputX) + "x" + stringify(inputY));
+
 	// Set our coördinates
 	locationX = inputX;
 	locationY = inputY;
@@ -93,6 +100,8 @@ void Creature::spawnSpecific(unsigned int inputX, unsigned int inputY)
 
 void Creature::move(int dx, int dy)
 {
+	log(2, "creature: moving to " + stringify(locationX+dx) + "x" + stringify(locationY+dy));
+
 	if (pointerWorld->checkSpot(locationX+dx, locationY+dy) != WORLD_FREE)
 	{
 		status = CREATURE_DEAD;
@@ -110,6 +119,8 @@ void Creature::move(int dx, int dy)
 // Input textual data
 void Creature::inputTextual(std::string &inputText)
 {
+	log(3, "creature: parsing DNA");
+
 	// Clear current DNA
 	dnaCode->~DNA();
 
@@ -120,12 +131,14 @@ void Creature::inputTextual(std::string &inputText)
 // Output textual data
 std::string Creature::outputTextual()
 {
+	log(3, "creature: outputting textual DNA");
 	return dnaCode->outputTextual();
 }
 
 // Output code
 std::string Creature::outputCode()
 {
+	log(3, "creature: outputting code");
 	return dnaCode->outputCode();
 }
 
@@ -137,6 +150,8 @@ std::string Creature::outputCode()
 // Simulate while creature hasn't found endpoint yet
 bool Creature::do_simulate()
 {
+	log(2, "creature: checking if we can simulate");
+
 	// We cannot execute more commands than a certain limit
 	if (credits > pointerWorld->creatureMaxCommands)
 		return false;
@@ -162,6 +177,8 @@ bool Creature::do_simulate()
 
 void Creature::simulate()
 {
+	log(1, "creature: simulating");
+
 	// Launch the simulation
 	while (do_simulate())
 		dnaCode->execute();
@@ -186,6 +203,8 @@ void Creature::simulate()
 
 void Creature::mutate()
 {
+	log(1, "creature: mutating");
+
 	// How many times do we want to mutate
 	int amount = random_range(1, 5);
 
@@ -221,12 +240,14 @@ void Creature::mutate()
 
 void Creature::BackupDNA()
 {
+	log(2, "creature: backing up DNA");
 	DNA* tempDNA = new DNA(*dnaCode);
 	dnaBackup.push(tempDNA);
 }
 
 void Creature::RestoreDNA()
 {
+	log(2, "creature: restoring DNA backup");
 	dnaCode->~DNA();
 	delete dnaCode;
 	dnaCode = new DNA(*(dnaBackup.top()));
@@ -234,6 +255,7 @@ void Creature::RestoreDNA()
 
 void Creature::RemoveBackupDNA()
 {
+	log(2, "creature: removing DNA backup");
 	dnaBackup.top()->~DNA();
 	delete dnaBackup.top();
 	dnaBackup.pop();
@@ -241,6 +263,8 @@ void Creature::RemoveBackupDNA()
 
 void Creature::reset()
 {
+	// Reset all
+	log(2, "creature: resetting data");
 	credits = 0;
 	creditsTotal = 0;
 	locationIsSet = false;

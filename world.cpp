@@ -43,6 +43,8 @@
 // Constructor
 World::World(const unsigned int rows, const unsigned  int columns)
 {
+	log(3, "world: constructing");
+
 	// Save size
 	sizeColumns = columns;
 	sizeRows = rows;
@@ -57,6 +59,8 @@ World::World(const unsigned int rows, const unsigned  int columns)
 // Destructor
 World::~World()
 {
+	log(3, "world: destructing");
+
 	// Remove and delete all objects
 	clearObj();
 
@@ -82,6 +86,8 @@ World::~World()
 //   input: percentage of obstacles (unsigned int)
 void World::addObstacles(const unsigned int percentage)
 {
+	log(1, "world: adding obstacles");
+
 	// How many blocks do we need?
 	unsigned int obstacles = (sizeColumns*sizeRows) * percentage / 100;
 
@@ -126,6 +132,8 @@ void World::addObstacles(const unsigned int percentage)
 // Check spot availability
 int World::checkSpot(const unsigned int x, const unsigned int y)
 {
+	log(2, "world: checking spot " + stringify(x) + "x" + stringify(y));
+
 	// Check if spot is between main borders
 	if (x<0 || y<0 || (unsigned)x>=sizeColumns || (unsigned)y>=sizeRows)
 		return WORLD_INVALID;
@@ -154,6 +162,8 @@ int World::checkSpot(const unsigned int x, const unsigned int y)
 // Check for finish
 bool World::checkFinish(const unsigned int x, const unsigned int y)
 {
+	log(2, "world: checking for finish on " + stringify(x) + "x" + stringify(y));
+
 	// Check for finish
 	std::list<Obstacle*>::iterator it_finish = dataFinishes.begin();
 	while (it_finish != dataFinishes.end())
@@ -168,6 +178,7 @@ bool World::checkFinish(const unsigned int x, const unsigned int y)
 // Add a finish
 void World::addFinish(const unsigned int x, const unsigned int y)
 {
+	log(1, "world: added creature");
 	Obstacle* finish = new Obstacle;
 	finish->dataX = x;
 	finish->dataY = y,
@@ -184,6 +195,8 @@ void World::addFinish(const unsigned int x, const unsigned int y)
 // NOTE: creature placment is handled by the creature itself, this routine only links the creature to the world
 void World::creatureAdd(Creature *inputCreature)
 {
+	log(1, "world: adding creature");
+
 	// Save a pointer to the creature
 	dataCreatures.push_back(inputCreature);
 
@@ -195,6 +208,8 @@ void World::creatureAdd(Creature *inputCreature)
 //   input: the creature to place (Creature)
 void World::creatureAdd(Creature &inputCreature)
 {
+	log(3, "world: adding creature by object");
+
 	// Save a pointer to the creature
 	Creature* pointerCreature = &inputCreature;
 	dataCreatures.push_back(pointerCreature);
@@ -211,6 +226,8 @@ void World::creatureAdd(Creature &inputCreature)
 // Simulate while not all creatures have finished
 bool World::do_simulate()
 {
+	log(2, "world: checking if we can simulate");
+
 	if (worldSimulations > worldMaxSimulations)
 	{
 		return false;
@@ -236,6 +253,8 @@ bool World::do_simulate()
 
 void World::simulate()
 {
+	log(1, "world: simulating");
+
 	while (do_simulate())
 	{
 		std::list<Creature*>::iterator it = dataCreatures.begin();
@@ -251,12 +270,16 @@ void World::simulate()
 
 void World::reset()
 {
+	log(2, "world: resetting");
+
 	worldSimulations = 0;
 }
 
 void World::clearObj()
 {
-	// Remove all objects
+	log(2, "world: removing and deleting objects");
+
+	// Remove and delete all objects
 	std::list<Obstacle*>::iterator it_obst = dataObstacles.begin();
 	while (it_obst != dataObstacles.end())
 	{
@@ -268,6 +291,8 @@ void World::clearObj()
 
 void World::clearCreat()
 {
+	log(2, "world: removing creatures");
+
 	// Remove all creatures
 	dataCreatures.clear();
 }

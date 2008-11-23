@@ -38,6 +38,8 @@
 #include <ctime>
 #include <sstream>
 #include <string>
+#include "constants.h"
+#include <iostream>
 
 
 //////////////
@@ -59,6 +61,9 @@ template <typename X> std::string stringify(X input)
 	output = convert.str();
 	return output;
 }
+
+// Print a message
+void log(int level, std::string message);
 
 
 // Include guard
