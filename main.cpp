@@ -108,14 +108,13 @@ int main()
 
 			// Simulate
 			simWorld.simulate();
-			if (simCreature.is_finished())
+			if (simCreature.status == CREATURE_FINISHED)
 			{
 				commands += simCreature.creditsTotal;
 				int locx2 = simCreature.locationX;
 				int locy2 = simCreature.locationY;
 				steps += (int) sqrt((locx2 - locx)*(locx2 - locx) + (locy2 - locy)*(locy2 - locy));
 				finishes++;
-			} else {
 			}
 		}
 

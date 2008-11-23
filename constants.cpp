@@ -10,6 +10,11 @@ int WORLD_FREE = 0;
 int WORLD_OBSTACLE = 1;
 int WORLD_CREATURE = 2;
 
+// Creature statusses
+int CREATURE_ALIVE = 1;
+int CREATURE_FINISHED = 2;
+int CREATURE_DEAD = 3;
+
 
 //
 // Unique level 1 (breaks EVERYTHING)

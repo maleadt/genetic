@@ -277,7 +277,7 @@ void Gen::actAll()
 	parent->parent->credits++;
 
 	std::list<Command*>::iterator it = dataCommands.begin();
-	while (it != dataCommands.end() && parent->parent->credits <= parent->parent->pointerWorld->creatureMaxCommands)
+	while (it != dataCommands.end() && parent->parent->credits <= parent->parent->pointerWorld->creatureMaxCommands && parent->parent->status == CREATURE_ALIVE)
 	{
 		if ((*it)->is_action)
 		{

@@ -16,6 +16,11 @@ extern int WORLD_FREE;
 extern int WORLD_OBSTACLE;
 extern int WORLD_CREATURE;
 
+// Creature statusses
+extern int CREATURE_ALIVE;
+extern int CREATURE_FINISHED;
+extern int CREATURE_DEAD;
+
 
 //////////////
 // DNA code //

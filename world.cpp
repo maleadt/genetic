@@ -135,8 +135,7 @@ int World::checkSpot(const unsigned int x, const unsigned int y)
 
 	// Check for obstacles
 	std::list<Obstacle*>::iterator it_obst = dataObstacles.begin();
-	std::list<Obstacle*>::iterator ite_obst = dataObstacles.end();
-	while (it_obst != ite_obst)
+	while (it_obst != dataObstacles.end())
 	{
 		if ((*it_obst)->dataX == x && (*it_obst)->dataY == y)
 			return WORLD_OBSTACLE;
@@ -145,8 +144,7 @@ int World::checkSpot(const unsigned int x, const unsigned int y)
 
 	// Check for creatures
 	std::list<Creature*>::iterator it_creat = dataCreatures.begin();
-	std::list<Creature*>::iterator ite_creat = dataCreatures.end();
-	while (it_creat != ite_creat)
+	while (it_creat != dataCreatures.end())
 	{
 		if ((*it_creat)->locationIsSet && (*it_creat)->locationX == x && (*it_creat)->locationY == y)
 			return WORLD_CREATURE;
@@ -161,8 +159,7 @@ bool World::checkFinish(const unsigned int x, const unsigned int y)
 {
 	// Check for finish
 	std::list<Obstacle*>::iterator it_finish = dataFinishes.begin();
-	std::list<Obstacle*>::iterator ite_finish = dataFinishes.end();
-	while (it_finish != ite_finish)
+	while (it_finish != dataFinishes.end())
 	{
 		if ((*it_finish)->dataX == x && (*it_finish)->dataY == y)
 			return true;
@@ -224,10 +221,9 @@ bool World::do_simulate()
 
 	int alive = dataCreatures.size();
 	std::list<Creature*>::iterator it = dataCreatures.begin();
-	std::list<Creature*>::iterator ite = dataCreatures.end();
-	while (it != ite)
+	while (it != dataCreatures.end())
 	{
-		if ((*it)->is_finished() && !(*it)->is_alive)
+		if ((*it)->status != CREATURE_ALIVE)
 		{
 			alive--;
 		}
@@ -246,10 +242,10 @@ void World::simulate()
 	while (do_simulate())
 	{
 		std::list<Creature*>::iterator it = dataCreatures.begin();
-		std::list<Creature*>::iterator ite = dataCreatures.end();
-		while (it != ite)
+		while (it != dataCreatures.end())
 		{
-			(*it)->simulate();
+			if ((*it)->status == CREATURE_ALIVE)
+				(*it)->simulate();
 			++it;
 		}
 		worldSimulations++;

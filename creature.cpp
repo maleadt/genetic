@@ -96,7 +96,7 @@ void Creature::move(int dx, int dy)
 {
 	if (pointerWorld->checkSpot(locationX+dx, locationY+dy) != WORLD_FREE)
 	{
-		is_alive = false;
+		status = CREATURE_DEAD;
 		return;
 	}
 
@@ -135,17 +135,6 @@ std::string Creature::outputCode()
 // Simulation handling
 //
 
-// Check if creature is finished
-bool Creature::is_finished()
-{
-	if (pointerWorld->checkFinish(locationX, locationY))
-	{
-		return true;
-	}
-
-	return false;
-}
-
 // Simulate while creature hasn't found endpoint yet
 bool Creature::do_simulate()
 {
@@ -153,12 +142,9 @@ bool Creature::do_simulate()
 	if (credits > pointerWorld->creatureMaxCommands)
 		return false;
 
-	// Refuse to simulate if we have done something nasty
-	if (!is_alive)
-		return false;
 
-	// Have we finished yet?
-	if (is_finished())
+	// Only simulate if we are alive
+	if (status != CREATURE_ALIVE)
 		return false;
 
 	// Check if we are not at exactly the same spot as before
@@ -190,6 +176,12 @@ void Creature::simulate()
 	// Save credits
 	creditsTotal += credits;
 	credits = 0;
+
+	// Check the finish
+	if (pointerWorld->checkFinish(locationX, locationY))
+	{
+		status = CREATURE_FINISHED;
+	}
 }
 
 
@@ -252,14 +244,8 @@ void Creature::reset()
 	credits = 0;
 	creditsTotal = 0;
 	locationIsSet = false;
-	is_alive = true;
 	creditsTotal = 0;
 	locationPrevX = 0;
 	locationPrevY = 0;
-}
-
-bool Creature::is_valid()
-{
-	std::cout << "creature: checking if dna is valid" << std::endl;
-	return dnaCode->is_valid();
+	status = CREATURE_ALIVE;
 }

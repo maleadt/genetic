@@ -85,8 +85,6 @@ class Creature
 		void move (int dx, int dy);
 
 		// Simulation handling
-		bool is_alive;
-		bool is_finished();
 		int credits;
 		int creditsTotal;
 		bool do_simulate();
@@ -105,6 +103,9 @@ class Creature
 		void inputTextual(std::string&);
 		std::string outputTextual();
 		std::string outputCode();
+
+		// Status variable
+		int status;
 
 	private:
 		// DNA specifics
