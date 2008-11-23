@@ -1,0 +1,3 @@
+- Avoid the access of childs to parent's raw data.
+- Move raw locationX & locationY access to setSpot(), so we can build and invalidate a cache easily
+- Make the code adaptable for other worlds (e.g. non-constant DNA code as it is now, etc)
