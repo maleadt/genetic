@@ -66,8 +66,7 @@ World::~World()
 
 	// Remove and delete all finishes
 	std::list<Obstacle*>::iterator it_finish = dataFinishes.begin();
-	std::list<Obstacle*>::iterator ite_finish = dataFinishes.end();
-	while (it_finish != ite_finish)
+	while (it_finish != dataFinishes.end())
 	{
 		delete (*it_finish);
 		++it_finish;
@@ -104,8 +103,7 @@ void World::addObstacles(const unsigned int percentage)
 			if (dataObstacles.size() > 0)
 			{
 				std::list<Obstacle*>::iterator it = dataObstacles.begin();
-				std::list<Obstacle*>::iterator ite = dataObstacles.end();
-				while (obstacle_valid && it != ite)
+				while (obstacle_valid && it != dataObstacles.end())
 				{
 					if ((*(*it)).dataX == p_obst->dataX && (*(*it)).dataY == p_obst->dataY)
 						obstacle_valid = false;
@@ -261,8 +259,7 @@ void World::clearObj()
 {
 	// Remove all objects
 	std::list<Obstacle*>::iterator it_obst = dataObstacles.begin();
-	std::list<Obstacle*>::iterator ite_obst = dataObstacles.end();
-	while (it_obst != ite_obst)
+	while (it_obst != dataObstacles.end())
 	{
 		delete (*it_obst);
 		++it_obst;

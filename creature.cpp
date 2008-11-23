@@ -193,6 +193,7 @@ void Creature::mutate()
 	// Backup DNA
 	BackupDNA();
 
+	// Mutate untill we have a valid DNA
 	bool mutated_good = false;
 	while (!mutated_good)
 	{
