@@ -51,6 +51,7 @@ Command::Command(const Command& oldCommand)
 	identifier = oldCommand.identifier;
 
 	// Copy all parameters
+	parameters.clear();
 	std::vector<char>::const_iterator it = oldCommand.parameters.begin();
 	while (it != oldCommand.parameters.end())
 	{

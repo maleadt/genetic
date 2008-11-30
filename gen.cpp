@@ -54,6 +54,7 @@ Gen::Gen(Gen const& oldGen)
 	log(3, "gen: constructing by given copy");
 
 	// Copy all commands
+	dataCommands.clear();
 	std::list<Command*>::const_iterator it = oldGen.dataCommands.begin();
 	while (it != oldGen.dataCommands.end())
 	{

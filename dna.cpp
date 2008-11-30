@@ -52,6 +52,7 @@ DNA::DNA(const DNA &oldDNA)
 	log(3, "dna: constructing by given copy");
 
 	// Copy all genes
+	dataGenes.clear();
 	std::list<Gen*>::const_iterator it = oldDNA.dataGenes.begin();
 	while (it != oldDNA.dataGenes.end())
 	{

@@ -76,7 +76,7 @@ int random_range(int lowest_number, int highest_number)
 	//   (William H. Press, Brian P. Flannery, Saul A. Teukolsky,
 	//   William T. Vetterling; New York: Cambridge University Press,
 	//   1992 (2nd ed., p. 277))
-	return lowest_number + range*(rand()/(RAND_MAX+1.0));
+	return int(lowest_number + range*(rand()/(RAND_MAX+1.0)));
 }
 
 // Print a message
