@@ -46,7 +46,7 @@ class EnvDebug : public Environment
 {
 	public:
 		// Required functons
-		int fitness(std::list<std::vector<int> >&);
+		int fitness(std::list<std::list<int> >&);
 		int alphabet();
 };
 
@@ -57,7 +57,7 @@ int EnvDebug::alphabet()
 }
 
 // Fitness function
-int EnvDebug::fitness(std::list<std::vector<int> >& inputList)
+int EnvDebug::fitness(std::list<std::list<int> >& inputList)
 {
 	return 1;
 }

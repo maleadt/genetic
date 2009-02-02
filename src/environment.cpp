@@ -48,12 +48,12 @@
 int Environment::fitness(std::queue<int>& inputQueue)
 {
 	objParser.setQueue(inputQueue);
-	std::list<std::vector<int> > tempList = objParser.getList();
+	std::list<std::list<int> > tempList = objParser.getList();
 	return fitness(tempList);
 }
 
 // Convert the DNA and call the other fitness function
-int Environment::fitness(std::list<std::vector<int> >& inputList)
+int Environment::fitness(std::list<std::list<int> >& inputList)
 {
 	objParser.setList(inputList);
 	std::queue<int> tempQueue = objParser.getQueue();

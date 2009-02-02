@@ -52,7 +52,7 @@ void Parser::setQueue(std::queue<int>& inputQueue)
 }
 
 // Construct parser object with a given list
-void Parser::setList(std::list<std::vector<int> >& inputList)
+void Parser::setList(std::list<std::list<int> >& inputList)
 {
 	// Save list
 	dataList = inputList;
@@ -73,7 +73,7 @@ std::queue<int> Parser::getQueue()
 }
 
 // Get the list representation
-std::list<std::vector<int> > Parser::getList()
+std::list<std::list<int> > Parser::getList()
 {
 	return dataList;
 }
@@ -106,12 +106,13 @@ void Parser::debug_list()
 
 	// Process list
 	std::cout << "Contents of list with size " << dataList.size() << ":" << std::endl;
-	std::list<std::vector<int> >::iterator it = dataList.begin();
+	std::list<std::list<int> >::iterator it = dataList.begin();
 	while (it != dataList.end())
 	{
-		std::cout << "\tvector<int>: ";
-		for (int i = 0; i < it->size(); i++)
-			std::cout << std::hex << "0x" << it->at(i) << " ";
+		std::cout << "\tlist<int>: ";
+		std::list<int>::iterator it2 = it->begin();
+		while (it2 != it->end())
+			std::cout << std::hex << "0x" << *(it2++) << " ";
 		std::cout << std::endl;
 		it++;
 	}
@@ -133,11 +134,12 @@ void Parser::toQueue()
 	dataQueue.push(255);
 
 	// Process all genes
-	std::list<std::vector<int> >::iterator it = dataList.begin();
+	std::list<std::list<int> >::iterator it = dataList.begin();
 	while (it != dataList.end())
 	{
-		for (int i = 0; i < it->size(); i++)
-			dataQueue.push(it->at(i));
+		std::list<int>::iterator it2 = it->begin();
+		while (it2 != it->end())
+			dataQueue.push(*(it2++));
 		dataQueue.push(0);
 		it++;
 	}
@@ -162,7 +164,7 @@ void Parser::toList()
 	dataQueueDup.pop();
 
 	// Process all
-	std::vector<int> tempVector;
+	std::list<int> tempVector;
 	while (!dataQueueDup.empty() && dataQueueDup.front() != 255)
 	{
 		if (dataQueueDup.front() == 0)

@@ -41,7 +41,7 @@
 //
 
 // Create client with given DNA
-Client::Client(std::list<std::vector<int> >& inputList)
+Client::Client(std::list<std::list<int> >& inputList)
 {
 	dataDNA = inputList;
 }
@@ -89,7 +89,7 @@ void Client::crossover(Client&)
 // DNA output
 //
 
-std::list<std::vector<int> > Client::getDNA()
+std::list<std::list<int> > Client::getDNA()
 {
 	return dataDNA;
 }
@@ -117,7 +117,7 @@ void Client::mutate_dna()
 	 	random2 = random_range(0, dataDNA.size()-1);
 
 	// Calculate iterators to those genes
-	std::list<std::vector<int> >::iterator it1 = dataDNA.begin(), it2 = dataDNA.begin();
+	std::list<std::list<int> >::iterator it1 = dataDNA.begin(), it2 = dataDNA.begin();
 	for (int i = 0; i < random1; i++)
 		it1++;
 	for (int i = 0; i < random2; i++)
@@ -160,7 +160,7 @@ void Client::mutate_dna()
 		// Translocation
 		case 5:
 		{
-			std::vector<int> temp = *it1;
+			std::list<int> temp = *it1;
 			dataDNA.erase(it1);
 			dataDNA.insert(it2, temp);
 			break;

@@ -53,11 +53,11 @@ class Parser
 	public:
 		// Input routines
 		void setQueue(std::queue<int>&);
-		void setList(std::list<std::vector<int> >&);
+		void setList(std::list<std::list<int> >&);
 
 		// Output routines
 		std::queue<int> getQueue();
-		std::list<std::vector<int> > getList();
+		std::list<std::list<int> > getList();
 
 		// Debugging routines
 		void debug_queue();
@@ -66,7 +66,7 @@ class Parser
 	private:
 		// Data
 		std::queue<int> dataQueue;
-		std::list<std::vector<int> > dataList;
+		std::list<std::list<int> > dataList;
 
 		// Conversion routines
 		void toQueue();

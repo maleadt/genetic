@@ -36,7 +36,6 @@
 #include <iostream>
 #include <queue>
 #include <list>
-#include <vector>
 #include "generic.h"
 
 
@@ -57,21 +56,21 @@ class Client
 {
 	public:
 		// Construction and destruction
-		Client(std::list<std::vector<int> >&);
+		Client(std::list<std::list<int> >&);
 
 		// DNA alteration
 		void mutate();
 		void crossover(Client&);
 
 		// DNA output
-		std::list<std::vector<int> > getDNA();
+		std::list<std::list<int> > getDNA();
 
 		// Alphabet
 		int dataAlphabet;
 
 	private:
 		// DNA
-		std::list<std::vector<int> > dataDNA;
+		std::list<std::list<int> > dataDNA;
 
 		// Mutation routines
 		void mutate_dna();

@@ -51,7 +51,7 @@ class Environment
 	public:
 		// Required functions
 		int fitness(std::queue<int>&);
-		int fitness(std::list<std::vector<int> >&);
+		int fitness(std::list<std::list<int> >&);
 		int alphabet();
 
 	private:
