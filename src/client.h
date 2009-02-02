@@ -66,6 +66,9 @@ class Client
 		// DNA output
 		std::list<std::vector<int> > getDNA();
 
+		// Alphabet
+		int dataAlphabet;
+
 	private:
 		// DNA
 		std::list<std::vector<int> > dataDNA;

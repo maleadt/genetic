@@ -90,9 +90,10 @@ void Parser::debug_queue()
 	// Loop queue's contents
 	std::cout << "Contents of queue with size " << dataQueue.size() << ":" << std::endl;
 	std::queue<int> dataQueueDup(dataQueue);
+	std::cout << "\t";
 	while (!dataQueueDup.empty())
 	{
-		std::cout << std::hex << dataQueueDup.front() << " ";
+		std::cout << std::hex << "0x" << dataQueueDup.front() << " ";
 		dataQueueDup.pop();
 	}
 	std::cout << std::endl;
@@ -110,7 +111,7 @@ void Parser::debug_list()
 	{
 		std::cout << "\tvector<int>: ";
 		for (int i = 0; i < it->size(); i++)
-			std::cout << std::hex << it->at(i) << " ";
+			std::cout << std::hex << "0x" << it->at(i) << " ";
 		std::cout << std::endl;
 		it++;
 	}
@@ -129,7 +130,7 @@ void Parser::toQueue()
 		dataQueue.pop();
 
 	// Starting semantics
-	dataQueue.push(0x255);
+	dataQueue.push(255);
 
 	// Process all genes
 	std::list<std::vector<int> >::iterator it = dataList.begin();
@@ -137,13 +138,13 @@ void Parser::toQueue()
 	{
 		for (int i = 0; i < it->size(); i++)
 			dataQueue.push(it->at(i));
-		dataQueue.push(0x0);
+		dataQueue.push(0);
 		it++;
 	}
 
 	// Ending semantics
 	dataQueue.pop();
-	dataQueue.push(0x255);
+	dataQueue.push(255);
 }
 
 // Convert list to string
@@ -156,15 +157,15 @@ void Parser::toList()
 	std::queue<int> dataQueueDup(dataQueue);
 
 	// Check semantics
-	if (dataQueueDup.front() != 0x255)
-		throw(std::string("Parser.toList: saved DNA queue doesn't start with 0x255"));
+	if (dataQueueDup.front() != 255)
+		throw(std::string("Parser.toList: saved DNA queue doesn't start with 255"));
 	dataQueueDup.pop();
 
 	// Process all
 	std::vector<int> tempVector;
-	while (!dataQueueDup.empty() && dataQueueDup.front() != 0x255)
+	while (!dataQueueDup.empty() && dataQueueDup.front() != 255)
 	{
-		if (dataQueueDup.front() == 0x0)
+		if (dataQueueDup.front() == 0)
 		{
 			dataList.push_back(tempVector);
 			tempVector.clear();
@@ -177,8 +178,8 @@ void Parser::toList()
 	}
 
 	// Check semantics
-	if (dataQueueDup.front() != 0x255)
-		throw(std::string("Parser.toList: saved DNA queue doesn't end with 0x255"));
+	if (dataQueueDup.front() != 255)
+		throw(std::string("Parser.toList: saved DNA queue doesn't end with 255"));
 
 	// Save last vector
 	dataList.push_back(tempVector);

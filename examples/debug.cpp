@@ -31,7 +31,6 @@
 // Headers
 #include "../src/population.h"
 #include "../src/environment.h"
-#include "../src/parser.h"
 #include <queue>
 
 //
@@ -54,7 +53,7 @@ class EnvDebug : public Environment
 // Alphabet (maximal amount of instructions)
 int EnvDebug::alphabet()
 {
-	return 0x254;	// Pick maximum as of debugging purposes
+	return 254;	// Pick maximum as of debugging purposes
 }
 
 // Fitness function
@@ -73,17 +72,17 @@ int main()
 {
 	// Generate a DNA string
 	std::queue<int> tempDNA;
-	tempDNA.push(0x255);
-	tempDNA.push(0x123);
-	tempDNA.push(0x64);
-	tempDNA.push(0x0);
-	tempDNA.push(0x0);
-	tempDNA.push(0x48);
-	tempDNA.push(0x91);
-	tempDNA.push(0x31);
-	tempDNA.push(0x0);
-	tempDNA.push(0x49);
-	tempDNA.push(0x255);
+	tempDNA.push(255);
+	tempDNA.push(123);
+	tempDNA.push(64);
+	tempDNA.push(0);
+	tempDNA.push(0);
+	tempDNA.push(48);
+	tempDNA.push(91);
+	tempDNA.push(31);
+	tempDNA.push(0);
+	tempDNA.push(49);
+	tempDNA.push(255);
 
 	// Create an environment
 	EnvDebug tempEnvironment;

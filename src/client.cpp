@@ -93,3 +93,21 @@ std::list<std::vector<int> > Client::getDNA()
 {
 	return dataDNA;
 }
+
+
+//
+// Mutation routines
+//
+
+void Client::mutate_dna()
+{
+}
+
+void Client::mutate_gen()
+{
+}
+
+void Client::mutate_codon()
+{
+}
+

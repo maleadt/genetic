@@ -59,3 +59,9 @@ int Environment::fitness(std::list<std::vector<int> >& inputList)
 	std::queue<int> tempQueue = objParser.getQueue();
 	return fitness(tempQueue);
 }
+
+// Return the alphabet value
+int Environment::alphabet()
+{
+	return 0;
+}
