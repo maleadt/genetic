@@ -1,1 +1,54 @@
+1) Introduction
+
+This application provides a modular framework for genetic evolutionary algorithms.
+In order to use this framework, two parts are required:
+	- The client:
+	    this is the framework provided by this application, which handles
+	    the evolutionary aspects. Its input is a DNA string/container, and
+	    its output is the evolved variant of that set of instructions.
+	- The environment:
+	    this part of the evolutionary application should be provided by the
+	    user. It evaluates the evolved DNA string, and calculates a fitness
+	    value according to its performance. That fitness value is given back
+	    to the client, which handles accordingly
+
+
+2) Application contents
+
+This application consists out of three sets of files:
+	- client
+	    one evolutionary client, which can be re-used with several environments
+	- environment
+	    some example environments, which use the client
+	- generic
+	    routines which can be used in both the client and environment
+
+
+3) DNA format
+
+The client accepts DNA in two different forms:
+	- string
+	    a string containing hexadecimal representation of bytes
+	- container
+	    a list of vectors of int's, in which the vector<int> represent one
+	    gene, and the list<vector> is the encapsulating DNA code
+
+Genes consist out of bytes, ranging between 1 and 254 (so 253 instructions are possible).
+The environment can interprete genes the way it likes, which increases the amount of possibilities
+hugely. I.e., an environment in which a creature moves through a world, could instruct
+the first byte of a gene to be the instruction (move, shoot, jump), and the two following bytes
+to be the coördinates. This interpretation does not change the way the client mutates
+the bytes.
+
+
+4) Description of the environment
+
+The client will call the environment on several occasions, so it needs to have implemented
+a certain amount of functions.
+	- int fitness(DNA)
+	    this is the most important routine, which describes how performant a certain DNA set is.
+	    The sky is the limit, but a value of -1 is interpreted as "invalid DNA", which will cause
+	    the DNA set to be dropped
+	- int alphabet()
+	    this function returns the highest possible value of a gene byte (maximum = 254)
 
