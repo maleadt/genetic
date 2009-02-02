@@ -101,75 +101,18 @@ std::list<std::list<int> > Client::getDNA()
 
 void Client::mutate_dna()
 {
-	// Pick mutation
-	 int mutation = 0;
-	 if (dataDNA.size() > 1)
-	 {
-	 	mutation = random_range(1, 5);
-	 } else {
-	 	mutation = random_range(1, 2);
-	 }
-
-	 // Pick random gene(s)
-	 int random1 = random_range(0, dataDNA.size()-1);
-	 int random2 = random_range(0, dataDNA.size()-1);
-	 while (dataDNA.size() > 1 && random1 == random2)
-	 	random2 = random_range(0, dataDNA.size()-1);
-
-	// Calculate iterators to those genes
-	std::list<std::list<int> >::iterator it1 = dataDNA.begin(), it2 = dataDNA.begin();
-	for (int i = 0; i < random1; i++)
-		it1++;
-	for (int i = 0; i < random2; i++)
-		it2++;
-
-
-	// Mutate
-	switch (mutation)
-	{
-		// Deletion
-		case 1:
-		{
-			dataDNA.erase(it1);
-			break;
-		}
-
-		// Amplification (at current spot)
-		case 2:
-		{
-			int randAmp = random_range(1, dataDNA.size());
-			for (int i = 0; i < randAmp; i++)
-				dataDNA.insert(it1, *(it1));
-			break;
-		}
-
-		// Duplication (at random spot)
-		case 3:
-		{
-			dataDNA.insert(it2, *(it1));
-			break;
-		}
-
-		// Inversion
-		case 4:
-		{
-			swap(*(it1), *(it2));
-			break;
-		}
-
-		// Translocation
-		case 5:
-		{
-			std::list<int> temp = *it1;
-			dataDNA.erase(it1);
-			dataDNA.insert(it2, temp);
-			break;
-		}
-	}
+	mutate_list(dataDNA);
 }
 
 void Client::mutate_gen()
 {
+	// Pick random gene
+	int random = random_range(0, dataDNA.size()-1);
+	std::list<std::list<int> >::iterator it = dataDNA.begin();
+	for (int i = 0; i < random; i++)
+		it++;
+
+	mutate_list(*it);
 }
 
 void Client::mutate_codon()

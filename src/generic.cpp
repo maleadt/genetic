@@ -55,7 +55,7 @@ int random_range(int lowest_number, int highest_number)
 	if (!GENERIC_SRAND)
 	{
 		//srand((unsigned)time(0));
-		srand(10);
+		srand(time(0));
 		GENERIC_SRAND = true;
 	}
 

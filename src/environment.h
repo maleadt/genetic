@@ -50,9 +50,9 @@ class Environment
 {
 	public:
 		// Required functions
-		int fitness(std::queue<int>&);
-		int fitness(std::list<std::list<int> >&);
-		int alphabet();
+		virtual int fitness(std::queue<int>&);
+		virtual int fitness(std::list<std::list<int> >&);
+		virtual int alphabet();
 
 	private:
 		// Parser

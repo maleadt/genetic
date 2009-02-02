@@ -45,10 +45,23 @@
 class EnvDebug : public Environment
 {
 	public:
+		// Constructor
+		EnvDebug();
+
 		// Required functons
 		int fitness(std::list<std::list<int> >&);
 		int alphabet();
+
+	private:
+		int counter;
 };
+
+// Constructor
+EnvDebug::EnvDebug()
+{
+	std::cout << "Set counter." << std::endl;
+	counter = 0;
+}
 
 // Alphabet (maximal amount of instructions)
 int EnvDebug::alphabet()
@@ -59,9 +72,25 @@ int EnvDebug::alphabet()
 // Fitness function
 int EnvDebug::fitness(std::list<std::list<int> >& inputList)
 {
-	return 1;
+	return counter++;
 }
 
+//////////////
+// ROUTINES //
+//////////////
+
+void debug_queue(std::queue<int> inputQueue)
+{
+	// Loop queue's contents
+	std::cout << "Contents of queue with size " << std::dec << inputQueue.size() << ":" << std::endl;
+	std::cout << "\t";
+	while (!inputQueue.empty())
+	{
+		std::cout << std::hex << "0x" << inputQueue.front() << " ";
+		inputQueue.pop();
+	}
+	std::cout << std::endl;
+}
 
 
 //////////
@@ -84,11 +113,27 @@ int main()
 	tempDNA.push(49);
 	tempDNA.push(255);
 
+	debug_queue(tempDNA);
+
 	// Create an environment
 	EnvDebug tempEnvironment;
 
 	// Create a population with initial DNA
 	Population tempPopulation(&tempEnvironment, tempDNA);
 
+	// Simulate
+	try
+	{
+		tempPopulation.evolve_single_straight(1);
+		tempDNA = tempPopulation.getDNAQueue();
+		debug_queue(tempDNA);
+	}
+	catch (std::string error)
+	{
+		std::cout << "Caugt error: " << error << std::endl;
+	}
+
 	return 0;
 }
+
+

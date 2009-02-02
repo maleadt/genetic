@@ -78,5 +78,79 @@ class Client
 		void mutate_codon();
 };
 
+template <class T>
+void mutate_list(std::list<T>& inputList)
+{
+	// Prevent mutation of empty lists
+	if (inputList.size() < 1)
+		return;
+
+	// Pick mutation
+	 int mutation = 0;
+	 if (inputList.size() > 1)
+	 {
+	 	mutation = random_range(1, 5);
+	 } else {
+	 	mutation = random_range(1, 2);
+	 }
+
+	 // Pick random gene(s)
+	 int random1 = random_range(0, inputList.size()-1);
+	 int random2 = random_range(0, inputList.size()-1);
+	 while (inputList.size() > 1 && random1 == random2)
+	 	random2 = random_range(0, inputList.size()-1);
+
+	// Calculate iterators to those genes
+	typename std::list<T>::iterator it1 = inputList.begin(), it2 = inputList.begin();
+	for (int i = 0; i < random1; i++)
+		it1++;
+	for (int i = 0; i < random2; i++)
+		it2++;
+
+
+	// Mutate
+	switch (mutation)
+	{
+		// Deletion
+		case 1:
+		{
+			inputList.erase(it1);
+			break;
+		}
+
+		// Amplification (at current spot)
+		case 2:
+		{
+			int randAmp = random_range(1, inputList.size());
+			for (int i = 0; i < randAmp; i++)
+				inputList.insert(it1, *(it1));
+			break;
+		}
+
+		// Duplication (at random spot)
+		case 3:
+		{
+			inputList.insert(it2, *(it1));
+			break;
+		}
+
+		// Inversion
+		case 4:
+		{
+			swap(*(it1), *(it2));
+			break;
+		}
+
+		// Translocation
+		case 5:
+		{
+			T temp = *it1;
+			inputList.erase(it1);
+			inputList.insert(it2, temp);
+			break;
+		}
+	}
+}
+
 // Include guard
 #endif

@@ -88,7 +88,7 @@ void Parser::debug_queue()
 	std::cout << "* Parser.debug_queue" << std::endl;
 
 	// Loop queue's contents
-	std::cout << "Contents of queue with size " << dataQueue.size() << ":" << std::endl;
+	std::cout << "Contents of queue with size " << std::dec << dataQueue.size() << ":" << std::endl;
 	std::queue<int> dataQueueDup(dataQueue);
 	std::cout << "\t";
 	while (!dataQueueDup.empty())
@@ -105,7 +105,7 @@ void Parser::debug_list()
 	std::cout << "* Parser.debug_list" << std::endl;
 
 	// Process list
-	std::cout << "Contents of list with size " << dataList.size() << ":" << std::endl;
+	std::cout << "Contents of list with size " << std::dec << dataList.size() << ":" << std::endl;
 	std::list<std::list<int> >::iterator it = dataList.begin();
 	while (it != dataList.end())
 	{
@@ -140,12 +140,14 @@ void Parser::toQueue()
 		std::list<int>::iterator it2 = it->begin();
 		while (it2 != it->end())
 			dataQueue.push(*(it2++));
-		dataQueue.push(0);
 		it++;
+
+		// Only add 0 if not at end (can't fix this later on as queue has no pop_back)
+		if (it != dataList.end())
+			dataQueue.push(0);
 	}
 
 	// Ending semantics
-	dataQueue.pop();
 	dataQueue.push(255);
 }
 

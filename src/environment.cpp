@@ -57,6 +57,7 @@ int Environment::fitness(std::list<std::list<int> >& inputList)
 {
 	objParser.setList(inputList);
 	std::queue<int> tempQueue = objParser.getQueue();
+	objParser.debug_queue();
 	return fitness(tempQueue);
 }
 
