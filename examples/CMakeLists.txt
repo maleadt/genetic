@@ -2,7 +2,7 @@ INCLUDE_DIRECTORIES(${EVOLVE_SOURCE_DIR}/src)
 
 ADD_EXECUTABLE(debug debug.cpp)
 TARGET_LINK_LIBRARIES(debug parser)
-TARGET_LINK_LIBRARIES(debug client)
+TARGET_LINK_LIBRARIES(debug population)
 TARGET_LINK_LIBRARIES(debug environment)
 
 

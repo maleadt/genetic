@@ -37,7 +37,6 @@
 #include <queue>
 #include <list>
 #include <vector>
-#include "parser.h"
 #include "generic.h"
 
 
@@ -58,7 +57,6 @@ class Client
 {
 	public:
 		// Construction and destruction
-		Client(std::queue<int>&);
 		Client(std::list<std::vector<int> >&);
 
 		// DNA alteration
@@ -66,15 +64,16 @@ class Client
 		void crossover(Client&);
 
 		// DNA output
-		std::list<std::vector<int> > getList();
-		std::queue<int> getQueue();
+		std::list<std::vector<int> > getDNA();
 
 	private:
-		// Parser object
-		Parser dataParser;
-
 		// DNA
 		std::list<std::vector<int> > dataDNA;
+
+		// Mutation routines
+		void mutate_dna();
+		void mutate_gen();
+		void mutate_codon();
 };
 
 // Include guard

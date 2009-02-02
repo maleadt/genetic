@@ -29,7 +29,7 @@
 //
 
 // Headers
-#include "../src/client.h"
+#include "../src/population.h"
 #include "../src/environment.h"
 #include "../src/parser.h"
 #include <queue>
@@ -43,7 +43,7 @@
 /////////////////
 
 // Class definition
-class EnvDebug : Environment
+class EnvDebug : public Environment
 {
 	public:
 		// Required functons
@@ -88,8 +88,8 @@ int main()
 	// Create an environment
 	EnvDebug tempEnvironment;
 
-	// Create a client
-	Client tempClient(tempDNA);
+	// Create a population with initial DNA
+	Population tempPopulation(&tempEnvironment, tempDNA);
 
 	return 0;
 }

@@ -41,11 +41,6 @@
 //
 
 // Create client with given DNA
-Client::Client(std::queue<int>& inputQueue)
-{
-	dataParser.setQueue(inputQueue);
-	dataDNA = dataParser.getList();
-}
 Client::Client(std::list<std::vector<int> >& inputList)
 {
 	dataDNA = inputList;
@@ -61,6 +56,27 @@ void Client::mutate()
 {
 	// Amount of mutations
 	int tempAmount = random_range(MUTATE_AMOUNT_LOWER, MUTATE_AMOUNT_UPPER);
+
+	// Process all mutations
+	for (int i = 0; i < tempAmount; i++)
+	{
+		// Pick level of mutation
+		int level = random_range(1, 3);
+
+		// Call correct mutation routine
+		switch (level)
+		{
+			case 1:
+				mutate_dna();
+				break;
+			case 2:
+				mutate_gen();
+				break;
+			case 3:
+				mutate_codon();
+				break;
+		}
+	}
 }
 
 // Combine the DNA with another client
@@ -73,13 +89,7 @@ void Client::crossover(Client&)
 // DNA output
 //
 
-std::list<std::vector<int> > Client::getList()
+std::list<std::vector<int> > Client::getDNA()
 {
 	return dataDNA;
-}
-
-std::queue<int> Client::getQueue()
-{
-	dataParser.setList(dataDNA);
-	return dataParser.getQueue();
 }

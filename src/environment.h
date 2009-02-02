@@ -56,7 +56,7 @@ class Environment
 
 	private:
 		// Parser
-		Parser dataParser;
+		Parser objParser;
 };
 
 
