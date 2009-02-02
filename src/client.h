@@ -38,11 +38,16 @@
 #include <list>
 #include <vector>
 #include "parser.h"
+#include "generic.h"
 
 
 //
 // Constants
 //
+
+// Mutation: amount of mutations
+const int MUTATE_AMOUNT_LOWER = 1;
+const int MUTATE_AMOUNT_UPPER = 5;
 
 
 //////////////////////
@@ -56,12 +61,20 @@ class Client
 		Client(std::queue<int>&);
 		Client(std::list<std::vector<int> >&);
 
+		// DNA alteration
+		void mutate();
+		void crossover(Client&);
+
+		// DNA output
+		std::list<std::vector<int> > getList();
+		std::queue<int> getQueue();
+
 	private:
 		// Parser object
 		Parser dataParser;
 
 		// DNA
-		std::list<std::vector<int> > dataList;
+		std::list<std::vector<int> > dataDNA;
 };
 
 // Include guard

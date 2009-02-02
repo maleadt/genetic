@@ -1,6 +1,6 @@
 /*
- * client.cpp
- * Evolve - Evolutionary client
+ * generic.h
+ * Evolve - generic functions.
  *
  * Copyright (c) 2009 Tim Besard <tim.besard@gmail.com>
  * All rights reserved.
@@ -28,58 +28,38 @@
 // Essential stuff
 //
 
+// Include guard
+#ifndef __GENERIC
+#define __GENERIC
+
+
 // Headers
-#include "client.h"
+#include <cstdlib>
+#include <ctime>
+#include <sstream>
+#include <string>
+#include <iostream>
 
 
-////////////////////
-// CLASS ROUTINES //
-////////////////////
+//////////////
+// ROUTINES //
+//////////////
 
-//
-// Construction and destruction
-//
+// Swap two items through references
+template <class X> void swap(X &a, X &b);
 
-// Create client with given DNA
-Client::Client(std::queue<int>& inputQueue)
+// Generate a number from lower up to (and with) upper
+int random_range(int lowest_number, int highest_number);
+
+// Convert several types to a string
+template <typename X> std::string stringify(X input)
 {
-	dataParser.setQueue(inputQueue);
-	dataDNA = dataParser.getList();
-}
-Client::Client(std::list<std::vector<int> >& inputList)
-{
-	dataDNA = inputList;
-}
-
-
-//
-// DNA alteration
-//
-
-// Mutate the DNA
-void Client::mutate()
-{
-	// Amount of mutations
-	int tempAmount = random_range(MUTATE_AMOUNT_LOWER, MUTATE_AMOUNT_UPPER);
+	std::string output;
+	std::stringstream convert;
+	convert << input;
+	output = convert.str();
+	return output;
 }
 
-// Combine the DNA with another client
-void Client::crossover(Client&)
-{
-}
-
-
-//
-// DNA output
-//
-
-std::list<std::vector<int> > Client::getList()
-{
-	return dataDNA;
-}
-
-std::queue<int> Client::getQueue()
-{
-	dataParser.setList(dataDNA);
-	return dataParser.getQueue();
-}
+// Include guard
+#endif
