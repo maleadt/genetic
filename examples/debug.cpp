@@ -32,6 +32,7 @@
 #include "../src/client.h"
 #include "../src/environment.h"
 #include "../src/parser.h"
+#include <queue>
 
 //
 // Constants
@@ -41,6 +42,28 @@
 // ENVIRONMENT //
 /////////////////
 
+// Class definition
+class EnvDebug : Environment
+{
+	public:
+		// Required functons
+		int fitness(std::list<std::vector<int> >&);
+		int alphabet();
+};
+
+// Alphabet (maximal amount of instructions)
+int EnvDebug::alphabet()
+{
+	return 0x254;	// Pick maximum as of debugging purposes
+}
+
+// Fitness function
+int EnvDebug::fitness(std::list<std::vector<int> >& inputList)
+{
+	return 1;
+}
+
+
 
 //////////
 // MAIN //
@@ -48,6 +71,25 @@
 
 int main()
 {
+	// Generate a DNA string
+	std::queue<int> tempDNA;
+	tempDNA.push(0x255);
+	tempDNA.push(0x123);
+	tempDNA.push(0x64);
+	tempDNA.push(0x0);
+	tempDNA.push(0x0);
+	tempDNA.push(0x48);
+	tempDNA.push(0x91);
+	tempDNA.push(0x31);
+	tempDNA.push(0x0);
+	tempDNA.push(0x49);
+	tempDNA.push(0x255);
+
+	// Create an environment
+	EnvDebug tempEnvironment;
+
+	// Create a client
+	Client tempClient(tempDNA);
 
 	return 0;
 }

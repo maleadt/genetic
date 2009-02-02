@@ -37,5 +37,25 @@
 ////////////////////
 
 //
-// Construction and destruction
+// Required routines
 //
+
+// WARNING: obviousely at least one of these fitness functions
+//          should be derived, as this would otherwise cause
+//          a never ending loop!
+
+// Convert the DNA and call the other fitness function
+int Environment::fitness(std::queue<int>& inputQueue)
+{
+	dataParser.setQueue(inputQueue);
+	std::list<std::vector<int> > tempList = dataParser.getList();
+	return fitness(tempList);
+}
+
+// Convert the DNA and call the other fitness function
+int Environment::fitness(std::list<std::vector<int> >& inputList)
+{
+	dataParser.setList(inputList);
+	std::queue<int> tempQueue = dataParser.getQueue();
+	return fitness(tempQueue);
+}

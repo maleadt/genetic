@@ -51,10 +51,9 @@
 class Parser
 {
 	public:
-		// Construction and destruction
-		Parser(std::list<std::vector<int> >&);
-		Parser(std::queue<int>&);
-		~Parser();
+		// Input routines
+		void setQueue(std::queue<int>&);
+		void setList(std::list<std::vector<int> >&);
 
 		// Output routines
 		std::queue<int> getQueue();

@@ -38,11 +38,11 @@
 ////////////////////
 
 //
-// Construction and destruction
+// Input routines
 //
 
 // Construct parser object with a given string
-Parser::Parser(std::queue<int>& inputQueue)
+void Parser::setQueue(std::queue<int>& inputQueue)
 {
 	// Save string
 	dataQueue = inputQueue;
@@ -52,18 +52,13 @@ Parser::Parser(std::queue<int>& inputQueue)
 }
 
 // Construct parser object with a given list
-Parser::Parser(std::list<std::vector<int> >& inputList)
+void Parser::setList(std::list<std::vector<int> >& inputList)
 {
 	// Save list
 	dataList = inputList;
 
 	// Convert
 	toQueue();
-}
-
-// Destructor
-Parser::~Parser()
-{
 }
 
 

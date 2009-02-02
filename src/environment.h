@@ -49,13 +49,14 @@
 class Environment
 {
 	public:
-		// Construction & destruction
-		Environment();
-		~Environment();
-
 		// Required functions
-		int fitness();
+		int fitness(std::queue<int>&);
+		int fitness(std::list<std::vector<int> >&);
 		int alphabet();
+
+	private:
+		// Parser
+		Parser dataParser;
 };
 
 

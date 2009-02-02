@@ -39,3 +39,14 @@
 //
 // Construction and destruction
 //
+
+// Create client with given DNA
+Client::Client(std::queue<int>& inputQueue)
+{
+	dataParser.setQueue(inputQueue);
+	dataList = dataParser.getList();
+}
+Client::Client(std::list<std::vector<int> >& inputList)
+{
+	dataList = inputList;
+}

@@ -34,6 +34,10 @@
 
 // Headers
 #include <iostream>
+#include <queue>
+#include <list>
+#include <vector>
+#include "parser.h"
 
 
 //
@@ -45,6 +49,20 @@
 // CLASS DEFINITION //
 //////////////////////
 
+class Client
+{
+	public:
+		// Construction and destruction
+		Client(std::queue<int>&);
+		Client(std::list<std::vector<int> >&);
+
+	private:
+		// Parser object
+		Parser dataParser;
+
+		// DNA
+		std::list<std::vector<int> > dataList;
+};
 
 // Include guard
 #endif
