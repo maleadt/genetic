@@ -61,6 +61,7 @@ class Client
 		// DNA alteration
 		void mutate();
 		void crossover(Client&);
+		void clean();
 
 		// DNA output
 		std::list<std::list<int> > getDNA();
@@ -121,7 +122,7 @@ void mutate_list(std::list<T>& inputList)
 		// Amplification (at current spot)
 		case 2:
 		{
-			int randAmp = random_range(1, inputList.size());
+			int randAmp = random_range(1, 5);
 			for (int i = 0; i < randAmp; i++)
 				inputList.insert(it1, *(it1));
 			break;

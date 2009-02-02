@@ -84,6 +84,22 @@ void Client::crossover(Client&)
 {
 }
 
+// Clean the DNA
+void Client::clean()
+{
+	// Pick random gene
+	int random = random_range(0, dataDNA.size()-1);
+	std::list<std::list<int> >::iterator it = dataDNA.begin();
+	while (it != dataDNA.end())
+	{
+		if (it->empty())
+		{
+			it = dataDNA.erase(it);
+		}
+		++it;
+	}
+}
+
 
 //
 // DNA output
@@ -106,6 +122,10 @@ void Client::mutate_dna()
 
 void Client::mutate_gen()
 {
+	// Avoid altering empty DNA
+	if (dataDNA.empty())
+		return;
+
 	// Pick random gene
 	int random = random_range(0, dataDNA.size()-1);
 	std::list<std::list<int> >::iterator it = dataDNA.begin();
@@ -117,5 +137,27 @@ void Client::mutate_gen()
 
 void Client::mutate_codon()
 {
+	// Avoid altering empty DNA
+	if (dataDNA.empty())
+		return;
+
+	// Pick random gene
+	int random = random_range(0, dataDNA.size()-1);
+	std::list<std::list<int> >::iterator it = dataDNA.begin();
+	for (int i = 0; i < random; i++)
+		it++;
+
+	// Avoid altering empty gene
+	if (it->empty())
+		return;
+
+	// Pick random codon
+	random = random_range(0, it->size()-1);
+	std::list<int>::iterator it2 = it->begin();
+	for (int i = 0; i < random; i++)
+		it2++;
+
+	// Point mutate
+	*it2 = random_range(1, dataAlphabet);
 }
 

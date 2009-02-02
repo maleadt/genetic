@@ -59,7 +59,6 @@ class EnvDebug : public Environment
 // Constructor
 EnvDebug::EnvDebug()
 {
-	std::cout << "Set counter." << std::endl;
 	counter = 0;
 }
 
@@ -124,7 +123,7 @@ int main()
 	// Simulate
 	try
 	{
-		tempPopulation.evolve_single_straight(1);
+		tempPopulation.evolve_single_straight(100);
 		tempDNA = tempPopulation.getDNAQueue();
 		debug_queue(tempDNA);
 	}
