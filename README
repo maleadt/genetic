@@ -28,7 +28,7 @@ This application consists out of three sets of files:
 
 The client accepts DNA in two different forms:
 	- string
-	    a string containing hexadecimal representation of bytes
+	    a queue containing int
 	- container
 	    a list of vectors of int's, in which the vector<int> represent one
 	    gene, and the list<vector> is the encapsulating DNA code
@@ -39,6 +39,10 @@ hugely. I.e., an environment in which a creature moves through a world, could in
 the first byte of a gene to be the instruction (move, shoot, jump), and the two following bytes
 to be the coördinates. This interpretation does not change the way the client mutates
 the bytes.
+
+When using the queue representation, there are some special possibilities:
+	255: marks the DNA bounds, every queue should start and end with 255
+	0: sperates genes
 
 
 4) Description of the environment

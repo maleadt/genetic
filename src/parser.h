@@ -34,6 +34,9 @@
 
 // Headers
 #include <iostream>
+#include <vector>
+#include <queue>
+#include <list>
 
 
 //
@@ -44,6 +47,33 @@
 //////////////////////
 // CLASS DEFINITION //
 //////////////////////
+
+class Parser
+{
+	public:
+		// Construction and destruction
+		Parser(std::list<std::vector<int> >&);
+		Parser(std::queue<int>&);
+		~Parser();
+
+		// Output routines
+		std::queue<int> getQueue();
+		std::list<std::vector<int> > getList();
+
+		// Debugging routines
+		void debug_queue();
+		void debug_list();
+
+	private:
+		// Data
+		std::queue<int> dataQueue;
+		std::list<std::vector<int> > dataList;
+
+		// Conversion routines
+		void toQueue();
+		void toList();
+};
+
 
 
 // Include guard

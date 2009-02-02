@@ -34,6 +34,7 @@
 
 // Headers
 #include <iostream>
+#include "parser.h"
 
 
 //
@@ -44,6 +45,18 @@
 //////////////////////
 // CLASS DEFINITION //
 //////////////////////
+
+class Environment
+{
+	public:
+		// Construction & destruction
+		Environment();
+		~Environment();
+
+		// Required functions
+		int fitness();
+		int alphabet();
+};
 
 
 // Include guard
