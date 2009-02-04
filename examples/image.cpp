@@ -22,7 +22,7 @@
 
 /*
 DNA format specification
-	- 3 bits describing the colour (R, G and B)
+	- 4 bits describing the colour (R, G, B, and alpha)
 	- All following pairs of 2 bytes describe a point, in which
 	  a coordinate = byte/254 * image_width or image_height
 
@@ -62,8 +62,8 @@ on later mutation) could be better.
 const int LIMIT_POLYGONS = 50;
 const int LIMIT_POLYGON_POINTS = 5;
 
-// wxWidgets settings
-const int WXWIDGETS_DEPTH = 32;
+// Image settings
+const int IMAGE_DEPTH = 24;	// Set to 32 (if supported) to use transparency
 
 /////////////////
 // ENVIRONMENT //
@@ -79,6 +79,7 @@ class EnvImage : public Environment
 		// Required functons
 		double fitness(std::list<std::list<int> >& inputList);
 		int alphabet();
+		void update(std::list<std::list<int> >& inputList);
 
 		// Image functions
 		void setImage(wxImage& inputImage);
@@ -99,20 +100,9 @@ class EnvImage : public Environment
 // Required functons
 //
 
-// Alphabet (maximal amount of instructions)
-int EnvImage::alphabet()
-{
-	return 254;
-}
-
 // Fitness function
 double EnvImage::fitness(std::list<std::list<int> >& inputList)
 {
-	// DEBUG
-	Parser tempParser(inputList);
-	std::cout << std::endl << std::endl;
-	tempParser.debug_queue();
-
 	// Create a DC for the generated image
 	wxMemoryDC tempDC;
 	wxBitmap tempBitmap(width, height);
@@ -128,17 +118,43 @@ double EnvImage::fitness(std::list<std::list<int> >& inputList)
 	// Convert DC to image
 	wxImage tempImage = tempBitmap.ConvertToImage();
 
-	// DEBUG: save the image
-	wxString mystring;
-	mystring << counter++;
-	tempImage.SaveFile(_T("mona-lisa-") + mystring + _T(".png"), wxBITMAP_TYPE_PNG);
-
 	// Compare them
 	double resemblance = compare(&dataImage, &tempImage);
 
 	// Finish
 	tempDC.SelectObject(wxNullBitmap);
 	return resemblance;
+}
+
+// Alphabet (maximal amount of instructions)
+int EnvImage::alphabet()
+{
+	return 254;
+}
+
+// Update call
+void EnvImage::update(std::list<std::list<int> >& inputList)
+{
+	// Create a DC for the generated image
+	wxMemoryDC tempDC;
+	wxBitmap tempBitmap(width, height, IMAGE_DEPTH);
+	tempDC.SelectObject(tempBitmap);
+
+	// Draw white background
+	wxColour tempWhite(255, 255, 255, 255);
+	tempDC.SetBrush(tempWhite);
+	tempDC.DrawRectangle(0, 0, width, height);
+
+	// Draw the DNA onto the DC
+	draw(&tempDC, inputList);
+
+	// Convert DC to image
+	wxImage tempImage = tempBitmap.ConvertToImage();
+
+	// Save the current image
+	wxString mystring;
+	mystring << counter++;
+	tempImage.SaveFile(_T("evolve-") + mystring + _T(".png"), wxBITMAP_TYPE_PNG);
 }
 
 
@@ -159,7 +175,7 @@ void EnvImage::setImage(wxImage& inputImage)
 bool EnvImage::valid_limits(std::list<std::list<int> >& inputList)
 {
 	// Check amount of polygons
-	if (inputList.size() > LIMIT_POLYGONS)
+	if (inputList.size() < 1 || inputList.size() > LIMIT_POLYGONS)
 		return false;
 
 	// Check points per polygon
@@ -168,12 +184,12 @@ bool EnvImage::valid_limits(std::list<std::list<int> >& inputList)
 	{
 		int size = (it++)->size();
 
-		// 9 bytes at minimum
-		if ((size-3)/2 > LIMIT_POLYGON_POINTS || size < 9)
+		// 10 bytes at minimum
+		if ((size-4)/2 > LIMIT_POLYGON_POINTS || size < 10)
 			return false;
 
-		// Should be odd
-		if (size%2 != 1)
+		// Should be even
+		if (size%2 != 0)
 			return false;
 	}
 
@@ -186,20 +202,17 @@ void EnvImage::draw(wxMemoryDC* inputDC, std::list<std::list<int> >& inputList)
 {
 
 	// Loop all genes
-	std::cout << "DRAWING" << std::endl;
 	std::list<std::list<int> >::iterator it = inputList.begin();
 	while (it != inputList.end())
 	{
 		std::list<int>::iterator it2 = it->begin();
 
 		// Get colour code
-		int r = *(it2++), g = *(it2++), b = *(it2++);
-		wxColour colour(r, g, b);
-		std::cout << "Colour: " << r << " - " << g << " - " << b << std::endl;
+		int r = *(it2++), g = *(it2++), b = *(it2++), a = *(it2++);
+		wxColour colour(r, g, b, a);
 
 		// Load coördinates
-		wxPoint* points = new wxPoint[(it->size()-3) / 2];
-		std::cout << "Got " << (it->size()-3) / 2 << " points. " << std::endl;
+		wxPoint* points = new wxPoint[(it->size()-4) / 2];
 		int i = 0;
 		while (it2 != it->end())
 		{
@@ -207,20 +220,18 @@ void EnvImage::draw(wxMemoryDC* inputDC, std::list<std::list<int> >& inputList)
 			int x = *(it2++)-1, y = *(it2++)-1;
 			points[i].x = width*x/253.0;
 			points[i].y = height*y/253.0;
-			std::cout << "Point at " << points[i].x << " x " << points[i].y << std::endl;
 			i++;
 		}
 
 		// Draw
 		inputDC->SetPen(wxPen(colour, 1));
-		inputDC->SetBrush(wxBrush(colour, wxSOLID));
-		inputDC->DrawPolygon((it->size()-3) / 2, points);
+		inputDC->SetBrush(wxBrush(colour));
+		inputDC->DrawPolygon((it->size()-4) / 2, points);
 		++it;
 
 		// Clean up
 		delete[] points;
 	}
-	std::cout << "DONE" << std::endl;
 }
 
 // Compare two images
@@ -239,11 +250,21 @@ double EnvImage::compare(wxImage* inputImage1, wxImage* inputImage2)
 	unsigned char* tempData2 = inputImage2->GetData();
 
 	// Compare them
-	double difference = memcmp(tempData1, tempData2, width*height*3);
+	long double difference = 0;
+	for (int i = 0; i < width*height; i++)
+	{
+		// RGB (GetData always returns RGB, without Alpha)
+		int dr = *(tempData1++) - *(tempData2++);
+		int dg = *(tempData1++) - *(tempData2++);
+		int db = *(tempData1++) - *(tempData2++);
+
+		// Calculate difference
+		difference += sqrt(abs(dr) + abs(dg) + abs(db) + 1);	// +1, in case of perfect resemblance the
+																// difference will be width*height
+	}
 
 	// Get resemblance
-	double resemblance = 1 / difference;
-	std::cout << "Returning resemblace factor of " << (int)resemblance << std::endl;
+	double resemblance = width*height / difference;
 	return resemblance;
 }
 
@@ -327,7 +348,6 @@ bool Image::OnInit()
 		return false;
 	}
 	wxBitmap inputBitmap(inputImage);
-	inputBitmap.SetDepth(WXWIDGETS_DEPTH);
 
 	// Convert the bitmap to a DC
 	wxMemoryDC inputDC;
@@ -358,9 +378,10 @@ bool Image::OnInit()
 	// Initial DNA (black window)
 	std::queue<int> tempDNA;
 	tempDNA.push(255);	// Start of DNA
-	tempDNA.push(1);	// Black pen (RGB 1, 1, 1)
-	tempDNA.push(1);
-	tempDNA.push(1);
+	tempDNA.push(254);	// Semi transparent black brush (RGBa = 254 254 254 128)
+	tempDNA.push(254);
+	tempDNA.push(254);
+	tempDNA.push(128);
 	tempDNA.push(1);	// Point one: (1, 1)
 	tempDNA.push(1);
 	tempDNA.push(254);	// Point two: (254, 1)
@@ -383,7 +404,7 @@ bool Image::OnInit()
 	//
 
 	// Single straight evolution
-	tempPopulation.evolve_single_straight(1);
+	tempPopulation.evolve_single_straight(100000);
 
 	return false;
 }

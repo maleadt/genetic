@@ -69,3 +69,8 @@ int Environment::alphabet()
 {
 	return 0;
 }
+
+// Update call
+void Environment::update(std::list<std::list<int> >& inputList)
+{
+}

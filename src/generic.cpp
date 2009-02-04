@@ -40,14 +40,6 @@ bool GENERIC_SRAND = false;
 // ROUTINES //
 //////////////
 
-// Swap two items through references
-template <class X> void swap(X &a, X &b)
-{
-	X temp = a;
-	a = b;
-	b = temp;
-}
-
 // Generate a number from lower up to (and with) upper
 int random_range(int lowest_number, int highest_number)
 {

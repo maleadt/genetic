@@ -79,13 +79,10 @@ class Client
 		void mutate_codon();
 };
 
+// Mutate a list structurally
 template <class T>
 void mutate_list(std::list<T>& inputList)
 {
-	// Prevent mutation of empty lists
-	if (inputList.size() < 1)
-		return;
-
 	// Pick mutation
 	 int mutation = 0;
 	 if (inputList.size() > 1)
@@ -150,6 +147,8 @@ void mutate_list(std::list<T>& inputList)
 			inputList.insert(it2, temp);
 			break;
 		}
+
+		// Merge
 	}
 }
 
