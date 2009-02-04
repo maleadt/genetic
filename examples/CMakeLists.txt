@@ -28,7 +28,6 @@ ADD_DEFINITIONS(${wxWidgets_DEFINITIONS})
 ADD_EXECUTABLE(image image.cpp)
 
 # Link executable
-TARGET_LINK_LIBRARIES(image parser)
 TARGET_LINK_LIBRARIES(image population)
 TARGET_LINK_LIBRARIES(image environment)
 TARGET_LINK_LIBRARIES(image ${wxWidgets_LIBRARIES})

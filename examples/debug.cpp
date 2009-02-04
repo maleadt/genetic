@@ -49,7 +49,7 @@ class EnvDebug : public Environment
 		EnvDebug();
 
 		// Required functons
-		int fitness(std::list<std::list<int> >&);
+		double fitness(std::list<std::list<int> >&);
 		int alphabet();
 
 	private:
@@ -69,7 +69,7 @@ int EnvDebug::alphabet()
 }
 
 // Fitness function
-int EnvDebug::fitness(std::list<std::list<int> >& inputList)
+double EnvDebug::fitness(std::list<std::list<int> >& inputList)
 {
 	return counter++;
 }

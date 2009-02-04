@@ -54,8 +54,6 @@ on later mutation) could be better.
 #include <wx/wx.h>
 #endif
 
-#include "../src/parser.h"
-
 //
 // Constants
 //
@@ -79,19 +77,21 @@ class EnvImage : public Environment
 {
 	public:
 		// Required functons
-		int fitness(std::list<std::list<int> >& inputList);
+		double fitness(std::list<std::list<int> >& inputList);
 		int alphabet();
 
 		// Image functions
 		void setImage(wxImage& inputImage);
 		bool valid_limits(std::list<std::list<int> >& inputList);
-		void draw(wxMemoryDC& inputDC, std::list<std::list<int> >& inputList);
-		int compare(wxMemoryDC* inputDC1, wxMemoryDC* inputD2, int width, int height);
+		void draw(wxMemoryDC* inputDC, std::list<std::list<int> >& inputList);
+		double compare(wxImage* inputImage1, wxImage* inputImage2);
 
 	private:
 		wxMemoryDC* dcInput;
 		wxImage dataImage;
 		int width, height;
+
+		int counter;
 };
 
 
@@ -106,7 +106,7 @@ int EnvImage::alphabet()
 }
 
 // Fitness function
-int EnvImage::fitness(std::list<std::list<int> >& inputList)
+double EnvImage::fitness(std::list<std::list<int> >& inputList)
 {
 	// DEBUG
 	Parser tempParser(inputList);
@@ -114,8 +114,8 @@ int EnvImage::fitness(std::list<std::list<int> >& inputList)
 	tempParser.debug_queue();
 
 	// Create a DC for the generated image
-	wxBitmap tempBitmap(width, height, WXWIDGETS_DEPTH);
 	wxMemoryDC tempDC;
+	wxBitmap tempBitmap(width, height);
 	tempDC.SelectObject(tempBitmap);
 
 	// Check the DNA's limit's
@@ -123,17 +123,22 @@ int EnvImage::fitness(std::list<std::list<int> >& inputList)
 		return -1;
 
 	// Draw the DNA onto the DC
-	draw(tempDC, inputList);
+	draw(&tempDC, inputList);
 
 	// Convert DC to image
 	wxImage tempImage = tempBitmap.ConvertToImage();
 
-	// Compare them
-	//int vfitness = compare(dcInput, &dc, width, height);
-	int vfitness = 1.0/memcmp(dataImage.GetData(), tempImage.GetData(), width*height*4);
-	std::cout << "Fitness: " << vfitness << std::endl;;
-	return vfitness;
+	// DEBUG: save the image
+	wxString mystring;
+	mystring << counter++;
+	tempImage.SaveFile(_T("mona-lisa-") + mystring + _T(".png"), wxBITMAP_TYPE_PNG);
 
+	// Compare them
+	double resemblance = compare(&dataImage, &tempImage);
+
+	// Finish
+	tempDC.SelectObject(wxNullBitmap);
+	return resemblance;
 }
 
 
@@ -147,6 +152,7 @@ void EnvImage::setImage(wxImage& inputImage)
 	dataImage = inputImage;
 	height = dataImage.GetHeight();
 	width = dataImage.GetWidth();
+	counter = 0;
 }
 
 // Validity function
@@ -176,14 +182,11 @@ bool EnvImage::valid_limits(std::list<std::list<int> >& inputList)
 }
 
 // Render the DNA code onto a draw container
-void EnvImage::draw(wxMemoryDC& inputDC, std::list<std::list<int> >& inputList)
+void EnvImage::draw(wxMemoryDC* inputDC, std::list<std::list<int> >& inputList)
 {
-	//DEBUG
-	int x, y;
-	inputDC.GetSize(&x, &y);
-	std::cout << "Given DC is sized " << x << " x " << y << ", saved values are " << width << " x " << height << std::endl;
 
 	// Loop all genes
+	std::cout << "DRAWING" << std::endl;
 	std::list<std::list<int> >::iterator it = inputList.begin();
 	while (it != inputList.end())
 	{
@@ -200,7 +203,7 @@ void EnvImage::draw(wxMemoryDC& inputDC, std::list<std::list<int> >& inputList)
 		int i = 0;
 		while (it2 != it->end())
 		{
-			// Points vary between 1 and 254, so let 1 be the lower bounw and 254 the upper one
+			// Points vary between 1 and 254, so let 1 be the lower bound and 254 the upper one
 			int x = *(it2++)-1, y = *(it2++)-1;
 			points[i].x = width*x/253.0;
 			points[i].y = height*y/253.0;
@@ -209,52 +212,39 @@ void EnvImage::draw(wxMemoryDC& inputDC, std::list<std::list<int> >& inputList)
 		}
 
 		// Draw
-		inputDC.SetPen(wxPen(colour, 1));
-		inputDC.DrawPolygon((it->size()-3) / 2, points);
+		inputDC->SetPen(wxPen(colour, 1));
+		inputDC->SetBrush(wxBrush(colour, wxSOLID));
+		inputDC->DrawPolygon((it->size()-3) / 2, points);
 		++it;
+
+		// Clean up
+		delete[] points;
 	}
+	std::cout << "DONE" << std::endl;
 }
 
-// Compare two DC's
-int EnvImage::compare(wxMemoryDC* inputDC1, wxMemoryDC* inputDC2, int width, int height)
+// Compare two images
+double EnvImage::compare(wxImage* inputImage1, wxImage* inputImage2)
 {
-	// Compare sizes
-	int x, y;
-	inputDC1->GetSize(&x, &y);
-	if (width != x || height != y)
+	// Get and verify size
+	int width = inputImage1->GetWidth(), height = inputImage1->GetHeight();
+	if (width != inputImage2->GetWidth() || height != inputImage2->GetHeight())
 	{
-		std::cout << "WARN: given width/height doesn't match first input DC";
-	}
-	inputDC2->GetSize(&x, &y);
-	if (width != x || height != y)
-	{
-		std::cout << "WARN: given width/height doesn't match second input DC";
+		std::cout << "WARNING: cannot calculate resemblance between two different-sized images" << std::endl;
+		return 0;
 	}
 
-	// Loop all pixels and calculate resemblance
-	double resemblance = 0;
-	for (x = 0; x < width; x++)
-	{
-		std::cout << x << std::endl;
-		for (y = 0; y < height; y++)
-		{
-			// Get colours
-			wxColour colourDC1, colourDC2;
-			inputDC1->GetPixel(x, y, &colourDC1);
-			inputDC2->GetPixel(x, y, &colourDC2);
+	// Get the raw data
+	unsigned char* tempData1 = inputImage1->GetData();
+	unsigned char* tempData2 = inputImage2->GetData();
 
-			// Get RGV value of pixel 1
-			int r1 = colourDC1.Red(), g1 = colourDC1.Green(), b1 = colourDC2.Blue();
-			int r2 = colourDC2.Red(), g2 = colourDC2.Green(), b2 = colourDC2.Blue();
+	// Compare them
+	double difference = memcmp(tempData1, tempData2, width*height*3);
 
-			// Calculate distance
-			double distance = (r2-r1)*(r2-r1) + (g2-g1)*(g2-g1) + (b2-b1)*(b2-b1);
-			resemblance += 1 / sqrt(distance);
-		}
-	}
-
-	// Return the resemblance
-	return (int)resemblance;
+	// Get resemblance
+	double resemblance = 1 / difference;
+	std::cout << "Returning resemblace factor of " << (int)resemblance << std::endl;
+	return resemblance;
 }
 
 
@@ -368,9 +358,9 @@ bool Image::OnInit()
 	// Initial DNA (black window)
 	std::queue<int> tempDNA;
 	tempDNA.push(255);	// Start of DNA
-	tempDNA.push(254);	// Black pen (RGB 254, 254, 254)
-	tempDNA.push(254);
-	tempDNA.push(254);
+	tempDNA.push(1);	// Black pen (RGB 1, 1, 1)
+	tempDNA.push(1);
+	tempDNA.push(1);
 	tempDNA.push(1);	// Point one: (1, 1)
 	tempDNA.push(1);
 	tempDNA.push(254);	// Point two: (254, 1)
@@ -386,27 +376,6 @@ bool Image::OnInit()
 
 	// Message
 	std::cout << "NOTE: population created" << std::endl;
-
-	// DEBUG
-	try
-	{
-		wxBitmap bitmap(inputBitmap.GetWidth(), inputBitmap.GetHeight(), WXWIDGETS_DEPTH);
-		wxMemoryDC dc;
-		dc.SelectObject(bitmap);
-		std::list<std::list<int> > tempDNAList = tempPopulation.getDNAList();
-		tempEnvironment.draw(dc, tempDNAList);
-		wxString outputFile = file.GetName() + _T("-evolved.png");
-		bitmap.SaveFile(outputFile, wxBITMAP_TYPE_PNG);
-		std::cout << "saved" << std::endl;
-	}
-	catch (std::string error)
-	{
-		std::cout << "ERROR: " << error << std::endl;
-	}
-	catch (...)
-	{
-		std::cout << "ERROR: unknown error" << std::endl;
-	}
 
 
 	//

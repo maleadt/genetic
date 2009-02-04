@@ -48,18 +48,18 @@ WARNING:
 */
 
 // Fitness functions
-int Environment::fitness(Parser inputParser)
+double Environment::fitness(Parser inputParser)
 {
 	std::queue<int> tempQueue = inputParser.getQueue();
 	std::list<std::list<int> > tempList = inputParser.getList();
 
 	return fitness(tempQueue) + fitness(tempList);
 }
-int Environment::fitness(std::queue<int>& inputQueue)
+double Environment::fitness(std::queue<int>& inputQueue)
 {
 	return 0;
 }
-int Environment::fitness(std::list<std::list<int> >& inputList)
+double Environment::fitness(std::list<std::list<int> >& inputList)
 {
 	return 0;
 }
