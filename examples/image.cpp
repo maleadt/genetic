@@ -49,6 +49,7 @@ on later mutation) could be better.
 #include <iostream>
 #include <wx/filename.h>
 #include <wx/cmdline.h>
+#include <wx/sizer.h>
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
@@ -65,14 +66,41 @@ const int LIMIT_POLYGON_POINTS = 5;
 // Image settings
 const int IMAGE_DEPTH = 24;	// Set to 32 (if supported) to use transparency
 
-/////////////////
-// ENVIRONMENT //
-/////////////////
 
 //
-// Class definition
+// Class definitions
 //
 
+// Forward declarations
+class EnvImage;
+class Image;
+
+// Application
+class Image : public wxApp
+{
+	public:
+		// Elements
+		wxFrame* frame;
+		wxPanel* drawPane;
+
+	private:
+		// Initialisation
+		virtual bool OnInit();
+
+		// Command-line parser
+		virtual void OnInitCmdLine(wxCmdLineParser& parser);
+		virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
+
+		// Input filename
+		wxFileName dataFile;
+
+		// Evolutionary data
+		EnvImage* dataEnvironment;
+		Population* dataPopulation;
+		wxImage* dataImage;
+};
+
+// Environment
 class EnvImage : public Environment
 {
 	public:
@@ -82,19 +110,25 @@ class EnvImage : public Environment
 		void update(std::list<std::list<int> >& inputList);
 
 		// Image functions
-		void setImage(wxImage& inputImage);
+		void setImage(wxImage* inputImage);
 		bool valid_limits(std::list<std::list<int> >& inputList);
-		void draw(wxMemoryDC* inputDC, std::list<std::list<int> >& inputList);
+		void draw(wxDC* inputDC, std::list<std::list<int> >& inputList);
 		double compare(wxImage* inputImage1, wxImage* inputImage2);
+		void setGUI(Image*);
 
 	private:
-		wxMemoryDC* dcInput;
-		wxImage dataImage;
-		int width, height;
+		Image* dataGUI;
+		wxImage* dataImage;
 
 		int counter;
 };
 
+
+
+
+/////////////////
+// ENVIRONMENT //
+/////////////////
 
 //
 // Required functons
@@ -105,7 +139,7 @@ double EnvImage::fitness(std::list<std::list<int> >& inputList)
 {
 	// Create a DC for the generated image
 	wxMemoryDC tempDC;
-	wxBitmap tempBitmap(width, height);
+	wxBitmap tempBitmap(dataImage->GetWidth(), dataImage->GetHeight());
 	tempDC.SelectObject(tempBitmap);
 
 	// Check the DNA's limit's
@@ -119,7 +153,7 @@ double EnvImage::fitness(std::list<std::list<int> >& inputList)
 	wxImage tempImage = tempBitmap.ConvertToImage();
 
 	// Compare them
-	double resemblance = compare(&dataImage, &tempImage);
+	double resemblance = compare(dataImage, &tempImage);
 
 	// Finish
 	tempDC.SelectObject(wxNullBitmap);
@@ -135,26 +169,17 @@ int EnvImage::alphabet()
 // Update call
 void EnvImage::update(std::list<std::list<int> >& inputList)
 {
-	// Create a DC for the generated image
-	wxMemoryDC tempDC;
-	wxBitmap tempBitmap(width, height, IMAGE_DEPTH);
-	tempDC.SelectObject(tempBitmap);
-
 	// Draw white background
+	wxClientDC* tempDC = new wxClientDC(dataGUI->drawPane);
 	wxColour tempWhite(255, 255, 255, 255);
-	tempDC.SetBrush(tempWhite);
-	tempDC.DrawRectangle(0, 0, width, height);
+	tempDC->SetBrush(tempWhite);
+	tempDC->Clear();
 
 	// Draw the DNA onto the DC
-	draw(&tempDC, inputList);
+	draw(tempDC, inputList);
 
-	// Convert DC to image
-	wxImage tempImage = tempBitmap.ConvertToImage();
-
-	// Save the current image
-	wxString mystring;
-	mystring << counter++;
-	tempImage.SaveFile(_T("evolve-") + mystring + _T(".png"), wxBITMAP_TYPE_PNG);
+	// Clean
+	delete tempDC;
 }
 
 
@@ -163,11 +188,9 @@ void EnvImage::update(std::list<std::list<int> >& inputList)
 //
 
 // Set input image
-void EnvImage::setImage(wxImage& inputImage)
+void EnvImage::setImage(wxImage* inputImage)
 {
 	dataImage = inputImage;
-	height = dataImage.GetHeight();
-	width = dataImage.GetWidth();
 	counter = 0;
 }
 
@@ -198,7 +221,7 @@ bool EnvImage::valid_limits(std::list<std::list<int> >& inputList)
 }
 
 // Render the DNA code onto a draw container
-void EnvImage::draw(wxMemoryDC* inputDC, std::list<std::list<int> >& inputList)
+void EnvImage::draw(wxDC* inputDC, std::list<std::list<int> >& inputList)
 {
 
 	// Loop all genes
@@ -218,8 +241,8 @@ void EnvImage::draw(wxMemoryDC* inputDC, std::list<std::list<int> >& inputList)
 		{
 			// Points vary between 1 and 254, so let 1 be the lower bound and 254 the upper one
 			int x = *(it2++)-1, y = *(it2++)-1;
-			points[i].x = width*x/253.0;
-			points[i].y = height*y/253.0;
+			points[i].x = dataImage->GetWidth()*x/253.0;
+			points[i].y = dataImage->GetHeight()*y/253.0;
 			i++;
 		}
 
@@ -268,6 +291,12 @@ double EnvImage::compare(wxImage* inputImage1, wxImage* inputImage2)
 	return resemblance;
 }
 
+// Link the environment with the gui
+void EnvImage::setGUI(Image* inputGUI)
+{
+	dataGUI = inputGUI;
+}
+
 
 
 /////////////////
@@ -275,25 +304,8 @@ double EnvImage::compare(wxImage* inputImage1, wxImage* inputImage2)
 /////////////////
 
 //
-// Class definition
+// Application events
 //
-
-class Image: public wxApp
-{
-	public:
-		// Elements
-
-	private:
-		// Initialisation
-		virtual bool OnInit();
-
-		// Command-line parser
-		virtual void OnInitCmdLine(wxCmdLineParser& parser);
-		virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
-
-		// Input filename
-		wxFileName file;
-};
 
 // Configure the command-line parameters
 static const wxCmdLineEntryDesc g_cmdLineDesc [] =
@@ -307,6 +319,31 @@ static const wxCmdLineEntryDesc g_cmdLineDesc [] =
 
 // Implement it
 IMPLEMENT_APP(Image)
+
+
+//
+// Command-line parser
+//
+
+void Image::OnInitCmdLine(wxCmdLineParser& parser)
+{
+	parser.SetDesc(g_cmdLineDesc);
+	// must refuse '/' as parameter starter or cannot use "/path" style paths
+	parser.SetSwitchChars(wxT("-"));
+}
+
+bool Image::OnCmdLineParsed(wxCmdLineParser& parser)
+{
+	// Get unnamed parameter (only one accepted)
+	if (parser.GetParamCount() > 0)
+	{
+		dataFile = wxFileName(parser.GetParam(0));
+		return true;
+	} else {
+		std::cout << "ERROR: no input filename provided" << std::endl;
+		return false;
+	}
+}
 
 
 //
@@ -331,27 +368,22 @@ bool Image::OnInit()
 	//
 
 	// Check file
-	if (!file.FileExists())
+	if (!dataFile.FileExists())
 	{
 		std::cout << "ERROR: provided filename does not exist" << std::endl;
 		return false;
 	}
 
-	// Load correct image handler
-	wxImage inputImage;
+	// Load correct image handler (TODO)
+	dataImage = new wxImage;
 	wxInitAllImageHandlers();
 
-	// Load the file and create a bitmap
-	if (!inputImage.LoadFile(file.GetFullPath()))
+	// Load the file
+	if (!dataImage->LoadFile(dataFile.GetFullPath()))
 	{
 		std::cout << "ERROR: could not load the file" << std::endl;
 		return false;
 	}
-	wxBitmap inputBitmap(inputImage);
-
-	// Convert the bitmap to a DC
-	wxMemoryDC inputDC;
-	inputDC.SelectObject(inputBitmap);
 
 	// Message
 	std::cout << "NOTE: file loaded" << std::endl;
@@ -362,13 +394,36 @@ bool Image::OnInit()
 	//
 
 	// Create object
-	EnvImage tempEnvironment;
+	dataEnvironment = new EnvImage;
 
 	// Load image into environment
-	tempEnvironment.setImage(inputImage);
+	dataEnvironment->setImage(dataImage);
 
 	// Message
 	std::cout << "NOTE: environment created" << std::endl;
+
+
+	//
+	// GUI
+	//
+
+	// Initialise elements
+	frame = new wxFrame((wxFrame *)NULL, -1,  wxT("Genetic Evolution - ") + dataFile.GetFullName(), wxPoint(50,50), wxSize(dataImage->GetWidth(),dataImage->GetHeight()));
+	drawPane = new wxPanel(frame);
+
+	// Configure elements
+	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
+	sizer->Add(drawPane, 1, wxEXPAND);
+    frame->SetSizer(sizer);
+    frame->SetAutoLayout(true);
+    frame->Show();
+
+    // Give the environment access to the GUI
+    wxClientDC* outputDC = new wxClientDC(drawPane);
+    dataEnvironment->setGUI(this);
+
+	// Message
+	std::cout << "NOTE: GUI configured" << std::endl;
 
 
 	//
@@ -393,45 +448,13 @@ bool Image::OnInit()
 	tempDNA.push(255);	// End of DNA
 
 	// Create object
-	Population tempPopulation(&tempEnvironment, tempDNA);
+	dataPopulation = new Population(dataEnvironment, tempDNA);
 
 	// Message
 	std::cout << "NOTE: population created" << std::endl;
 
-
-	//
-	// Simulate
-	//
-
-	// Single straight evolution
-	tempPopulation.evolve_single_straight(100000);
+	dataPopulation->evolve_single_straight(10000);
 
 	return false;
 }
-
-
-//
-// Command-line parser
-//
-
-void Image::OnInitCmdLine(wxCmdLineParser& parser)
-{
-	parser.SetDesc(g_cmdLineDesc);
-	// must refuse '/' as parameter starter or cannot use "/path" style paths
-	parser.SetSwitchChars(wxT("-"));
-}
-
-bool Image::OnCmdLineParsed(wxCmdLineParser& parser)
-{
-	// Get unnamed parameter (only one accepted)
-	if (parser.GetParamCount() > 0)
-	{
-		file = wxFileName(parser.GetParam(0));
-		return true;
-	} else {
-		std::cout << "ERROR: no input filename provided" << std::endl;
-		return false;
-	}
-}
-
 
