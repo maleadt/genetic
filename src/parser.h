@@ -51,9 +51,9 @@
 class Parser
 {
 	public:
-		// Input routines
-		void setQueue(std::queue<int>& ipnutQueue);
-		void setList(std::list<std::list<int> >& inputList);
+		// Construction and destruction
+		Parser(std::queue<int>& inputQueue);
+		Parser(std::list<std::list<int> >& inputList);
 
 		// Output routines
 		std::queue<int> getQueue();

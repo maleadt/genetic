@@ -78,9 +78,6 @@ const int WXWIDGETS_DEPTH = 32;
 class EnvImage : public Environment
 {
 	public:
-		// Construction and destruction
-		EnvImage();
-
 		// Required functons
 		int fitness(std::list<std::list<int> >& inputList);
 		int alphabet();
@@ -99,16 +96,6 @@ class EnvImage : public Environment
 
 
 //
-// Construction and destruction
-//
-
-// Constructor
-EnvImage::EnvImage()
-{
-}
-
-
-//
 // Required functons
 //
 
@@ -122,8 +109,7 @@ int EnvImage::alphabet()
 int EnvImage::fitness(std::list<std::list<int> >& inputList)
 {
 	// DEBUG
-	Parser tempParser;
-	tempParser.setList(inputList);
+	Parser tempParser(inputList);
 	std::cout << std::endl << std::endl;
 	tempParser.debug_queue();
 

@@ -40,25 +40,28 @@
 // Required routines
 //
 
-// WARNING: obviousely at least one of these fitness functions
-//          should be derived, as this would otherwise cause
-//          a never ending loop!
+/*
+WARNING:
+  Only ONE fitness functions should be overloaded,
+  the other one should not and return a value of
+  zero.
+*/
 
-// Convert the DNA and call the other fitness function
+// Fitness functions
+int Environment::fitness(Parser inputParser)
+{
+	std::queue<int> tempQueue = inputParser.getQueue();
+	std::list<std::list<int> > tempList = inputParser.getList();
+
+	return fitness(tempQueue) + fitness(tempList);
+}
 int Environment::fitness(std::queue<int>& inputQueue)
 {
-	objParser.setQueue(inputQueue);
-	std::list<std::list<int> > tempList = objParser.getList();
-	return fitness(tempList);
+	return 0;
 }
-
-// Convert the DNA and call the other fitness function
 int Environment::fitness(std::list<std::list<int> >& inputList)
 {
-	objParser.setList(inputList);
-	std::queue<int> tempQueue = objParser.getQueue();
-	objParser.debug_queue();
-	return fitness(tempQueue);
+	return 0;
 }
 
 // Return the alphabet value
