@@ -44,6 +44,9 @@
 // Empty constructor (should not be used, only to be able to use in class definitions)
 Parser::Parser()
 {
+    // Both caches dirty
+    cacheQueue = false;
+    cacheList = false;
 }
 
 // Construct parser object with a given string
@@ -51,9 +54,10 @@ Parser::Parser(std::queue<int> inputQueue)
 {
 	// Save string
 	dataQueue = inputQueue;
+	cacheQueue = true;
 
-	// Convert
-	toList();
+	// Invalidate cache
+	cacheList = false;
 }
 
 // Construct parser object with a given list
@@ -61,9 +65,10 @@ Parser::Parser(std::list<std::list<int> > inputList)
 {
 	// Save list
 	dataList = inputList;
+	cacheList = true;
 
-	// Convert
-	toQueue();
+	// Invalidate cache
+	cacheQueue = false;
 }
 
 
@@ -74,13 +79,30 @@ Parser::Parser(std::list<std::list<int> > inputList)
 // Get the string representation
 std::queue<int> Parser::getQueue()
 {
-	return dataQueue;
+    // Check cache
+    if (!cacheQueue)
+    {
+        toQueue();
+        cacheQueue = true;
+    }
+
+    // Return
+    return dataQueue;
 }
 
 // Get the list representation
 std::list<std::list<int> > Parser::getList()
 {
-	return dataList;
+
+    // Check cache
+    if (!cacheList)
+    {
+        toList();
+        cacheList = true;
+    }
+
+    // Return
+    return dataList;
 }
 
 //

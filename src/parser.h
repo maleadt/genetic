@@ -20,6 +20,8 @@
  *
  */
 
+// TODO: write a complete DNA datatype instead of parsing between a queue and list?
+
 ///////////////////
 // CONFIGURATION //
 ///////////////////
@@ -72,6 +74,10 @@ class Parser
 		// Conversion routines
 		void toQueue();
 		void toList();
+
+		// Cache control
+		bool cacheQueue;
+		bool cacheList;
 };
 
 
