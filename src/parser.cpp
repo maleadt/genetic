@@ -41,8 +41,13 @@
 // Construction and destruction
 //
 
+// Empty constructor (should not be used, only to be able to use in class definitions)
+Parser::Parser()
+{
+}
+
 // Construct parser object with a given string
-Parser::Parser(std::queue<int>& inputQueue)
+Parser::Parser(std::queue<int> inputQueue)
 {
 	// Save string
 	dataQueue = inputQueue;
@@ -52,7 +57,7 @@ Parser::Parser(std::queue<int>& inputQueue)
 }
 
 // Construct parser object with a given list
-Parser::Parser(std::list<std::list<int> >& inputList)
+Parser::Parser(std::list<std::list<int> > inputList)
 {
 	// Save list
 	dataList = inputList;

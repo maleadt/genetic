@@ -105,9 +105,9 @@ class EnvImage : public Environment
 {
 	public:
 		// Required functons
-		double fitness(std::list<std::list<int> >& inputList);
+		double fitness(std::list<std::list<int> > inputList);
 		int alphabet();
-		void update(std::list<std::list<int> >& inputList);
+		void update(std::list<std::list<int> > inputList);
 
 		// Image functions
 		void setImage(wxImage* inputImage);
@@ -135,7 +135,7 @@ class EnvImage : public Environment
 //
 
 // Fitness function
-double EnvImage::fitness(std::list<std::list<int> >& inputList)
+double EnvImage::fitness(std::list<std::list<int> > inputList)
 {
 	// Create a DC for the generated image
 	wxMemoryDC tempDC;
@@ -167,7 +167,7 @@ int EnvImage::alphabet()
 }
 
 // Update call
-void EnvImage::update(std::list<std::list<int> >& inputList)
+void EnvImage::update(std::list<std::list<int> > inputList)
 {
 	// Draw white background
 	wxClientDC* tempDC = new wxClientDC(dataGUI->drawPane);

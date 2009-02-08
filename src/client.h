@@ -56,7 +56,7 @@ class Client
 {
 	public:
 		// Construction and destruction
-		Client(std::list<std::list<int> >&);
+		Client(std::list<std::list<int> >);
 
 		// DNA alteration
 		void mutate();

@@ -41,7 +41,7 @@
 //
 
 // Create client with given DNA
-Client::Client(std::list<std::list<int> >& inputList)
+Client::Client(std::list<std::list<int> > inputList)
 {
 	dataDNA = inputList;
 }

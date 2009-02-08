@@ -55,11 +55,11 @@ double Environment::fitness(Parser inputParser)
 
 	return fitness(tempQueue) + fitness(tempList);
 }
-double Environment::fitness(std::queue<int>& inputQueue)
+double Environment::fitness(std::queue<int> inputQueue)
 {
 	return 0;
 }
-double Environment::fitness(std::list<std::list<int> >& inputList)
+double Environment::fitness(std::list<std::list<int> > inputList)
 {
 	return 0;
 }
@@ -71,6 +71,6 @@ int Environment::alphabet()
 }
 
 // Update call
-void Environment::update(std::list<std::list<int> >& inputList)
+void Environment::update(std::list<std::list<int> > inputList)
 {
 }

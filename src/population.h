@@ -1,6 +1,6 @@
 /*
- * parser.h
- * Evolve - DNA conversion routines.
+ * Population.h
+ * Evolve - Population handling
  *
  * Copyright (c) 2009 Tim Besard <tim.besard@gmail.com>
  * All rights reserved.
@@ -29,14 +29,15 @@
 //
 
 // Include guard
-#ifndef __PARSER
-#define __PARSER
+#ifndef __POPULATION
+#define __POPULATION
 
 // Headers
-#include <iostream>
-#include <vector>
-#include <queue>
+#include "client.h"
+#include "environment.h"
+#include "parser.h"
 #include <list>
+#include <queue>
 
 
 //
@@ -48,32 +49,24 @@
 // CLASS DEFINITION //
 //////////////////////
 
-class Parser
+class Population
 {
-	public:
-		// Construction and destruction
-		Parser();
-		Parser(std::queue<int> inputQueue);
-		Parser(std::list<std::list<int> > inputList);
+    public:
+        // Construction and destruction
+        Population(Environment* inputEnvironment, Parser inputDNA);
 
-		// Output routines
-		std::queue<int> getQueue();
-		std::list<std::list<int> > getList();
+        // Output routines
+        std::queue<int> getDNAQueue();
+        std::list<std::list<int> > getDNAList();
 
-		// Debugging routines
-		void debug_queue();
-		void debug_list();
+        // Evolutionary methods
+        void evolve_single_straight(int successes);
 
-	private:
-		// Data
-		std::queue<int> dataQueue;
-		std::list<std::list<int> > dataList;
-
-		// Conversion routines
-		void toQueue();
-		void toList();
+    private:
+        // Current DNA
+        Parser dataDNA;
+        Environment* dataEnvironment;
 };
-
 
 
 // Include guard
