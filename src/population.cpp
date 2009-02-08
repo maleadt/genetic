@@ -87,7 +87,6 @@ void Population::evolve_single_straight(int successes)
         double tempFitness = dataEnvironment->fitness(tempClient.getDNA());
         if (tempFitness > dataFitness)
         {
-            std::cout << "* Fitness increased to " << tempFitness << std::endl;
             dataFitness = tempFitness;
             dataDNA = tempClient.getDNA();
             successes--;

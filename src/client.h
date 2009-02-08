@@ -45,7 +45,7 @@
 
 // Mutation: amount of mutations
 const int MUTATE_AMOUNT_LOWER = 1;
-const int MUTATE_AMOUNT_UPPER = 5;
+const int MUTATE_AMOUNT_UPPER = 50;
 
 
 //////////////////////

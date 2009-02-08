@@ -83,6 +83,9 @@ class Image : public wxApp
 		wxFrame* frame;
 		wxPanel* drawPane;
 
+		// Stopwatch
+		wxStopWatch stopwatch;
+
 	private:
 		// Initialisation
 		virtual bool OnInit();
@@ -177,6 +180,10 @@ void EnvImage::update(std::list<std::list<int> > inputList)
 
 	// Draw the DNA onto the DC
 	draw(tempDC, inputList);
+
+	// Print time
+	double tempFitness = fitness(inputList);
+	std::cout << dataGUI->stopwatch.Time() << "\t" << tempFitness << std::endl;
 
 	// Clean
 	delete tempDC;
@@ -453,6 +460,7 @@ bool Image::OnInit()
 	// Message
 	std::cout << "NOTE: population created" << std::endl;
 
+    stopwatch.Start();
 	dataPopulation->evolve_single_straight(10000);
 
 	return false;
