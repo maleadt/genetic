@@ -49,7 +49,6 @@ on later mutation) could be better.
 #include <iostream>
 #include <wx/filename.h>
 #include <wx/cmdline.h>
-#include <wx/sizer.h>
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
@@ -64,44 +63,12 @@ const int LIMIT_POLYGONS = 50;
 const int LIMIT_POLYGON_POINTS = 5;
 
 // Image settings
-const int IMAGE_DEPTH = 24;	// Set to 32 (if supported) to use transparency
+const bool IMAGE_ALPHA = false;
 
 
 //
 // Class definitions
 //
-
-// Forward declarations
-class EnvImage;
-class Image;
-
-// Application
-class Image : public wxApp
-{
-	public:
-		// Elements
-		wxFrame* frame;
-		wxPanel* drawPane;
-
-		// Stopwatch
-		wxStopWatch stopwatch;
-
-	private:
-		// Initialisation
-		virtual bool OnInit();
-
-		// Command-line parser
-		virtual void OnInitCmdLine(wxCmdLineParser& parser);
-		virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
-
-		// Input filename
-		wxFileName dataFile;
-
-		// Evolutionary data
-		EnvImage* dataEnvironment;
-		Population* dataPopulation;
-		wxImage* dataImage;
-};
 
 // Environment
 class EnvImage : public Environment
@@ -111,18 +78,18 @@ class EnvImage : public Environment
 		double fitness(std::list<std::list<int> > inputList);
 		int alphabet();
 		void update(std::list<std::list<int> > inputList);
+		void output(wxBitmap* inputBitmap, double fitness);
 
 		// Image functions
 		void setImage(wxImage* inputImage);
 		bool valid_limits(std::list<std::list<int> >& inputList);
-		void draw(wxDC* inputDC, std::list<std::list<int> >& inputList);
+		void draw(wxMemoryDC& inputDC, std::list<std::list<int> >& inputList);
 		double compare(wxImage* inputImage1, wxImage* inputImage2);
-		void setGUI(Image*);
+		void setFile(wxFileName& inputFile);
 
 	private:
-		Image* dataGUI;
 		wxImage* dataImage;
-
+		wxFileName dataFile;
 		int counter;
 };
 
@@ -141,7 +108,7 @@ class EnvImage : public Environment
 double EnvImage::fitness(std::list<std::list<int> > inputList)
 {
 	// Create a DC for the generated image
-	wxMemoryDC tempDC;
+	wxMemoryDC tempDC;  // WERKT NIET ZONDER INIT, MERGEN NAAR CAIRO
 	wxBitmap tempBitmap(dataImage->GetWidth(), dataImage->GetHeight());
 	tempDC.SelectObject(tempBitmap);
 
@@ -150,7 +117,7 @@ double EnvImage::fitness(std::list<std::list<int> > inputList)
 		return -1;
 
 	// Draw the DNA onto the DC
-	draw(&tempDC, inputList);
+	draw(tempDC, inputList);
 
 	// Convert DC to image
 	wxImage tempImage = tempBitmap.ConvertToImage();
@@ -172,22 +139,38 @@ int EnvImage::alphabet()
 // Update call
 void EnvImage::update(std::list<std::list<int> > inputList)
 {
-	// Draw white background
-	wxClientDC* tempDC = new wxClientDC(dataGUI->drawPane);
-	wxColour tempWhite(255, 255, 255, 255);
-	tempDC->SetBrush(tempWhite);
-	tempDC->Clear();
+	// Create temporary DC
+	wxMemoryDC dcTemp;
+	wxBitmap dcTempBitmap(dataImage->GetWidth(), dataImage->GetHeight());
+	dcTemp.SelectObject(dcTempBitmap);
 
 	// Draw the DNA onto the DC
-	draw(tempDC, inputList);
+	draw(dcTemp, inputList);
 
-	// Print time
-	double tempFitness = fitness(inputList);
-	std::cout << dataGUI->stopwatch.Time() << "\t" << tempFitness << std::endl;
+    // Let the application output the bitmap
+    output(&dcTempBitmap, fitness(inputList));
 
-	// Clean
-	delete tempDC;
+	// Destruct the memory DC
+	dcTemp.SelectObject(wxNullBitmap);
 }
+
+// Output call
+void EnvImage::output(wxBitmap* inputBitmap, double inputFitness)
+{
+    // Convert bitmap to image
+    wxImage tempImage = inputBitmap->ConvertToImage();
+
+    // Save the current image
+    wxFileName tempFile(dataFile);
+    tempFile.ClearExt();
+    wxString tempCount;
+    tempCount << counter++;
+    tempImage.SaveFile(dataFile.GetName() + _T("-") + tempCount + _T(".png"), wxBITMAP_TYPE_PNG);
+
+    // Output a message
+    std::cout << "- Successfully mutated (new fitness: " << int(10000*inputFitness)/100.0 << "%)" << std::endl;
+}
+
 
 
 //
@@ -228,8 +211,18 @@ bool EnvImage::valid_limits(std::list<std::list<int> >& inputList)
 }
 
 // Render the DNA code onto a draw container
-void EnvImage::draw(wxDC* inputDC, std::list<std::list<int> >& inputList)
+void EnvImage::draw(wxMemoryDC& inputDC, std::list<std::list<int> >& inputList)
 {
+	// Get graphics DC
+	wxGCDC dcGraphics(inputDC);
+
+	// Get the actual DC
+	wxDC& dcActual = IMAGE_ALPHA ? (wxDC&) dcGraphics : (wxDC&) inputDC;
+
+    // Draw white background
+    wxColour tempWhite(255, 255, 255, 255);
+    dcActual.SetBrush(tempWhite);
+    dcActual.DrawRectangle(0, 0, dataImage->GetWidth(), dataImage->GetHeight());
 
 	// Loop all genes
 	std::list<std::list<int> >::iterator it = inputList.begin();
@@ -254,9 +247,9 @@ void EnvImage::draw(wxDC* inputDC, std::list<std::list<int> >& inputList)
 		}
 
 		// Draw
-		inputDC->SetPen(wxPen(colour, 1));
-		inputDC->SetBrush(wxBrush(colour));
-		inputDC->DrawPolygon((it->size()-4) / 2, points);
+		dcActual.SetPen(wxPen(colour, 1));
+		dcActual.SetBrush(wxBrush(colour));
+		dcActual.DrawPolygon((it->size()-4) / 2, points);
 		++it;
 
 		// Clean up
@@ -298,81 +291,28 @@ double EnvImage::compare(wxImage* inputImage1, wxImage* inputImage2)
 	return resemblance;
 }
 
-// Link the environment with the gui
-void EnvImage::setGUI(Image* inputGUI)
+// Give the environment a file object
+void EnvImage::setFile(wxFileName& inputFile)
 {
-	dataGUI = inputGUI;
+    counter = 0;
+    dataFile = inputFile;
 }
 
 
 
-/////////////////
-// APPLICATION //
-/////////////////
+//////////
+// MAIN //
+//////////
 
-//
-// Application events
-//
-
-// Configure the command-line parameters
-static const wxCmdLineEntryDesc g_cmdLineDesc [] =
+int main(int argc, char** argv)
 {
-	// Standard unnamed parameter
-	{ wxCMD_LINE_PARAM, 0, 0, wxT("FILE"),
-	  wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL },
-
-	{ wxCMD_LINE_NONE }
-};
-
-// Implement it
-IMPLEMENT_APP(Image)
-
-
-//
-// Command-line parser
-//
-
-void Image::OnInitCmdLine(wxCmdLineParser& parser)
-{
-	parser.SetDesc(g_cmdLineDesc);
-	// must refuse '/' as parameter starter or cannot use "/path" style paths
-	parser.SetSwitchChars(wxT("-"));
-}
-
-bool Image::OnCmdLineParsed(wxCmdLineParser& parser)
-{
-	// Get unnamed parameter (only one accepted)
-	if (parser.GetParamCount() > 0)
-	{
-		dataFile = wxFileName(parser.GetParam(0));
-		return true;
-	} else {
-		std::cout << "ERROR: no input filename provided" << std::endl;
-		return false;
-	}
-}
-
-
-//
-// Initialisation
-//
-
-bool Image::OnInit()
-{
-	//
-	// Setup
-	//
-
-	// Call default behaviour (mandatory, it calls the command-line parser)
-	if (!wxApp::OnInit())
-		return false;
-
-	// Message
-	std::cout << "NOTE: initialisation comlpete" << std::endl;
-
 	//
 	// Load image
 	//
+
+	// Input data
+	wxString tempFileName(argv[1], wxConvUTF8);
+	wxFileName dataFile(tempFileName);
 
 	// Check file
 	if (!dataFile.FileExists())
@@ -382,11 +322,11 @@ bool Image::OnInit()
 	}
 
 	// Load correct image handler (TODO)
-	dataImage = new wxImage;
+	wxImage dataImage;
 	wxInitAllImageHandlers();
 
 	// Load the file
-	if (!dataImage->LoadFile(dataFile.GetFullPath()))
+	if (!dataImage.LoadFile(dataFile.GetFullPath()))
 	{
 		std::cout << "ERROR: could not load the file" << std::endl;
 		return false;
@@ -401,36 +341,16 @@ bool Image::OnInit()
 	//
 
 	// Create object
-	dataEnvironment = new EnvImage;
+	EnvImage dataEnvironment;
 
 	// Load image into environment
-	dataEnvironment->setImage(dataImage);
+	dataEnvironment.setImage(&dataImage);
+
+	// Provide it the filename
+	dataEnvironment.setFile(dataFile);
 
 	// Message
 	std::cout << "NOTE: environment created" << std::endl;
-
-
-	//
-	// GUI
-	//
-
-	// Initialise elements
-	frame = new wxFrame((wxFrame *)NULL, -1,  wxT("Genetic Evolution - ") + dataFile.GetFullName(), wxPoint(50,50), wxSize(dataImage->GetWidth(),dataImage->GetHeight()));
-	drawPane = new wxPanel(frame);
-
-	// Configure elements
-	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add(drawPane, 1, wxEXPAND);
-    frame->SetSizer(sizer);
-    frame->SetAutoLayout(true);
-    frame->Show();
-
-    // Give the environment access to the GUI
-    wxClientDC* outputDC = new wxClientDC(drawPane);
-    dataEnvironment->setGUI(this);
-
-	// Message
-	std::cout << "NOTE: GUI configured" << std::endl;
 
 
 	//
@@ -455,14 +375,13 @@ bool Image::OnInit()
 	tempDNA.push(255);	// End of DNA
 
 	// Create object
-	dataPopulation = new Population(dataEnvironment, tempDNA);
+	Population dataPopulation(&dataEnvironment, tempDNA);
 
 	// Message
 	std::cout << "NOTE: population created" << std::endl;
 
-    stopwatch.Start();
-	dataPopulation->evolve_single_straight(10000);
+	dataPopulation.evolve_single_straight(10000);
 
-	return false;
+	return 0;
 }
 
