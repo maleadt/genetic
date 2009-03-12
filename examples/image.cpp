@@ -46,13 +46,9 @@ on later mutation) could be better.
 #include <cmath>
 #include <queue>
 #include <string>
+#include <sstream>
 #include <iostream>
-#include <wx/filename.h>
-#include <wx/cmdline.h>
-#include <wx/wxprec.h>
-#ifndef WX_PRECOMP
-#include <wx/wx.h>
-#endif
+#include <cairo/cairo.h>
 
 //
 // Constants
@@ -78,18 +74,18 @@ class EnvImage : public Environment
 		double fitness(std::list<std::list<int> > inputList);
 		int alphabet();
 		void update(std::list<std::list<int> > inputList);
-		void output(wxBitmap* inputBitmap, double fitness);
+		void output(cairo_surface_t* inputSurface, double fitness);
 
 		// Image functions
-		void setImage(wxImage* inputImage);
+		bool loadImage(const std::string& inputFile);
 		bool valid_limits(std::list<std::list<int> >& inputList);
-		void draw(wxMemoryDC& inputDC, std::list<std::list<int> >& inputList);
-		double compare(wxImage* inputImage1, wxImage* inputImage2);
-		void setFile(wxFileName& inputFile);
+		void draw(cairo_surface_t* inputSurface, std::list<std::list<int> >& inputList);
+		double compare(cairo_surface_t* inputSurface);
 
 	private:
-		wxImage* dataImage;
-		wxFileName dataFile;
+		std::string dataInputFile;
+		unsigned char* dataInputRGB24;
+		unsigned int dataInputWidth, dataInputHeight;
 		int counter;
 };
 
@@ -107,26 +103,21 @@ class EnvImage : public Environment
 // Fitness function
 double EnvImage::fitness(std::list<std::list<int> > inputList)
 {
-	// Create a DC for the generated image
-	wxMemoryDC tempDC;  // WERKT NIET ZONDER INIT, MERGEN NAAR CAIRO
-	wxBitmap tempBitmap(dataImage->GetWidth(), dataImage->GetHeight());
-	tempDC.SelectObject(tempBitmap);
-
 	// Check the DNA's limit's
 	if (!valid_limits(inputList))
 		return -1;
 
-	// Draw the DNA onto the DC
-	draw(tempDC, inputList);
+	// Create a DC for the generated image
+    cairo_surface_t* tempSurface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, dataInputWidth, dataInputHeight);
 
-	// Convert DC to image
-	wxImage tempImage = tempBitmap.ConvertToImage();
+	// Draw the DNA onto the DC
+	draw(tempSurface, inputList);
 
 	// Compare them
-	double resemblance = compare(dataImage, &tempImage);
+	double resemblance = compare(tempSurface);
 
 	// Finish
-	tempDC.SelectObject(wxNullBitmap);
+	cairo_surface_destroy(tempSurface);
 	return resemblance;
 }
 
@@ -139,33 +130,29 @@ int EnvImage::alphabet()
 // Update call
 void EnvImage::update(std::list<std::list<int> > inputList)
 {
-	// Create temporary DC
-	wxMemoryDC dcTemp;
-	wxBitmap dcTempBitmap(dataImage->GetWidth(), dataImage->GetHeight());
-	dcTemp.SelectObject(dcTempBitmap);
+    // Create surface
+    cairo_surface_t* tempSurface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, dataInputWidth, dataInputHeight);
 
 	// Draw the DNA onto the DC
-	draw(dcTemp, inputList);
+	draw(tempSurface, inputList);
 
     // Let the application output the bitmap
-    output(&dcTempBitmap, fitness(inputList));
+    output(tempSurface, fitness(inputList));
 
-	// Destruct the memory DC
-	dcTemp.SelectObject(wxNullBitmap);
+    // Finish
+    cairo_surface_destroy(tempSurface);
 }
 
 // Output call
-void EnvImage::output(wxBitmap* inputBitmap, double inputFitness)
+void EnvImage::output(cairo_surface_t* inputSurface, double inputFitness)
 {
-    // Convert bitmap to image
-    wxImage tempImage = inputBitmap->ConvertToImage();
+    // Generate an output tag
+    std::stringstream convert;
+    convert << dataInputFile.substr( dataInputFile.find_last_of(".") ) << "-";
+    convert << counter++ << ".png";
 
-    // Save the current image
-    wxFileName tempFile(dataFile);
-    tempFile.ClearExt();
-    wxString tempCount;
-    tempCount << counter++;
-    tempImage.SaveFile(dataFile.GetName() + _T("-") + tempCount + _T(".png"), wxBITMAP_TYPE_PNG);
+    // Save the file
+    cairo_surface_write_to_png(inputSurface, convert.str().c_str());
 
     // Output a message
     std::cout << "- Successfully mutated (new fitness: " << int(10000*inputFitness)/100.0 << "%)" << std::endl;
@@ -178,10 +165,35 @@ void EnvImage::output(wxBitmap* inputBitmap, double inputFitness)
 //
 
 // Set input image
-void EnvImage::setImage(wxImage* inputImage)
+bool EnvImage::loadImage(const std::string& inputFile)
 {
-	dataImage = inputImage;
+    // Update variables
+	dataInputFile = inputFile;
 	counter = 0;
+
+	// Create Cairo surface from file
+	std::cout << "DEBUG: loading " << dataInputFile << std::endl;
+	cairo_surface_t* tempSurface = cairo_image_surface_create_from_png(dataInputFile.c_str());
+	if (tempSurface == NULL)
+	{
+	    std::cout << "ERROR: could not load PNG image" << std::endl;
+	    return false;
+	}
+	if (cairo_image_surface_get_format(tempSurface) != CAIRO_FORMAT_RGB24)
+	{
+	    std::cout << "ERROR: resulting surface is not RGB24 type" << std::endl;
+	    return false;
+	}
+
+	// Save data
+	dataInputRGB24 = cairo_image_surface_get_data(tempSurface);
+
+	// Save size
+	dataInputWidth = cairo_image_surface_get_width(tempSurface);
+	dataInputHeight = cairo_image_surface_get_height(tempSurface);
+
+	// Return
+	return true;
 }
 
 // Validity function
@@ -211,18 +223,15 @@ bool EnvImage::valid_limits(std::list<std::list<int> >& inputList)
 }
 
 // Render the DNA code onto a draw container
-void EnvImage::draw(wxMemoryDC& inputDC, std::list<std::list<int> >& inputList)
+void EnvImage::draw(cairo_surface_t* inputSurface, std::list<std::list<int> >& inputList)
 {
-	// Get graphics DC
-	wxGCDC dcGraphics(inputDC);
-
-	// Get the actual DC
-	wxDC& dcActual = IMAGE_ALPHA ? (wxDC&) dcGraphics : (wxDC&) inputDC;
+    // Create a Cairo context
+    cairo_t *cr = cairo_create(inputSurface);
 
     // Draw white background
-    wxColour tempWhite(255, 255, 255, 255);
-    dcActual.SetBrush(tempWhite);
-    dcActual.DrawRectangle(0, 0, dataImage->GetWidth(), dataImage->GetHeight());
+    cairo_set_source_rgb(cr, 255, 255, 255);
+    cairo_rectangle(cr, 0, 0, dataInputWidth, dataInputHeight);
+    cairo_fill(cr);
 
 	// Loop all genes
 	std::list<std::list<int> >::iterator it = inputList.begin();
@@ -232,70 +241,74 @@ void EnvImage::draw(wxMemoryDC& inputDC, std::list<std::list<int> >& inputList)
 
 		// Get colour code
 		int r = *(it2++), g = *(it2++), b = *(it2++), a = *(it2++);
-		wxColour colour(r, g, b, a);
+		if (IMAGE_ALPHA)
+            cairo_set_source_rgba(cr, r, g, b, a);
+        else
+            cairo_set_source_rgb(cr, r, g, b);
+
+        // Move to start point
+        int x = *(it2++)-1, y = *(it2++)-1;
+        cairo_move_to(cr, dataInputWidth*x/253.0, dataInputHeight*y/253.0);
 
 		// Load coördinates
-		wxPoint* points = new wxPoint[(it->size()-4) / 2];
-		int i = 0;
 		while (it2 != it->end())
 		{
 			// Points vary between 1 and 254, so let 1 be the lower bound and 254 the upper one
-			int x = *(it2++)-1, y = *(it2++)-1;
-			points[i].x = dataImage->GetWidth()*x/253.0;
-			points[i].y = dataImage->GetHeight()*y/253.0;
-			i++;
+			x = *(it2++)-1;
+			y = *(it2++)-1;
+			cairo_line_to(cr, dataInputWidth*x/253.0, dataInputHeight*y/253.0);
 		}
 
 		// Draw
-		dcActual.SetPen(wxPen(colour, 1));
-		dcActual.SetBrush(wxBrush(colour));
-		dcActual.DrawPolygon((it->size()-4) / 2, points);
+		cairo_close_path(cr);
+		cairo_fill(cr);
 		++it;
-
-		// Clean up
-		delete[] points;
 	}
+	cairo_destroy(cr);
 }
 
 // Compare two images
-double EnvImage::compare(wxImage* inputImage1, wxImage* inputImage2)
+double EnvImage::compare(cairo_surface_t* inputSurface)
 {
 	// Get and verify size
-	int width = inputImage1->GetWidth(), height = inputImage1->GetHeight();
-	if (width != inputImage2->GetWidth() || height != inputImage2->GetHeight())
+	if ((cairo_image_surface_get_width(inputSurface) != dataInputWidth) || (cairo_image_surface_get_height(inputSurface) != dataInputHeight))
 	{
 		std::cout << "WARNING: cannot calculate resemblance between two different-sized images" << std::endl;
 		return 0;
 	}
 
-	// Get the raw data
-	unsigned char* tempData1 = inputImage1->GetData();
-	unsigned char* tempData2 = inputImage2->GetData();
+	// Verify formats
+	if (cairo_image_surface_get_format(inputSurface) != CAIRO_FORMAT_RGB24)
+	{
+		std::cout << "WARNING: can only process RGB24 data" << std::endl;
+		return 0;
+	}
+
+	// Get the raw data of the given surface
+	unsigned char* tempData1 = dataInputRGB24;
+	unsigned char* tempData2 = cairo_image_surface_get_data(inputSurface);
 
 	// Compare them
 	long double difference = 0;
-	for (int i = 0; i < width*height; i++)
+	for (int i = 0; i < dataInputWidth*dataInputHeight; i++)
 	{
 		// RGB (GetData always returns RGB, without Alpha)
-		int dr = *(tempData1++) - *(tempData2++);
-		int dg = *(tempData1++) - *(tempData2++);
 		int db = *(tempData1++) - *(tempData2++);
+		int dg = *(tempData1++) - *(tempData2++);
+		int dr = *(tempData1++) - *(tempData2++);
+		int da = 0;
+		if (IMAGE_ALPHA)
+            da = *(tempData1++) - *(tempData2++);
+        else
+            ++tempData1 && ++tempData2;
 
 		// Calculate difference
-		difference += sqrt(abs(dr) + abs(dg) + abs(db) + 1);	// +1, in case of perfect resemblance the
-																// difference will be width*height
+		difference += sqrt(abs(dr) + abs(dg) + abs(db) + abs(da));
 	}
 
 	// Get resemblance
-	double resemblance = width*height / difference;
+	double resemblance = dataInputWidth*dataInputHeight / difference;
 	return resemblance;
-}
-
-// Give the environment a file object
-void EnvImage::setFile(wxFileName& inputFile)
-{
-    counter = 0;
-    dataFile = inputFile;
 }
 
 
@@ -310,30 +323,18 @@ int main(int argc, char** argv)
 	// Load image
 	//
 
-	// Input data
-	wxString tempFileName(argv[1], wxConvUTF8);
-	wxFileName dataFile(tempFileName);
-
-	// Check file
-	if (!dataFile.FileExists())
+	// Check input
+	if (argc != 2)
 	{
-		std::cout << "ERROR: provided filename does not exist" << std::endl;
-		return false;
+        std::cout << "ERROR: input filename missing or too many parameters" << std::endl;
+        return 1;
 	}
 
-	// Load correct image handler (TODO)
-	wxImage dataImage;
-	wxInitAllImageHandlers();
-
-	// Load the file
-	if (!dataImage.LoadFile(dataFile.GetFullPath()))
-	{
-		std::cout << "ERROR: could not load the file" << std::endl;
-		return false;
-	}
+	// Save filename
+	std::string inputFile = argv[1];
 
 	// Message
-	std::cout << "NOTE: file loaded" << std::endl;
+	std::cout << "NOTE: configured" << std::endl;
 
 
 	//
@@ -343,11 +344,12 @@ int main(int argc, char** argv)
 	// Create object
 	EnvImage dataEnvironment;
 
-	// Load image into environment
-	dataEnvironment.setImage(&dataImage);
-
-	// Provide it the filename
-	dataEnvironment.setFile(dataFile);
+	// Load base image
+	if (!dataEnvironment.loadImage(inputFile))
+	{
+	    std::cout << "ERROR: could not load image" << std::endl;
+	    return 1;
+	}
 
 	// Message
 	std::cout << "NOTE: environment created" << std::endl;
