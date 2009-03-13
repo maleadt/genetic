@@ -1,6 +1,6 @@
 /*
- * parser.h
- * Evolve - DNA conversion routines.
+ * dna.h
+ * Evolve - DNA datastructure.
  *
  * Copyright (c) 2009 Tim Besard <tim.besard@gmail.com>
  * All rights reserved.
@@ -31,8 +31,8 @@
 //
 
 // Include guard
-#ifndef __PARSER
-#define __PARSER
+#ifndef __DNA
+#define __DNA
 
 // Headers
 #include <iostream>
@@ -50,13 +50,13 @@
 // CLASS DEFINITION //
 //////////////////////
 
-class Parser
+class DNA
 {
 	public:
 		// Construction and destruction
-		Parser();
-		Parser(std::queue<int> inputQueue);
-		Parser(std::list<std::list<int> > inputList);
+		DNA();
+		DNA(std::queue<int> inputQueue);
+		DNA(std::list<std::list<int> > inputList);
 
 		// Output routines
 		std::queue<int> getQueue();

@@ -41,7 +41,7 @@
 //
 
 // Constructor with given DNA and environment
-Population::Population(Environment* inputEnvironment, Parser inputDNA)
+Population::Population(Environment* inputEnvironment, DNA inputDNA)
 {
     // Save all data
     dataDNA = inputDNA;

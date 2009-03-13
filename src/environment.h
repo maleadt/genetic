@@ -34,7 +34,7 @@
 
 // Headers
 #include <iostream>
-#include "parser.h"
+#include "dna.h"
 
 
 //
@@ -50,7 +50,7 @@ class Environment
 {
 	public:
 		// Required functions
-		double fitness(Parser inputParser);
+		double fitness(DNA inputDNA);
 		virtual double fitness(std::queue<int> inputQueue);
 		virtual double fitness(std::list<std::list<int> > inputList);
 		virtual int alphabet();

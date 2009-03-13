@@ -1,6 +1,6 @@
 /*
- * parser.cpp
- * Evolve - DNA conversion routines.
+ * dna.cpp
+ * Evolve - DNA datastructure.
  *
  * Copyright (c) 2009 Tim Besard <tim.besard@gmail.com>
  * All rights reserved.
@@ -30,7 +30,7 @@
 //
 
 // Headers
-#include "parser.h"
+#include "dna.h"
 
 
 ////////////////////
@@ -42,15 +42,15 @@
 //
 
 // Empty constructor (should not be used, only to be able to use in class definitions)
-Parser::Parser()
+DNA::DNA()
 {
     // Both caches dirty
     cacheQueue = false;
     cacheList = false;
 }
 
-// Construct parser object with a given string
-Parser::Parser(std::queue<int> inputQueue)
+// Construct dna object with a given string
+DNA::DNA(std::queue<int> inputQueue)
 {
 	// Save string
 	dataQueue = inputQueue;
@@ -60,8 +60,8 @@ Parser::Parser(std::queue<int> inputQueue)
 	cacheList = false;
 }
 
-// Construct parser object with a given list
-Parser::Parser(std::list<std::list<int> > inputList)
+// Construct dna object with a given list
+DNA::DNA(std::list<std::list<int> > inputList)
 {
 	// Save list
 	dataList = inputList;
@@ -77,7 +77,7 @@ Parser::Parser(std::list<std::list<int> > inputList)
 //
 
 // Get the string representation
-std::queue<int> Parser::getQueue()
+std::queue<int> DNA::getQueue()
 {
     // Check cache
     if (!cacheQueue)
@@ -91,7 +91,7 @@ std::queue<int> Parser::getQueue()
 }
 
 // Get the list representation
-std::list<std::list<int> > Parser::getList()
+std::list<std::list<int> > DNA::getList()
 {
 
     // Check cache
@@ -109,10 +109,10 @@ std::list<std::list<int> > Parser::getList()
 // Debugging routines
 //
 
-void Parser::debug_queue()
+void DNA::debug_queue()
 {
 	// Debug message
-	std::cout << "* Parser.debug_queue" << std::endl;
+	std::cout << "* DNA.debug_queue" << std::endl;
 
 	// Loop queue's contents
 	std::cout << "Contents of queue with size " << std::dec << dataQueue.size() << ":" << std::endl;
@@ -126,10 +126,10 @@ void Parser::debug_queue()
 	std::cout << std::endl;
 }
 
-void Parser::debug_list()
+void DNA::debug_list()
 {
 	// Debug message
-	std::cout << "* Parser.debug_list" << std::endl;
+	std::cout << "* DNA.debug_list" << std::endl;
 
 	// Process list
 	std::cout << "Contents of list with size " << std::dec << dataList.size() << ":" << std::endl;
@@ -151,7 +151,7 @@ void Parser::debug_list()
 //
 
 // Convert list to string
-void Parser::toQueue()
+void DNA::toQueue()
 {
 	// Reset the queue
 	while (!dataQueue.empty())
@@ -179,7 +179,7 @@ void Parser::toQueue()
 }
 
 // Convert list to string
-void Parser::toList()
+void DNA::toList()
 {
 	// Reset the list
 	dataList.clear();
@@ -189,7 +189,7 @@ void Parser::toList()
 
 	// Check semantics
 	if (dataQueueDup.front() != 255)
-		throw(std::string("Parser.toList: saved DNA queue doesn't start with 255"));
+		throw(std::string("DNA.toList: saved DNA queue doesn't start with 255"));
 	dataQueueDup.pop();
 
 	// Process all
@@ -210,7 +210,7 @@ void Parser::toList()
 
 	// Check semantics
 	if (dataQueueDup.front() != 255)
-		throw(std::string("Parser.toList: saved DNA queue doesn't end with 255"));
+		throw(std::string("DNA.toList: saved DNA queue doesn't end with 255"));
 
 	// Save last vector
 	dataList.push_back(tempVector);

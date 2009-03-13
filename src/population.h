@@ -35,7 +35,7 @@
 // Headers
 #include "client.h"
 #include "environment.h"
-#include "parser.h"
+#include "dna.h"
 #include <list>
 #include <queue>
 
@@ -53,7 +53,7 @@ class Population
 {
     public:
         // Construction and destruction
-        Population(Environment* inputEnvironment, Parser inputDNA);
+        Population(Environment* inputEnvironment, DNA inputDNA);
 
         // Output routines
         std::queue<int> getDNAQueue();
@@ -64,7 +64,7 @@ class Population
 
     private:
         // Current DNA
-        Parser dataDNA;
+        DNA dataDNA;
         Environment* dataEnvironment;
 };
 

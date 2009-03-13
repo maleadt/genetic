@@ -48,10 +48,10 @@ WARNING:
 */
 
 // Fitness functions
-double Environment::fitness(Parser inputParser)
+double Environment::fitness(DNA inputDNA)
 {
-	std::queue<int> tempQueue = inputParser.getQueue();
-	std::list<std::list<int> > tempList = inputParser.getList();
+	std::queue<int> tempQueue = inputDNA.getQueue();
+	std::list<std::list<int> > tempList = inputDNA.getList();
 
 	return fitness(tempQueue) + fitness(tempList);
 }
