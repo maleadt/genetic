@@ -18,18 +18,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- */
-
-/*
-DNA format specification
-	- 4 bits describing the colour (R, G, B, and alpha)
-	- All following pairs of 2 bytes describe a point, in which
-	  a coordinate = byte/254 * image_width or image_height
-
-Thus, a minimum of 9 bytes is required, and should be odd!
-
-REMARK: ignoring invalidity and skipping the byte (might get corrected
-on later mutation) could be better.
+ *
+ * DNA interpretation
+ * 	- 4 bits describing the colour (R, G, B, and alpha)
+ * 	- All following pairs of 2 bytes describe a point, in which
+ * 	  a coordinate = byte/254 * image_width or image_height
+ *
+ * Thus, a minimum of 9 bytes is required, and should be odd!
+ *
+ * REMARK: ignoring invalidity and skipping the byte (might get corrected
+ * on later mutation) could be better.
 */
 
 ///////////////////
@@ -241,7 +239,7 @@ void EnvImage::draw(cairo_surface_t* inputSurface, std::list<std::list<int> >& i
 
 		// Get colour code
 		int r = *(it2++), g = *(it2++), b = *(it2++), a = *(it2++);
-        cairo_set_source_rgba(cr, r/255.0, g/255.0, b/255.0, a/255.0);
+        cairo_set_source_rgba(cr, (r-1)/253.0, (g-1)/253.0, (b-1)/253.0, (a-1)/253.0);
 
         // Move to start point
         int x = *(it2++)-1, y = *(it2++)-1;

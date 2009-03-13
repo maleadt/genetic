@@ -93,7 +93,6 @@ std::queue<int> DNA::getQueue()
 // Get the list representation
 std::list<std::list<int> > DNA::getList()
 {
-
     // Check cache
     if (!cacheList)
     {
@@ -111,6 +110,13 @@ std::list<std::list<int> > DNA::getList()
 
 void DNA::debug_queue()
 {
+    // Check cache
+    if (!cacheQueue)
+    {
+        toQueue();
+        cacheQueue = true;
+    }
+
 	// Debug message
 	std::cout << "* DNA.debug_queue" << std::endl;
 
@@ -128,6 +134,13 @@ void DNA::debug_queue()
 
 void DNA::debug_list()
 {
+    // Check cache
+    if (!cacheList)
+    {
+        toList();
+        cacheList = true;
+    }
+
 	// Debug message
 	std::cout << "* DNA.debug_list" << std::endl;
 
