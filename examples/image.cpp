@@ -58,9 +58,6 @@ on later mutation) could be better.
 const int LIMIT_POLYGONS = 50;
 const int LIMIT_POLYGON_POINTS = 5;
 
-// Image settings
-const bool IMAGE_ALPHA = false;
-
 
 //
 // Class definitions
@@ -74,7 +71,7 @@ class EnvImage : public Environment
 		double fitness(std::list<std::list<int> > inputList);
 		int alphabet();
 		void update(std::list<std::list<int> > inputList);
-		void output(cairo_surface_t* inputSurface, double fitness);
+		void output(cairo_surface_t* inputSurface);
 
 		// Image functions
 		bool loadImage(const std::string& inputFile);
@@ -137,25 +134,25 @@ void EnvImage::update(std::list<std::list<int> > inputList)
 	draw(tempSurface, inputList);
 
     // Let the application output the bitmap
-    output(tempSurface, fitness(inputList));
+    output(tempSurface);
+
+    // Print a message
+    std::cout << "- Successfully mutated (new fitness: " << int(10000*fitness(inputList))/100.0 << "%)" << std::endl;
 
     // Finish
     cairo_surface_destroy(tempSurface);
 }
 
 // Output call
-void EnvImage::output(cairo_surface_t* inputSurface, double inputFitness)
+void EnvImage::output(cairo_surface_t* inputSurface)
 {
     // Generate an output tag
     std::stringstream convert;
-    convert << dataInputFile.substr( dataInputFile.find_last_of(".") ) << "-";
+    convert << dataInputFile.substr( 0, dataInputFile.find_last_of(".") ) << "-";
     convert << counter++ << ".png";
 
     // Save the file
     cairo_surface_write_to_png(inputSurface, convert.str().c_str());
-
-    // Output a message
-    std::cout << "- Successfully mutated (new fitness: " << int(10000*inputFitness)/100.0 << "%)" << std::endl;
 }
 
 
@@ -172,7 +169,6 @@ bool EnvImage::loadImage(const std::string& inputFile)
 	counter = 0;
 
 	// Create Cairo surface from file
-	std::cout << "DEBUG: loading " << dataInputFile << std::endl;
 	cairo_surface_t* tempSurface = cairo_image_surface_create_from_png(dataInputFile.c_str());
 	if (tempSurface == NULL)
 	{
@@ -184,6 +180,10 @@ bool EnvImage::loadImage(const std::string& inputFile)
 	    std::cout << "ERROR: resulting surface is not RGB24 type" << std::endl;
 	    return false;
 	}
+
+	// Save initial image
+	std::cout << "- Evolution started, writing target image" << std::endl;
+	output(tempSurface);
 
 	// Save data
 	dataInputRGB24 = cairo_image_surface_get_data(tempSurface);
@@ -229,7 +229,7 @@ void EnvImage::draw(cairo_surface_t* inputSurface, std::list<std::list<int> >& i
     cairo_t *cr = cairo_create(inputSurface);
 
     // Draw white background
-    cairo_set_source_rgb(cr, 255, 255, 255);
+    cairo_set_source_rgba(cr, 1, 1, 1, 1);
     cairo_rectangle(cr, 0, 0, dataInputWidth, dataInputHeight);
     cairo_fill(cr);
 
@@ -241,10 +241,7 @@ void EnvImage::draw(cairo_surface_t* inputSurface, std::list<std::list<int> >& i
 
 		// Get colour code
 		int r = *(it2++), g = *(it2++), b = *(it2++), a = *(it2++);
-		if (IMAGE_ALPHA)
-            cairo_set_source_rgba(cr, r, g, b, a);
-        else
-            cairo_set_source_rgb(cr, r, g, b);
+        cairo_set_source_rgba(cr, r/255.0, g/255.0, b/255.0, a/255.0);
 
         // Move to start point
         int x = *(it2++)-1, y = *(it2++)-1;
@@ -289,25 +286,21 @@ double EnvImage::compare(cairo_surface_t* inputSurface)
 	unsigned char* tempData2 = cairo_image_surface_get_data(inputSurface);
 
 	// Compare them
-	long double difference = 0;
+	long int difference = 0;
 	for (int i = 0; i < dataInputWidth*dataInputHeight; i++)
 	{
 		// RGB (GetData always returns RGB, without Alpha)
 		int db = *(tempData1++) - *(tempData2++);
 		int dg = *(tempData1++) - *(tempData2++);
 		int dr = *(tempData1++) - *(tempData2++);
-		int da = 0;
-		if (IMAGE_ALPHA)
-            da = *(tempData1++) - *(tempData2++);
-        else
-            ++tempData1 && ++tempData2;
+        int da = *(tempData1++) - *(tempData2++);
 
 		// Calculate difference
-		difference += sqrt(abs(dr) + abs(dg) + abs(db) + abs(da));
+		difference += sqrt(dr*dr + dg*dg + db*db);
 	}
 
 	// Get resemblance
-	double resemblance = dataInputWidth*dataInputHeight / difference;
+	double resemblance = dataInputWidth*dataInputHeight / double(difference);
 	return resemblance;
 }
 
@@ -359,20 +352,18 @@ int main(int argc, char** argv)
 	// Create population
 	//
 
-	// Initial DNA (black window)
+	// Initial DNA (triangle)
 	std::queue<int> tempDNA;
 	tempDNA.push(255);	// Start of DNA
-	tempDNA.push(254);	// Semi transparent black brush (RGBa = 254 254 254 128)
-	tempDNA.push(254);
-	tempDNA.push(254);
+	tempDNA.push(50);	// Semi transparent grey brush (RGB = 50 50 50, with 50% opacity)
+	tempDNA.push(50);
+	tempDNA.push(50);
 	tempDNA.push(128);
-	tempDNA.push(1);	// Point one: (1, 1)
-	tempDNA.push(1);
-	tempDNA.push(254);	// Point two: (254, 1)
+	tempDNA.push(1);	// Point one: (1, 254)
+	tempDNA.push(254);
+	tempDNA.push(128);	// Point two: (128, 1)
 	tempDNA.push(1);
 	tempDNA.push(254);	// Point three: (254, 254)
-	tempDNA.push(254);
-	tempDNA.push(1);	// Point four: (1, 254)
 	tempDNA.push(254);
 	tempDNA.push(255);	// End of DNA
 
@@ -386,4 +377,3 @@ int main(int argc, char** argv)
 
 	return 0;
 }
-
