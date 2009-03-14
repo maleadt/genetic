@@ -119,11 +119,32 @@ void DNA::set(std::queue<int> inputQueue)
 
 
 //
+// Modifyers
+//
+
+// Erase an element
+DNA::iterator DNA::erase(iterator it)
+{
+    return data.erase(it);
+}
+
+// Insert a gene
+DNA::iterator DNA::insert(iterator it, std::list<int>& item)
+{
+    return data.insert(it, item);
+}
+
+
+//
 // Informational routines
 //
 
 // Amount of genes
 int DNA::genes() const
+{
+    return data.size();
+}
+int DNA::size() const
 {
     return data.size();
 }

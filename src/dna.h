@@ -58,17 +58,14 @@ class DNA
 		DNA(std::queue<int> inputQueue);
 		DNA(std::list<std::list<int> > inputList);
 
+		// Getters
+		std::list<std::list<int> > get();
+
 		// Setters
 		void set(std::queue<int> inputQueue);
 		void set(std::list<std::list<int> > inputList);
 
-		// Getters
-		std::list<std::list<int> > get();
-
-		// Informational routines
-		int genes() const;
-
-        // Iterators
+        // Const iterators
         typedef std::list<std::list<int> >::const_iterator const_iterator;
         const_iterator begin() const
         {
@@ -79,6 +76,24 @@ class DNA
                 return data.end();
         }
 
+        // Normal iterators
+        typedef std::list<std::list<int> >::iterator iterator;
+        iterator begin()
+        {
+                return data.begin();
+        }
+        iterator end()
+        {
+                return data.end();
+        }
+
+        // Modifyers
+        iterator erase(iterator it);
+        iterator insert(iterator it, std::list<int>& item);
+
+		// Informational routines
+		int genes() const;
+		int size() const;
 
 		// Debugging routines
 		void debug();

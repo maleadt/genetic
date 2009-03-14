@@ -206,7 +206,7 @@ bool EnvImage::valid_limits(const DNA& inputDNA) const
 		return false;
 
 	// Check points per polygon
-	std::list<std::list<int> >::const_iterator it = inputDNA.begin();
+	DNA::const_iterator it = inputDNA.begin();
 	while (it != inputDNA.end())
 	{
 		int size = (it++)->size();
@@ -236,7 +236,7 @@ void EnvImage::draw(cairo_surface_t* inputSurface, const DNA& inputDNA) const
     cairo_fill(cr);
 
 	// Loop all genes
-	std::list<std::list<int> >::const_iterator it = inputDNA.begin();
+	DNA::const_iterator it = inputDNA.begin();
 	while (it != inputDNA.end())
 	{
 		std::list<int>::const_iterator it2 = it->begin();

@@ -83,11 +83,12 @@ class Client
 
 // Mutate a list structurally
 template <class T>
-void mutate_list(std::list<T>& inputList)
+void mutate_list(T& inputObject)
 {
 	// Pick mutation
 	 int mutation = 0;
-	 if (inputList.size() > 1)
+	 int size = inputObject.size();
+	 if (size > 1)
 	 {
 	 	mutation = random_range(1, 5);
 	 } else {
@@ -95,13 +96,13 @@ void mutate_list(std::list<T>& inputList)
 	 }
 
 	 // Pick random gene(s)
-	 int random1 = random_range(0, inputList.size()-1);
-	 int random2 = random_range(0, inputList.size()-1);
-	 while (inputList.size() > 1 && random1 == random2)
-	 	random2 = random_range(0, inputList.size()-1);
+	 int random1 = random_range(0, size-1);
+	 int random2 = random_range(0, size-1);
+	 while (size > 1 && random1 == random2)
+	 	random2 = random_range(0, size-1);
 
 	// Calculate iterators to those genes
-	typename std::list<T>::iterator it1 = inputList.begin(), it2 = inputList.begin();
+	typename T::iterator it1 = inputObject.begin(), it2 = inputObject.begin();
 	for (int i = 0; i < random1; i++)
 		it1++;
 	for (int i = 0; i < random2; i++)
@@ -114,7 +115,7 @@ void mutate_list(std::list<T>& inputList)
 		// Deletion
 		case 1:
 		{
-			inputList.erase(it1);
+			inputObject.erase(it1);
 			break;
 		}
 
@@ -123,14 +124,14 @@ void mutate_list(std::list<T>& inputList)
 		{
 			int randAmp = random_range(1, 5);
 			for (int i = 0; i < randAmp; i++)
-				inputList.insert(it1, *(it1));
+				inputObject.insert(it1, *(it1));
 			break;
 		}
 
 		// Duplication (at random spot)
 		case 3:
 		{
-			inputList.insert(it2, *(it1));
+			inputObject.insert(it2, *(it1));
 			break;
 		}
 
@@ -144,9 +145,9 @@ void mutate_list(std::list<T>& inputList)
 		// Translocation
 		case 5:
 		{
-			T temp = *it1;
-			inputList.erase(it1);
-			inputList.insert(it2, temp);
+		//	T temp = *it1;
+		//	inputObject.erase(it1);
+		//	inputObject.insert(it2, temp);
 			break;
 		}
 
