@@ -20,8 +20,6 @@
  *
  */
 
-// TODO: write a complete DNA datatype instead of parsing between a queue and list?
-
 ///////////////////
 // CONFIGURATION //
 ///////////////////
@@ -36,7 +34,6 @@
 
 // Headers
 #include <iostream>
-#include <vector>
 #include <queue>
 #include <list>
 

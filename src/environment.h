@@ -33,7 +33,6 @@
 #define __ENVIRONMENT
 
 // Headers
-#include <iostream>
 #include "dna.h"
 
 

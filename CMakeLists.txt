@@ -4,19 +4,19 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 # Project name
 PROJECT(Evolve)
 
-# Add an "optimizedp4" build type
-SET(CMAKE_CXX_FLAGS_OPTIMIZEDP4 "-march=pentium4 -O3 -pipe -fomit-frame-pointer" CACHE STRING
-    "Flags used by the C++ compiler during optimized-for-p4 builds."
+# Add an "profile" build type
+SET(CMAKE_CXX_FLAGS_PROFILE "-pg -DNDEBUG" CACHE STRING
+    "Flags used by the C++ compiler during profiled builds."
     FORCE)
-SET(CMAKE_C_FLAGS_OPTIMIZEDP4 "-march=pentium4 -O3 -pipe -fomit-frame-pointer" CACHE STRING
-    "Flags used by the C compiler during optimized-for-p4 builds."
+SET(CMAKE_C_FLAGS_PROFILE "-pg -DNDEBUG" CACHE STRING
+    "Flags used by the C compiler during profiled builds."
     FORCE)
 MARK_AS_ADVANCED(
-    CMAKE_CXX_FLAGS_OPTIMIZEDP4
-    CMAKE_C_FLAGS_OPTIMIZEDP4)
+    CMAKE_CXX_FLAGS_PROFILE
+    CMAKE_C_FLAGS_PROFILE)
 
-# Type of build ("debug", "release" or "optimizedp4")
-set(CMAKE_BUILD_TYPE debug)
+# Type of build ("debug", "release" or "profile")
+set(CMAKE_BUILD_TYPE profile)
 
 # Add individual subdirectories
 ADD_SUBDIRECTORY(src)

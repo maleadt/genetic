@@ -34,7 +34,6 @@
 
 // Headers
 #include <iostream>
-#include <queue>
 #include <list>
 #include <algorithm>
 #include "generic.h"

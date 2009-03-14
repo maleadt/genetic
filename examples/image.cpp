@@ -323,26 +323,25 @@ double EnvImage::compare(cairo_surface_t* inputSurface) const
 	}
 
 	// Get the raw data of the given surface
-	unsigned char* tempData1 = dataInputRGB24;
-	unsigned char* tempData2 = cairo_image_surface_get_data(inputSurface);
+	unsigned char* tempData = cairo_image_surface_get_data(inputSurface);
 
 	// Compare them
-	long int difference = 0;
+	double difference = 0;
+	register int db, dg, dr;
 	for (int i = 0; i < dataInputWidth*dataInputHeight; i++)
 	{
-		// RGB (GetData always returns RGB, without Alpha)
-		int db = *(tempData1++) - *(tempData2++);
-		int dg = *(tempData1++) - *(tempData2++);
-		int dr = *(tempData1++) - *(tempData2++);
-        int da = *(tempData1++) - *(tempData2++);
+		// RGBa
+		db = dataInputRGB24[i] - *(tempData++);
+		dg = dataInputRGB24[i+1] - *(tempData++);
+		dr = dataInputRGB24[i+2] - *(tempData++);
+        ++tempData;
 
 		// Calculate difference
 		difference += sqrt(dr*dr + dg*dg + db*db);
 	}
 
 	// Get resemblance
-	double resemblance = dataInputWidth*dataInputHeight / double(difference);
-	return resemblance;
+	return dataInputWidth*dataInputHeight / difference;
 }
 
 
@@ -416,7 +415,7 @@ int main(int argc, char** argv)
 	std::cout << "NOTE: population created" << std::endl;
 
     // Evolve
-	dataPopulation.evolve_box_mix(1000000000);
+	dataPopulation.evolve_box_mix(50);
 
 	return 0;
 }
