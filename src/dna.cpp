@@ -44,110 +44,104 @@
 // Empty constructor (should not be used, only to be able to use in class definitions)
 DNA::DNA()
 {
-    // Both caches dirty
-    cacheQueue = false;
-    cacheList = false;
 }
 
 // Construct dna object with a given string
 DNA::DNA(std::queue<int> inputQueue)
 {
-	// Save string
-	dataQueue = inputQueue;
-	cacheQueue = true;
-
-	// Invalidate cache
-	cacheList = false;
+	set(inputQueue);
 }
 
 // Construct dna object with a given list
 DNA::DNA(std::list<std::list<int> > inputList)
 {
-	// Save list
-	dataList = inputList;
-	cacheList = true;
-
-	// Invalidate cache
-	cacheQueue = false;
+	set(inputList);
 }
 
 
 //
-// Output routines
+// Getters
 //
-
-// Get the string representation
-std::queue<int> DNA::getQueue()
-{
-    // Check cache
-    if (!cacheQueue)
-    {
-        toQueue();
-        cacheQueue = true;
-    }
-
-    // Return
-    return dataQueue;
-}
 
 // Get the list representation
-std::list<std::list<int> > DNA::getList()
+std::list<std::list<int> > DNA::get()
 {
-    // Check cache
-    if (!cacheList)
-    {
-        toList();
-        cacheList = true;
-    }
-
     // Return
-    return dataList;
+    return data;
 }
+
+
+//
+// Setters
+//
+
+void DNA::set(std::list<std::list<int> > inputList)
+{
+    data = inputList;
+}
+
+void DNA::set(std::queue<int> inputQueue)
+{
+	// Reset the list
+	data.clear();
+
+	// Duplicate the list and work with that copy
+	std::queue<int> inputQueueDup(inputQueue);
+
+	// Check semantics
+	if (inputQueueDup.front() != 255)
+		throw(std::string("DNA.toList: saved DNA queue doesn't start with 255"));
+	inputQueueDup.pop();
+
+	// Process all
+	std::list<int> tempVector;
+	while (!inputQueueDup.empty() && inputQueueDup.front() != 255)
+	{
+		if (inputQueueDup.front() == 0)
+		{
+			data.push_back(tempVector);
+			tempVector.clear();
+		}
+		else
+		{
+			tempVector.push_back(inputQueueDup.front());
+		}
+		inputQueueDup.pop();
+	}
+
+	// Check semantics
+	if (inputQueueDup.front() != 255)
+		throw(std::string("DNA.toList: saved DNA queue doesn't end with 255"));
+
+	// Save last vector
+	data.push_back(tempVector);
+}
+
+
+//
+// Informational routines
+//
+
+// Amount of genes
+int DNA::genes() const
+{
+    return data.size();
+}
+
 
 //
 // Debugging routines
 //
 
-void DNA::debug_queue()
+void DNA::debug()
 {
-    // Check cache
-    if (!cacheQueue)
-    {
-        toQueue();
-        cacheQueue = true;
-    }
-
 	// Debug message
-	std::cout << "* DNA.debug_queue" << std::endl;
-
-	// Loop queue's contents
-	std::cout << "Contents of queue with size " << std::dec << dataQueue.size() << ":" << std::endl;
-	std::queue<int> dataQueueDup(dataQueue);
-	std::cout << "\t";
-	while (!dataQueueDup.empty())
-	{
-		std::cout << std::hex << "0x" << dataQueueDup.front() << " ";
-		dataQueueDup.pop();
-	}
-	std::cout << std::endl;
-}
-
-void DNA::debug_list()
-{
-    // Check cache
-    if (!cacheList)
-    {
-        toList();
-        cacheList = true;
-    }
-
-	// Debug message
-	std::cout << "* DNA.debug_list" << std::endl;
+	std::cout << "* DNA.debug" << std::endl;
 
 	// Process list
-	std::cout << "Contents of list with size " << std::dec << dataList.size() << ":" << std::endl;
-	std::list<std::list<int> >::iterator it = dataList.begin();
-	while (it != dataList.end())
+	std::cout << "Contents of list with size " << std::dec << data.size() << ":" << std::endl;
+	std::list<std::list<int> >::iterator it = data.begin();
+	while (it != data.end())
 	{
 		std::cout << "\tlist<int>: ";
 		std::list<int>::iterator it2 = it->begin();
@@ -158,73 +152,3 @@ void DNA::debug_list()
 	}
 }
 
-
-//
-// Conversion routines
-//
-
-// Convert list to string
-void DNA::toQueue()
-{
-	// Reset the queue
-	while (!dataQueue.empty())
-		dataQueue.pop();
-
-	// Starting semantics
-	dataQueue.push(255);
-
-	// Process all genes
-	std::list<std::list<int> >::iterator it = dataList.begin();
-	while (it != dataList.end())
-	{
-		std::list<int>::iterator it2 = it->begin();
-		while (it2 != it->end())
-			dataQueue.push(*(it2++));
-		it++;
-
-		// Only add 0 if not at end (can't fix this later on as queue has no pop_back)
-		if (it != dataList.end())
-			dataQueue.push(0);
-	}
-
-	// Ending semantics
-	dataQueue.push(255);
-}
-
-// Convert list to string
-void DNA::toList()
-{
-	// Reset the list
-	dataList.clear();
-
-	// Duplicate the list and work with that copy
-	std::queue<int> dataQueueDup(dataQueue);
-
-	// Check semantics
-	if (dataQueueDup.front() != 255)
-		throw(std::string("DNA.toList: saved DNA queue doesn't start with 255"));
-	dataQueueDup.pop();
-
-	// Process all
-	std::list<int> tempVector;
-	while (!dataQueueDup.empty() && dataQueueDup.front() != 255)
-	{
-		if (dataQueueDup.front() == 0)
-		{
-			dataList.push_back(tempVector);
-			tempVector.clear();
-		}
-		else
-		{
-			tempVector.push_back(dataQueueDup.front());
-		}
-		dataQueueDup.pop();
-	}
-
-	// Check semantics
-	if (dataQueueDup.front() != 255)
-		throw(std::string("DNA.toList: saved DNA queue doesn't end with 255"));
-
-	// Save last vector
-	dataList.push_back(tempVector);
-}

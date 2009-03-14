@@ -50,11 +50,9 @@ class Environment
 {
 	public:
 		// Required functions
-		double fitness(DNA inputDNA);
-		virtual double fitness(std::queue<int> inputQueue);
-		virtual double fitness(std::list<std::list<int> > inputList);
+		virtual double fitness(DNA& inputDNA);
 		virtual int alphabet();
-		virtual void update(std::list<std::list<int> > inputList);
+		virtual void update(DNA& inputDNA);
 };
 
 

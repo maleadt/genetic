@@ -63,8 +63,7 @@ class Population
         Population(Environment* inputEnvironment, DNA inputDNA);
 
         // Output routines
-        std::queue<int> getDNAQueue();
-        std::list<std::list<int> > getDNAList();
+        DNA getDNA();
 
         // Evolutionary methods
         void evolve_single_straight(int iterations);

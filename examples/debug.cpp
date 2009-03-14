@@ -49,7 +49,7 @@ class EnvDebug : public Environment
 		EnvDebug();
 
 		// Required functons
-		double fitness(std::list<std::list<int> >&);
+		double fitness(DNA& inputDNA);
 		int alphabet();
 
 	private:
@@ -69,26 +69,9 @@ int EnvDebug::alphabet()
 }
 
 // Fitness function
-double EnvDebug::fitness(std::list<std::list<int> >& inputList)
+double EnvDebug::fitness(DNA& inputDNA)
 {
 	return counter++;
-}
-
-//////////////
-// ROUTINES //
-//////////////
-
-void debug_queue(std::queue<int> inputQueue)
-{
-	// Loop queue's contents
-	std::cout << "Contents of queue with size " << std::dec << inputQueue.size() << ":" << std::endl;
-	std::cout << "\t";
-	while (!inputQueue.empty())
-	{
-		std::cout << std::hex << "0x" << inputQueue.front() << " ";
-		inputQueue.pop();
-	}
-	std::cout << std::endl;
 }
 
 
@@ -99,20 +82,20 @@ void debug_queue(std::queue<int> inputQueue)
 int main()
 {
 	// Generate a DNA string
-	std::queue<int> tempDNA;
-	tempDNA.push(255);
-	tempDNA.push(123);
-	tempDNA.push(64);
-	tempDNA.push(0);
-	tempDNA.push(0);
-	tempDNA.push(48);
-	tempDNA.push(91);
-	tempDNA.push(31);
-	tempDNA.push(0);
-	tempDNA.push(49);
-	tempDNA.push(255);
-
-	debug_queue(tempDNA);
+	std::queue<int> tempQueue;
+	tempQueue.push(255);
+	tempQueue.push(123);
+	tempQueue.push(64);
+	tempQueue.push(0);
+	tempQueue.push(0);
+	tempQueue.push(48);
+	tempQueue.push(91);
+	tempQueue.push(31);
+	tempQueue.push(0);
+	tempQueue.push(49);
+	tempQueue.push(255);
+	DNA tempDNA(tempQueue);
+    tempDNA.debug();
 
 	// Create an environment
 	EnvDebug tempEnvironment;
@@ -123,9 +106,8 @@ int main()
 	// Simulate
 	try
 	{
-		tempPopulation.evolve_single_straight(100);
-		tempDNA = tempPopulation.getDNAQueue();
-		debug_queue(tempDNA);
+		tempPopulation.evolve_single_straight(1);
+		tempPopulation.getDNA().debug();
 	}
 	catch (std::string error)
 	{

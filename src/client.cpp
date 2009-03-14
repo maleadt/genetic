@@ -88,7 +88,7 @@ void Client::crossover(Client&)
 void Client::clean()
 {
     // Get list of genes
-    std::list<std::list<int> > tempGenes = dataDNA.getList();
+    std::list<std::list<int> > tempGenes = dataDNA.get();
 
 	// Pick random gene
 	int random = random_range(0, tempGenes.size()-1);
@@ -103,7 +103,7 @@ void Client::clean()
 	}
 
 	// Save the altered DNA
-	dataDNA = DNA(tempGenes);
+	dataDNA.set(tempGenes);
 }
 
 
@@ -124,7 +124,7 @@ DNA Client::getDNA()
 void Client::mutate_dna()
 {
     // Get list of genes
-    std::list<std::list<int> > tempGenes = dataDNA.getList();
+    std::list<std::list<int> > tempGenes = dataDNA.get();
 
 	// Prevent mutation of empty lists
 	if (tempGenes.size() < 1)
@@ -168,13 +168,13 @@ void Client::mutate_dna()
 	}
 
 	// Save the altered DNA
-	dataDNA = DNA(tempGenes);
+	dataDNA.set(tempGenes);
 }
 
 void Client::mutate_gen()
 {
     // Get list of genes
-    std::list<std::list<int> > tempGenes = dataDNA.getList();
+    std::list<std::list<int> > tempGenes = dataDNA.get();
 
 	// Prevent mutation of empty lists
 	if (tempGenes.size() < 1)
@@ -209,13 +209,13 @@ void Client::mutate_gen()
 	}
 
 	// Save the altered DNA
-	dataDNA = DNA(tempGenes);
+	dataDNA.set(tempGenes);
 }
 
 void Client::mutate_codon()
 {
     // Get list of genes
-    std::list<std::list<int> > tempGenes = dataDNA.getList();
+    std::list<std::list<int> > tempGenes = dataDNA.get();
 
 	// Avoid altering empty DNA
 	if (tempGenes.empty())
@@ -241,6 +241,6 @@ void Client::mutate_codon()
 	*it2 = random_range(1, dataAlphabet);
 
 	// Save the altered DNA
-	dataDNA = DNA(tempGenes);
+	dataDNA.set(tempGenes);
 }
 

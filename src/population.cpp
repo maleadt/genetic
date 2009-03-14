@@ -53,14 +53,9 @@ Population::Population(Environment* inputEnvironment, DNA inputDNA)
 // Output routines
 //
 
-std::queue<int> Population::getDNAQueue()
+DNA Population::getDNA()
 {
-    return dataDNA.getQueue();
-}
-
-std::list<std::list<int> > Population::getDNAList()
-{
-    return dataDNA.getList();
+    return dataDNA;
 }
 
 
@@ -84,12 +79,13 @@ void Population::evolve_single_straight(int iterations)
         tempClient.mutate();
 
         // Compare the new DNA
-        double tempFitness = dataEnvironment->fitness(tempClient.getDNA().getList());
+        DNA tempDNA = tempClient.getDNA();
+        double tempFitness = dataEnvironment->fitness(tempDNA);
         if (tempFitness > dataFitness)
         {
             dataFitness = tempFitness;
             dataDNA = tempClient.getDNA();
-            dataEnvironment->update(dataDNA.getList());
+            dataEnvironment->update(dataDNA);
         }
 
         iterations--;
@@ -113,8 +109,12 @@ void Population::evolve_box_straight(int iterations)
     }
 
     // Fill the initial fitness fields in the box
+    DNA tempDNA;
     for (int i = 0; i < POPULATION_BOX_SIZE; i++)
-        tempBox[i].fitness = dataEnvironment->fitness(tempBox[i].dna.getList());
+    {
+        tempDNA = DNA(tempBox[i].dna);
+        tempBox[i].fitness = dataEnvironment->fitness(tempDNA);
+    }
 
     // Fitness watcher
     double fitness_critical = 0;
@@ -138,7 +138,7 @@ void Population::evolve_box_straight(int iterations)
         if (tempBox[0].fitness > fitness_critical)
         {
             fitness_critical = tempBox[0].fitness;
-            dataEnvironment->update(tempBox[0].dna.getList());
+            dataEnvironment->update(tempBox[0].dna);
         }
 
         // Look up valid threshold
@@ -171,7 +171,7 @@ void Population::evolve_box_straight(int iterations)
 
         // Fill the newely created fitness fields in the box
         for (int i = limit; i < POPULATION_BOX_SIZE; i++)
-            tempBox[i].fitness = dataEnvironment->fitness(tempBox[i].dna.getList());
+            tempBox[i].fitness = dataEnvironment->fitness(tempBox[i].dna);
 
         // Save the best DNA
         dataDNA = tempBox[0].dna;

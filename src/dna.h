@@ -58,26 +58,34 @@ class DNA
 		DNA(std::queue<int> inputQueue);
 		DNA(std::list<std::list<int> > inputList);
 
-		// Output routines
-		std::queue<int> getQueue();
-		std::list<std::list<int> > getList();
+		// Setters
+		void set(std::queue<int> inputQueue);
+		void set(std::list<std::list<int> > inputList);
+
+		// Getters
+		std::list<std::list<int> > get();
+
+		// Informational routines
+		int genes() const;
+
+        // Iterators
+        typedef std::list<std::list<int> >::const_iterator const_iterator;
+        const_iterator begin() const
+        {
+                return data.begin();
+        }
+        const_iterator end() const
+        {
+                return data.end();
+        }
+
 
 		// Debugging routines
-		void debug_queue();
-		void debug_list();
+		void debug();
 
 	private:
-		// Data (TODO: only maintain ONE internal representation)
-		std::queue<int> dataQueue;
-		std::list<std::list<int> > dataList;
-
-		// Conversion routines
-		void toQueue();
-		void toList();
-
-		// Cache control
-		bool cacheQueue;
-		bool cacheList;
+		// Data
+		std::list<std::list<int> > data;
 };
 
 

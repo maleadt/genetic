@@ -41,6 +41,7 @@
 // Headers
 #include "../src/population.h"
 #include "../src/environment.h"
+#include "../src/dna.h"
 #include <cmath>
 #include <queue>
 #include <string>
@@ -66,15 +67,15 @@ class EnvImage : public Environment
 {
 	public:
 		// Required functons
-		double fitness(std::list<std::list<int> > inputList);
+		double fitness(DNA& inputDNA);
 		int alphabet();
-		void update(std::list<std::list<int> > inputList);
+		void update(DNA& inputDNA);
 		void output(cairo_surface_t* inputSurface);
 
 		// Image functions
 		bool loadImage(const std::string& inputFile);
-		bool valid_limits(std::list<std::list<int> >& inputList);
-		void draw(cairo_surface_t* inputSurface, std::list<std::list<int> >& inputList);
+		bool valid_limits(const DNA& inputDNA) const;
+		void draw(cairo_surface_t* inputSurface, const DNA& inputDNA) const;
 		double compare(cairo_surface_t* inputSurface);
 
 	private:
@@ -96,17 +97,17 @@ class EnvImage : public Environment
 //
 
 // Fitness function
-double EnvImage::fitness(std::list<std::list<int> > inputList)
+double EnvImage::fitness(DNA& inputDNA)
 {
 	// Check the DNA's limit's
-	if (!valid_limits(inputList))
+	if (!valid_limits(inputDNA))
 		return -1;
 
 	// Create a DC for the generated image
     cairo_surface_t* tempSurface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, dataInputWidth, dataInputHeight);
 
 	// Draw the DNA onto the DC
-	draw(tempSurface, inputList);
+	draw(tempSurface, inputDNA);
 
 	// Compare them
 	double resemblance = compare(tempSurface);
@@ -123,19 +124,19 @@ int EnvImage::alphabet()
 }
 
 // Update call
-void EnvImage::update(std::list<std::list<int> > inputList)
+void EnvImage::update(DNA& inputDNA)
 {
     // Create surface
     cairo_surface_t* tempSurface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, dataInputWidth, dataInputHeight);
 
 	// Draw the DNA onto the DC
-	draw(tempSurface, inputList);
+	draw(tempSurface, inputDNA);
 
     // Let the application output the bitmap
     output(tempSurface);
 
     // Print a message
-    std::cout << "- Successfully mutated (new fitness: " << int(10000*fitness(inputList))/100.0 << "%)" << std::endl;
+    std::cout << "- Successfully mutated (new fitness: " << int(10000*fitness(inputDNA))/100.0 << "%)" << std::endl;
 
     // Finish
     cairo_surface_destroy(tempSurface);
@@ -190,20 +191,23 @@ bool EnvImage::loadImage(const std::string& inputFile)
 	dataInputWidth = cairo_image_surface_get_width(tempSurface);
 	dataInputHeight = cairo_image_surface_get_height(tempSurface);
 
+    // Finish
+    //cairo_surface_destroy(tempSurface);
+
 	// Return
 	return true;
 }
 
 // Validity function
-bool EnvImage::valid_limits(std::list<std::list<int> >& inputList)
+bool EnvImage::valid_limits(const DNA& inputDNA) const
 {
 	// Check amount of polygons
-	if (inputList.size() < 1 || inputList.size() > LIMIT_POLYGONS)
+	if (inputDNA.genes() < 1 || inputDNA.genes() > LIMIT_POLYGONS)
 		return false;
 
 	// Check points per polygon
-	std::list<std::list<int> >::iterator it = inputList.begin();
-	while (it != inputList.end())
+	std::list<std::list<int> >::const_iterator it = inputDNA.begin();
+	while (it != inputDNA.end())
 	{
 		int size = (it++)->size();
 
@@ -221,7 +225,7 @@ bool EnvImage::valid_limits(std::list<std::list<int> >& inputList)
 }
 
 // Render the DNA code onto a draw container
-void EnvImage::draw(cairo_surface_t* inputSurface, std::list<std::list<int> >& inputList)
+void EnvImage::draw(cairo_surface_t* inputSurface, const DNA& inputDNA) const
 {
     // Create a Cairo context
     cairo_t *cr = cairo_create(inputSurface);
@@ -232,10 +236,10 @@ void EnvImage::draw(cairo_surface_t* inputSurface, std::list<std::list<int> >& i
     cairo_fill(cr);
 
 	// Loop all genes
-	std::list<std::list<int> >::iterator it = inputList.begin();
-	while (it != inputList.end())
+	std::list<std::list<int> >::const_iterator it = inputDNA.begin();
+	while (it != inputDNA.end())
 	{
-		std::list<int>::iterator it2 = it->begin();
+		std::list<int>::const_iterator it2 = it->begin();
 
 		// Get colour code
 		int r = *(it2++), g = *(it2++), b = *(it2++), a = *(it2++);
@@ -351,19 +355,20 @@ int main(int argc, char** argv)
 	//
 
 	// Initial DNA (triangle)
-	std::queue<int> tempDNA;
-	tempDNA.push(255);	// Start of DNA
-	tempDNA.push(50);	// Semi transparent grey brush (RGB = 50 50 50, with 50% opacity)
-	tempDNA.push(50);
-	tempDNA.push(50);
-	tempDNA.push(128);
-	tempDNA.push(1);	// Point one: (1, 254)
-	tempDNA.push(254);
-	tempDNA.push(128);	// Point two: (128, 1)
-	tempDNA.push(1);
-	tempDNA.push(254);	// Point three: (254, 254)
-	tempDNA.push(254);
-	tempDNA.push(255);	// End of DNA
+	std::queue<int> tempQueue;
+	tempQueue.push(255);	// Start of DNA
+	tempQueue.push(50);	// Semi transparent grey brush (RGB = 50 50 50, with 50% opacity)
+	tempQueue.push(50);
+	tempQueue.push(50);
+	tempQueue.push(128);
+	tempQueue.push(1);	// Point one: (1, 254)
+	tempQueue.push(254);
+	tempQueue.push(128);	// Point two: (128, 1)
+	tempQueue.push(1);
+	tempQueue.push(254);	// Point three: (254, 254)
+	tempQueue.push(254);
+	tempQueue.push(255);	// End of DNA
+	DNA tempDNA(tempQueue);
 
 	// Create object
 	Population dataPopulation(&dataEnvironment, tempDNA);
@@ -371,7 +376,7 @@ int main(int argc, char** argv)
 	// Message
 	std::cout << "NOTE: population created" << std::endl;
 
-	dataPopulation.evolve_box_straight(1000000000);
+	dataPopulation.evolve_single_straight(1000000000);
 
 	return 0;
 }

@@ -48,18 +48,7 @@ WARNING:
 */
 
 // Fitness functions
-double Environment::fitness(DNA inputDNA)
-{
-	std::queue<int> tempQueue = inputDNA.getQueue();
-	std::list<std::list<int> > tempList = inputDNA.getList();
-
-	return fitness(tempQueue) + fitness(tempList);
-}
-double Environment::fitness(std::queue<int> inputQueue)
-{
-	return 0;
-}
-double Environment::fitness(std::list<std::list<int> > inputList)
+double Environment::fitness(DNA& inputDNA)
 {
 	return 0;
 }
@@ -71,6 +60,6 @@ int Environment::alphabet()
 }
 
 // Update call
-void Environment::update(std::list<std::list<int> > inputList)
+void Environment::update(DNA& inputDNA)
 {
 }
