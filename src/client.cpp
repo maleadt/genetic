@@ -41,9 +41,9 @@
 //
 
 // Create client with given DNA
-Client::Client(std::list<std::list<int> > inputList)
+Client::Client(DNA inputDNA)
 {
-	dataDNA = inputList;
+	dataDNA = inputDNA;
 }
 
 
@@ -87,17 +87,23 @@ void Client::crossover(Client&)
 // Clean the DNA
 void Client::clean()
 {
+    // Get list of genes
+    std::list<std::list<int> > tempGenes = dataDNA.getList();
+
 	// Pick random gene
-	int random = random_range(0, dataDNA.size()-1);
-	std::list<std::list<int> >::iterator it = dataDNA.begin();
-	while (it != dataDNA.end())
+	int random = random_range(0, tempGenes.size()-1);
+	std::list<std::list<int> >::iterator it = tempGenes.begin();
+	while (it != tempGenes.end())
 	{
 		if (it->empty())
 		{
-			it = dataDNA.erase(it);
+			it = tempGenes.erase(it);
 		}
 		++it;
 	}
+
+	// Save the altered DNA
+	dataDNA = DNA(tempGenes);
 }
 
 
@@ -105,7 +111,7 @@ void Client::clean()
 // DNA output
 //
 
-std::list<std::list<int> > Client::getDNA()
+DNA Client::getDNA()
 {
 	return dataDNA;
 }
@@ -117,18 +123,21 @@ std::list<std::list<int> > Client::getDNA()
 
 void Client::mutate_dna()
 {
+    // Get list of genes
+    std::list<std::list<int> > tempGenes = dataDNA.getList();
+
 	// Prevent mutation of empty lists
-	if (dataDNA.size() < 1)
+	if (tempGenes.size() < 1)
 		return;
 
 	 // Pick random gene(s)
-	 int random1 = random_range(0, dataDNA.size()-1);
-	 int random2 = random_range(0, dataDNA.size()-1);
-	 while (dataDNA.size() > 1 && random1 == random2)
-	 	random2 = random_range(0, dataDNA.size()-1);
+	 int random1 = random_range(0, tempGenes.size()-1);
+	 int random2 = random_range(0, tempGenes.size()-1);
+	 while (tempGenes.size() > 1 && random1 == random2)
+	 	random2 = random_range(0, tempGenes.size()-1);
 
 	// Calculate iterators to those genes
-	std::list<std::list<int> >::iterator it1 = dataDNA.begin(), it2 = dataDNA.begin();
+	std::list<std::list<int> >::iterator it1 = tempGenes.begin(), it2 = tempGenes.begin();
 	for (int i = 0; i < random1; i++)
 		it1++;
 	for (int i = 0; i < random2; i++)
@@ -149,24 +158,30 @@ void Client::mutate_dna()
 			std::list<int> tempList;
 			for (int i = 0; i < size; i++)
 				tempList.push_back(random_range(0, dataAlphabet));
-			dataDNA.insert(it1, tempList);
+			tempGenes.insert(it1, tempList);
 			break;
 		}
 
 		default:
-			mutate_list(dataDNA);
+			mutate_list(tempGenes);
 			break;
 	}
+
+	// Save the altered DNA
+	dataDNA = DNA(tempGenes);
 }
 
 void Client::mutate_gen()
 {
+    // Get list of genes
+    std::list<std::list<int> > tempGenes = dataDNA.getList();
+
 	// Prevent mutation of empty lists
-	if (dataDNA.size() < 1)
+	if (tempGenes.size() < 1)
 		return;
 	// Pick random gene
-	int random = random_range(0, dataDNA.size()-1);
-	std::list<std::list<int> >::iterator it = dataDNA.begin();
+	int random = random_range(0, tempGenes.size()-1);
+	std::list<std::list<int> >::iterator it = tempGenes.begin();
 	for (int i = 0; i < random; i++)
 		it++;
 
@@ -192,17 +207,23 @@ void Client::mutate_gen()
 			mutate_list(*it);
 			break;
 	}
+
+	// Save the altered DNA
+	dataDNA = DNA(tempGenes);
 }
 
 void Client::mutate_codon()
 {
+    // Get list of genes
+    std::list<std::list<int> > tempGenes = dataDNA.getList();
+
 	// Avoid altering empty DNA
-	if (dataDNA.empty())
+	if (tempGenes.empty())
 		return;
 
 	// Pick random gene
-	int random = random_range(0, dataDNA.size()-1);
-	std::list<std::list<int> >::iterator it = dataDNA.begin();
+	int random = random_range(0, tempGenes.size()-1);
+	std::list<std::list<int> >::iterator it = tempGenes.begin();
 	for (int i = 0; i < random; i++)
 		it++;
 
@@ -218,5 +239,8 @@ void Client::mutate_codon()
 
 	// Point mutate
 	*it2 = random_range(1, dataAlphabet);
+
+	// Save the altered DNA
+	dataDNA = DNA(tempGenes);
 }
 

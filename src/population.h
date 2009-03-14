@@ -38,17 +38,24 @@
 #include "dna.h"
 #include <list>
 #include <queue>
+#include <vector>
+#include <algorithm>
 
 
 //
 // Constants
 //
 
+// Box
+const int POPULATION_BOX_SIZE = 100;
+const int POPULATION_BOX_THRESHOLD = 10;
+
 
 //////////////////////
 // CLASS DEFINITION //
 //////////////////////
 
+// Population
 class Population
 {
     public:
@@ -60,12 +67,24 @@ class Population
         std::list<std::list<int> > getDNAList();
 
         // Evolutionary methods
-        void evolve_single_straight(int successes);
+        void evolve_single_straight(int iterations);
+        void evolve_box_straight(int iterations);
 
     private:
         // Current DNA
         DNA dataDNA;
         Environment* dataEnvironment;
+};
+
+// Struct containing DNA as well as fitness
+struct DNAfit
+{
+    DNA dna;
+    double fitness;
+    friend bool operator<(const DNAfit& left, const DNAfit& right)
+    {
+        return (left.fitness > right.fitness);
+    }
 };
 
 

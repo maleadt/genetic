@@ -53,7 +53,7 @@ int random_range(int lowest_number, int highest_number)
 	// Swap the numbers if needed
 	if (lowest_number > highest_number)
 	{
-		swap(lowest_number, highest_number);
+		std::swap(lowest_number, highest_number);
 	}
 
 	// Calculate the range

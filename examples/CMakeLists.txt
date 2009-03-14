@@ -18,11 +18,16 @@ TARGET_LINK_LIBRARIES(debug environment)
 # Image
 #
 
-# Include wxWidgets
-SET(wxWidgets_USE_LIBS base core) 
-FIND_PACKAGE(wxWidgets REQUIRED) 
-INCLUDE_DIRECTORIES(${wxWidgets_INCLUDE_DIRS})
-ADD_DEFINITIONS(${wxWidgets_DEFINITIONS})
+# Cairo
+INCLUDE(CheckCCompilerFlag)
+CHECK_C_COMPILER_FLAG(-lcairo HAVE_CAIRO)
+IF (HAVE_CAIRO)
+	MESSAGE("** Found Cairo")
+	SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lcairo")
+ELSE (HAVE_CAIRO)
+	MESSAGE("!! Cannot link against Cairo")
+ENDIF (HAVE_CAIRO)
+
 
 # Build executale
 ADD_EXECUTABLE(image image.cpp)
@@ -30,4 +35,4 @@ ADD_EXECUTABLE(image image.cpp)
 # Link executable
 TARGET_LINK_LIBRARIES(image population)
 TARGET_LINK_LIBRARIES(image environment)
-TARGET_LINK_LIBRARIES(image ${wxWidgets_LIBRARIES})
+TARGET_LINK_LIBRARIES(image ${Cairo_LIBRARIES})

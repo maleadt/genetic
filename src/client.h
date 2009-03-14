@@ -36,7 +36,9 @@
 #include <iostream>
 #include <queue>
 #include <list>
+#include <algorithm>
 #include "generic.h"
+#include "dna.h"
 
 
 //
@@ -56,7 +58,7 @@ class Client
 {
 	public:
 		// Construction and destruction
-		Client(std::list<std::list<int> >);
+		Client(DNA inputDNA);
 
 		// DNA alteration
 		void mutate();
@@ -64,14 +66,14 @@ class Client
 		void clean();
 
 		// DNA output
-		std::list<std::list<int> > getDNA();
+		DNA getDNA();
 
 		// Alphabet
 		int dataAlphabet;
 
 	private:
 		// DNA
-		std::list<std::list<int> > dataDNA;
+		DNA dataDNA;
 
 		// Mutation routines
 		void mutate_dna();
@@ -135,7 +137,7 @@ void mutate_list(std::list<T>& inputList)
 		// Inversion
 		case 4:
 		{
-			swap(*(it1), *(it2));
+			std::swap(*(it1), *(it2));
 			break;
 		}
 

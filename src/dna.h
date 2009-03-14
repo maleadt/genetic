@@ -67,7 +67,7 @@ class DNA
 		void debug_list();
 
 	private:
-		// Data
+		// Data (TODO: only maintain ONE internal representation)
 		std::queue<int> dataQueue;
 		std::list<std::list<int> > dataList;
 
