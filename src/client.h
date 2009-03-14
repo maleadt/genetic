@@ -58,11 +58,13 @@ class Client
 {
 	public:
 		// Construction and destruction
-		Client(DNA inputDNA);
+		Client();
+		Client(const DNA& inputDNA);
+		Client(const DNA& inputDNA, int inputAlphabet);
 
 		// DNA alteration
 		void mutate();
-		void crossover(Client&);
+		void crossover(Client& inputClient);
 		void clean();
 
 		// DNA output

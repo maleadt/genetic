@@ -122,6 +122,12 @@ DNA::iterator DNA::insert(iterator it, std::list<int>& item)
     return data.insert(it, item);
 }
 
+// Add an element
+void DNA::push_back(std::list<int>& item)
+{
+    data.push_back(item);
+}
+
 
 //
 // Informational routines

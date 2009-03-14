@@ -56,6 +56,7 @@ const int POPULATION_BOX_THRESHOLD = 5;
 //////////////////////
 
 // Population
+struct CachedClient;
 class Population
 {
     public:
@@ -67,7 +68,11 @@ class Population
 
         // Evolutionary methods
         void evolve_single_straight(int iterations);
+        void evolve_box(int iterations, int process);
         void evolve_box_straight(int iterations);
+        void evolve_box_straight_process(std::vector<CachedClient>& inputBox);
+        void evolve_box_together(int iterations);
+        void evolve_box_together_process(std::vector<CachedClient>& inputBox);
 
     private:
         // Current DNA
@@ -75,12 +80,12 @@ class Population
         Environment* dataEnvironment;
 };
 
-// Struct containing DNA as well as fitness
-struct DNAfit
+// A struct containing a client, as well as a field for its fitness
+struct CachedClient
 {
-    DNA dna;
+    Client client;
     double fitness;
-    friend bool operator<(const DNAfit& left, const DNAfit& right)
+    friend bool operator<(const CachedClient& left, const CachedClient& right)
     {
         return (left.fitness > right.fitness);
     }

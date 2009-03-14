@@ -87,6 +87,7 @@ class DNA
         // Modifyers
         iterator erase(iterator it);
         iterator insert(iterator it, std::list<int>& item);
+        void push_back(std::list<int>& item);
 
 		// Informational routines
 		int genes() const;

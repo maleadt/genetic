@@ -40,10 +40,22 @@
 // Construction and destruction
 //
 
-// Create client with given DNA
-Client::Client(DNA inputDNA)
+// Default constructor
+Client::Client()
 {
-	dataDNA = inputDNA;
+}
+
+// Create client with given DNA
+Client::Client(const DNA& inputDNA)
+{
+	dataDNA = DNA(inputDNA);
+}
+
+// Create client with given DNA and alphabet
+Client::Client(const DNA& inputDNA, int inputAlphabet)
+{
+	dataDNA = DNA(inputDNA);
+	dataAlphabet = inputAlphabet;
 }
 
 
@@ -80,8 +92,70 @@ void Client::mutate()
 }
 
 // Combine the DNA with another client
-void Client::crossover(Client&)
+void Client::crossover(Client& inputClient)
 {
+    // Create a new DNA sequence
+    DNA tempDNA;
+
+    // Acquire DNA from given client
+    DNA inputDNA = inputClient.get();
+
+    // Pick a crossover-method
+    int method = random_range(0, 3);
+
+    // Crossover!
+    switch (method)
+    {
+        // Sequential merge
+        case 1:
+        {
+            for (DNA::iterator it = dataDNA.begin(); it != dataDNA.end(); it++)
+                tempDNA.push_back(*it);
+            for (DNA::iterator it = inputDNA.begin(); it != inputDNA.end(); it++)
+                tempDNA.push_back(*it);
+            break;
+        }
+
+        // Altering merge
+        case 2:
+        {
+            DNA::iterator it1 = dataDNA.begin();
+            DNA::iterator it2 = inputDNA.begin();
+            while (it1 != dataDNA.end() || it2 != inputDNA.end())
+            {
+                if (it1 != dataDNA.end())
+                    tempDNA.push_back(*(it1++));
+                if (it2 != inputDNA.end())
+                    tempDNA.push_back(*(it2++));
+            }
+            break;
+        }
+
+        // Random merge
+        case 3:
+        {
+            DNA::iterator it1 = dataDNA.begin();
+            DNA::iterator it2 = inputDNA.begin();
+            while (it1 != dataDNA.end() || it2 != inputDNA.end())
+            {
+                int choice = random_range(0, 1);
+                if (choice == 0 && it1 != dataDNA.end())
+                    tempDNA.push_back(*(it1));
+                else if (it2 != inputDNA.end())
+                    tempDNA.push_back(*(it2));
+
+                if (it1 != dataDNA.end())
+                    it1++;
+                if (it2 != inputDNA.end())
+                    it2++;
+            }
+            break;
+        }
+    }
+
+
+    // Save the DNA
+    dataDNA = tempDNA;
 }
 
 // Clean the DNA

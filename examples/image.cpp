@@ -70,6 +70,10 @@ const int LIMIT_POLYGON_POINTS = 5;
 class EnvImage : public Environment
 {
 	public:
+		// Construction & destruction
+		EnvImage();
+		~EnvImage();
+
 		// Required functons
 		double fitness(const DNA& inputDNA) const;
 		int alphabet() const;
@@ -96,6 +100,24 @@ class EnvImage : public Environment
 /////////////////
 // ENVIRONMENT //
 /////////////////
+
+//
+// Construction & destruction
+//
+
+// Constructor
+EnvImage::EnvImage()
+{
+    dataInputRGB24 = NULL;
+}
+
+// Destructor
+EnvImage::~EnvImage()
+{
+    if (dataInputRGB24 != NULL)
+        delete[] dataInputRGB24;
+}
+
 
 //
 // Required functons
@@ -195,15 +217,21 @@ bool EnvImage::loadImage(const std::string& inputFile)
 	std::cout << "- Evolution started, writing target image" << std::endl;
 	output(tempSurface);
 
-	// Save data
-	dataInputRGB24 = cairo_image_surface_get_data(tempSurface);
+	// Get data
+	unsigned char* tempRGB24 = cairo_image_surface_get_data(tempSurface);
 
 	// Save size
 	dataInputWidth = cairo_image_surface_get_width(tempSurface);
 	dataInputHeight = cairo_image_surface_get_height(tempSurface);
 
+	// Save data
+	dataInputRGB24 = new unsigned char[dataInputHeight*dataInputWidth*4+1];
+	for (int i = 0; i < dataInputHeight*dataInputWidth*4; i++)
+        dataInputRGB24[i] = *(tempRGB24++);
+    dataInputRGB24[dataInputHeight*dataInputWidth*4] = 0;
+
     // Finish
-    //cairo_surface_destroy(tempSurface);
+    cairo_surface_destroy(tempSurface);
 
 	// Return
 	return true;
@@ -387,7 +415,8 @@ int main(int argc, char** argv)
 	// Message
 	std::cout << "NOTE: population created" << std::endl;
 
-	dataPopulation.evolve_box_straight(1000000000);
+    // Evolve
+	dataPopulation.evolve_box_together(1000);
 
 	return 0;
 }

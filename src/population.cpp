@@ -95,25 +95,82 @@ void Population::evolve_single_straight(int iterations)
 // Evolve a box of clients straightly
 void Population::evolve_box_straight(int iterations)
 {
+    evolve_box(iterations, 1);
+}
+void Population::evolve_box_straight_process(std::vector<CachedClient>& inputBox)
+{
+    // Look up valid threshold
+    int limit = POPULATION_BOX_THRESHOLD;
+    while (inputBox[limit].fitness == -1)
+        limit--;
+
+    // Fill the rest of the box with copies of best x mutations
+    int j = 0;
+    for (int i = limit; i < POPULATION_BOX_SIZE; i++)
+    {
+        inputBox[i].client = Client(inputBox[j++].client);
+        if (j >= limit)
+            j = 0;
+    }
+
+    // Mutate the box
+    for (int i = limit; i < POPULATION_BOX_SIZE; i++)
+        inputBox[i].client.mutate();
+
+    // Fill the newely created fitness fields in the box
+    for (int i = limit; i < POPULATION_BOX_SIZE; i++)
+        inputBox[i].fitness = dataEnvironment->fitness(inputBox[i].client.get());
+}
+
+// Evolve a box of clients together
+void Population::evolve_box_together(int iterations)
+{
+    evolve_box(iterations, 2);
+}
+void Population::evolve_box_together_process(std::vector<CachedClient>& inputBox)
+{
+    // Look up valid threshold
+    int limit = POPULATION_BOX_THRESHOLD;
+    while (inputBox[limit].fitness == -1)
+        limit--;
+
+    // Fill the rest of the box with copies of best x mutations
+    int j = 0;
+    for (int i = limit; i < POPULATION_BOX_SIZE; i++)
+    {
+        inputBox[i].client = Client(inputBox[j++].client);
+        if (j >= limit)
+            j = 0;
+    }
+
+    // Convolute clients
+    for (int i = limit; i < POPULATION_BOX_SIZE; i++)
+        inputBox[i].client.crossover( inputBox[random_range(0, limit)].client );
+
+    // Fill the newely created fitness fields in the box
+    for (int i = limit; i < POPULATION_BOX_SIZE; i++)
+        inputBox[i].fitness = dataEnvironment->fitness(inputBox[i].client.get());
+}
+
+// Evolve a box
+void Population::evolve_box(int iterations, int process)
+{
     // Allocate the vector and fill it with the given DNA
-    std::vector<DNAfit> tempBox(POPULATION_BOX_SIZE);
+    std::vector<CachedClient> tempBox(POPULATION_BOX_SIZE);
     std::cout << "* Started boxed straight evolution" << std::endl;
 
     // Mutate all but one
-    tempBox[0].dna = dataDNA;
+    tempBox[0].client = Client(dataDNA, dataEnvironment->alphabet());
     for (int i = 1; i < POPULATION_BOX_SIZE; i++)
     {
-        Client tempClient(dataDNA);
-        tempClient.dataAlphabet = dataEnvironment->alphabet();
-        tempClient.mutate();
-        tempBox[i].dna = tempClient.get();
+        tempBox[i].client = Client(dataDNA, dataEnvironment->alphabet());
+        tempBox[i].client.mutate();
     }
 
     // Fill the initial fitness fields in the box
-    DNA tempDNA;
     for (int i = 0; i < POPULATION_BOX_SIZE; i++)
     {
-        tempDNA = DNA(tempBox[i].dna);
+        DNA tempDNA = DNA(tempBox[i].client.get());
         tempBox[i].fitness = dataEnvironment->fitness(tempDNA);
     }
 
@@ -137,41 +194,24 @@ void Population::evolve_box_straight(int iterations)
         if (tempBox[0].fitness > fitness_critical)
         {
             fitness_critical = tempBox[0].fitness;
-            dataEnvironment->update(tempBox[0].dna);
+            dataEnvironment->update(tempBox[0].client.get());
         }
 
-        // Look up valid threshold
-        int limit = POPULATION_BOX_THRESHOLD;
-        while (tempBox[limit].fitness == -1)
-            limit--;
-
-        // Fill the rest of the box with copies of best x mutations
-        int j = 0;
-        for (int i = limit; i < POPULATION_BOX_SIZE; i++)
+        // Call a specific function to process the box
+        switch (process)
         {
-            tempBox[i].dna = tempBox[j++].dna;
-            if (j >= limit)
-                j = 0;
+            case 1:
+                evolve_box_straight_process(tempBox);
+                break;
+            case 2:
+                evolve_box_together_process(tempBox);
+                break;
         }
-
-        // Mutate the box
-        for (int i = limit; i < POPULATION_BOX_SIZE; i++)
-        {
-            Client tempClient(tempBox[i].dna);
-            tempClient.dataAlphabet = dataEnvironment->alphabet();
-            tempClient.mutate();
-            tempBox[i].dna = tempClient.get();
-        }
-
-        // Fill the newely created fitness fields in the box
-        for (int i = limit; i < POPULATION_BOX_SIZE; i++)
-            tempBox[i].fitness = dataEnvironment->fitness(tempBox[i].dna);
 
         // Save the best DNA
-        dataDNA = tempBox[0].dna;
+        dataDNA = tempBox[0].client.get();
 
         iterations--;
     }
-
 }
 
