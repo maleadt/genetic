@@ -70,9 +70,11 @@ class Population
         void evolve_single_straight(int iterations);
         void evolve_box(int iterations, int process);
         void evolve_box_straight(int iterations);
-        void evolve_box_straight_process(std::vector<CachedClient>& inputBox);
+        void evolve_box_straight_process(std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator);
         void evolve_box_together(int iterations);
-        void evolve_box_together_process(std::vector<CachedClient>& inputBox);
+        void evolve_box_together_process(std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator);
+        void evolve_box_mix(int iterations);
+        void evolve_box_mix_process(std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator);
 
     private:
         // Current DNA

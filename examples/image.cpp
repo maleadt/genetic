@@ -416,7 +416,7 @@ int main(int argc, char** argv)
 	std::cout << "NOTE: population created" << std::endl;
 
     // Evolve
-	dataPopulation.evolve_box_together(1000);
+	dataPopulation.evolve_single_straight(1000000000);
 
 	return 0;
 }
