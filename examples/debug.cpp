@@ -107,7 +107,7 @@ int main()
 	try
 	{
 		tempPopulation.evolve_single_straight(1);
-		tempPopulation.getDNA().debug();
+		tempPopulation.get().debug();
 	}
 	catch (std::string error)
 	{

@@ -66,7 +66,8 @@ class Client
 		void clean();
 
 		// DNA output
-		DNA getDNA();
+		void set(const DNA& inputDNA);
+		DNA get() const;
 
 		// Alphabet
 		int dataAlphabet;

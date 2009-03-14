@@ -48,18 +48,21 @@ WARNING:
 */
 
 // Fitness functions
-double Environment::fitness(DNA& inputDNA)
+double Environment::fitness(const DNA& inputDNA) const
 {
+    std::cout << "WARNING: NON-OVERRIDDEN FITNESS FUNCTION CALLED" << std::endl;
 	return 0;
 }
 
 // Return the alphabet value
-int Environment::alphabet()
+int Environment::alphabet() const
 {
-	return 0;
+    std::cout << "WARNING: NON-OVERRIDDEN ALPHABET FUNCTION CALLED" << std::endl;
+	return 254;
 }
 
 // Update call
-void Environment::update(DNA& inputDNA)
+void Environment::update(const DNA& inputDNA)
 {
+    std::cout << "WARNING: NON-OVERRIDDEN UPDATE FUNCTION CALLED" << std::endl;
 }

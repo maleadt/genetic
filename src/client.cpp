@@ -102,10 +102,15 @@ void Client::clean()
 
 
 //
-// DNA output
+// DNA IO
 //
 
-DNA Client::getDNA()
+void Client::set(const DNA& inputDNA)
+{
+	dataDNA = DNA(inputDNA);
+}
+
+DNA Client::get() const
 {
 	return dataDNA;
 }

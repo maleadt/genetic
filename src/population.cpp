@@ -53,7 +53,7 @@ Population::Population(Environment* inputEnvironment, DNA inputDNA)
 // Output routines
 //
 
-DNA Population::getDNA()
+DNA Population::get() const
 {
     return dataDNA;
 }
@@ -79,12 +79,12 @@ void Population::evolve_single_straight(int iterations)
         tempClient.mutate();
 
         // Compare the new DNA
-        DNA tempDNA = tempClient.getDNA();
+        DNA tempDNA = tempClient.get();
         double tempFitness = dataEnvironment->fitness(tempDNA);
         if (tempFitness > dataFitness)
         {
             dataFitness = tempFitness;
-            dataDNA = tempClient.getDNA();
+            dataDNA = tempClient.get();
             dataEnvironment->update(dataDNA);
         }
 
@@ -106,7 +106,7 @@ void Population::evolve_box_straight(int iterations)
         Client tempClient(dataDNA);
         tempClient.dataAlphabet = dataEnvironment->alphabet();
         tempClient.mutate();
-        tempBox[i].dna = tempClient.getDNA();
+        tempBox[i].dna = tempClient.get();
     }
 
     // Fill the initial fitness fields in the box
@@ -123,8 +123,6 @@ void Population::evolve_box_straight(int iterations)
     // Loop
     while (iterations > 0)
     {
-
-
         // Sort the box by fitness value
         std::sort(tempBox.begin(), tempBox.end());
 
@@ -162,7 +160,7 @@ void Population::evolve_box_straight(int iterations)
             Client tempClient(tempBox[i].dna);
             tempClient.dataAlphabet = dataEnvironment->alphabet();
             tempClient.mutate();
-            tempBox[i].dna = tempClient.getDNA();
+            tempBox[i].dna = tempClient.get();
         }
 
         // Fill the newely created fitness fields in the box

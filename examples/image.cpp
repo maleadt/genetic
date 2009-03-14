@@ -48,7 +48,7 @@
 #include <sstream>
 #include <iostream>
 #include <cairo/cairo.h>
-#include <cmath>
+#include <ctime>
 
 //
 // Constants
@@ -71,22 +71,23 @@ class EnvImage : public Environment
 {
 	public:
 		// Required functons
-		double fitness(DNA& inputDNA);
-		int alphabet();
-		void update(DNA& inputDNA);
-		void output(cairo_surface_t* inputSurface);
+		double fitness(const DNA& inputDNA) const;
+		int alphabet() const;
+		void update(const DNA& inputDNA);
 
 		// Image functions
+		void output(cairo_surface_t* inputSurface);
 		bool loadImage(const std::string& inputFile);
 		bool valid_limits(const DNA& inputDNA) const;
 		void draw(cairo_surface_t* inputSurface, const DNA& inputDNA) const;
-		double compare(cairo_surface_t* inputSurface);
+		double compare(cairo_surface_t* inputSurface) const;
 
 	private:
 		std::string dataInputFile;
 		unsigned char* dataInputRGB24;
 		unsigned int dataInputWidth, dataInputHeight;
 		int counter;
+		clock_t start;
 };
 
 
@@ -101,7 +102,7 @@ class EnvImage : public Environment
 //
 
 // Fitness function
-double EnvImage::fitness(DNA& inputDNA)
+double EnvImage::fitness(const DNA& inputDNA) const
 {
 	// Check the DNA's limit's
 	if (!valid_limits(inputDNA))
@@ -122,13 +123,13 @@ double EnvImage::fitness(DNA& inputDNA)
 }
 
 // Alphabet (maximal amount of instructions)
-int EnvImage::alphabet()
+int EnvImage::alphabet() const
 {
 	return 254;
 }
 
 // Update call
-void EnvImage::update(DNA& inputDNA)
+void EnvImage::update(const DNA& inputDNA)
 {
     // Create surface
     cairo_surface_t* tempSurface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, dataInputWidth, dataInputHeight);
@@ -140,7 +141,9 @@ void EnvImage::update(DNA& inputDNA)
     output(tempSurface);
 
     // Print a message
-    std::cout << "- Successfully mutated (new fitness: " << int(10000000*fitness(inputDNA))/100.0 << ")" << std::endl;
+    double ms = 1000*(clock()-start)/CLOCKS_PER_SEC;
+    //std::cout << "\t- " << int(ms*100)/100 << " ms: " << int(10000000*fitness(inputDNA))/100.0 << " points" << std::endl;
+    std::cout << int(ms*100)/100 << " " << int(10000000*fitness(inputDNA))/100.0 << std::endl;
 
     // Finish
     cairo_surface_destroy(tempSurface);
@@ -173,6 +176,7 @@ bool EnvImage::loadImage(const std::string& inputFile)
     // Update variables
 	dataInputFile = inputFile;
 	counter = 0;
+	start = clock();
 
 	// Create Cairo surface from file
 	cairo_surface_t* tempSurface = cairo_image_surface_create_from_png(dataInputFile.c_str());
@@ -274,7 +278,7 @@ void EnvImage::draw(cairo_surface_t* inputSurface, const DNA& inputDNA) const
 }
 
 // Compare two images
-double EnvImage::compare(cairo_surface_t* inputSurface)
+double EnvImage::compare(cairo_surface_t* inputSurface) const
 {
 	// Get and verify size
 	if ((cairo_image_surface_get_width(inputSurface) != dataInputWidth) || (cairo_image_surface_get_height(inputSurface) != dataInputHeight))

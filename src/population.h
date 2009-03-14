@@ -47,8 +47,8 @@
 //
 
 // Box
-const int POPULATION_BOX_SIZE = 100;
-const int POPULATION_BOX_THRESHOLD = 10;
+const int POPULATION_BOX_SIZE = 50;
+const int POPULATION_BOX_THRESHOLD = 5;
 
 
 //////////////////////
@@ -63,7 +63,7 @@ class Population
         Population(Environment* inputEnvironment, DNA inputDNA);
 
         // Output routines
-        DNA getDNA();
+        DNA get() const;
 
         // Evolutionary methods
         void evolve_single_straight(int iterations);

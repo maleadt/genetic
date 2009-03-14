@@ -60,18 +60,6 @@ DNA::DNA(std::list<std::list<int> > inputList)
 
 
 //
-// Getters
-//
-
-// Get the list representation
-std::list<std::list<int> > DNA::get()
-{
-    // Return
-    return data;
-}
-
-
-//
 // Setters
 //
 
@@ -154,18 +142,18 @@ int DNA::size() const
 // Debugging routines
 //
 
-void DNA::debug()
+void DNA::debug() const
 {
 	// Debug message
 	std::cout << "* DNA.debug" << std::endl;
 
 	// Process list
 	std::cout << "Contents of list with size " << std::dec << data.size() << ":" << std::endl;
-	std::list<std::list<int> >::iterator it = data.begin();
+	std::list<std::list<int> >::const_iterator it = data.begin();
 	while (it != data.end())
 	{
 		std::cout << "\tlist<int>: ";
-		std::list<int>::iterator it2 = it->begin();
+		std::list<int>::const_iterator it2 = it->begin();
 		while (it2 != it->end())
 			std::cout << std::hex << "0x" << *(it2++) << " ";
 		std::cout << std::endl;

@@ -58,9 +58,6 @@ class DNA
 		DNA(std::queue<int> inputQueue);
 		DNA(std::list<std::list<int> > inputList);
 
-		// Getters
-		std::list<std::list<int> > get();
-
 		// Setters
 		void set(std::queue<int> inputQueue);
 		void set(std::list<std::list<int> > inputList);
@@ -96,10 +93,9 @@ class DNA
 		int size() const;
 
 		// Debugging routines
-		void debug();
+		void debug() const;
 
 	private:
-		// Data
 		std::list<std::list<int> > data;
 };
 

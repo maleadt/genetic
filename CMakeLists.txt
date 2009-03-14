@@ -16,7 +16,7 @@ MARK_AS_ADVANCED(
     CMAKE_C_FLAGS_OPTIMIZEDP4)
 
 # Type of build ("debug", "release" or "optimizedp4")
-set(CMAKE_BUILD_TYPE optimizedp4)
+set(CMAKE_BUILD_TYPE release)
 
 # Add individual subdirectories
 ADD_SUBDIRECTORY(src)
