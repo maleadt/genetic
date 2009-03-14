@@ -48,10 +48,14 @@
 #include <sstream>
 #include <iostream>
 #include <cairo/cairo.h>
+#include <cmath>
 
 //
 // Constants
 //
+
+// Image output settings
+const int IMAGE_DIGITS = 5;
 
 // Polygon limits
 const int LIMIT_POLYGONS = 50;
@@ -136,7 +140,7 @@ void EnvImage::update(DNA& inputDNA)
     output(tempSurface);
 
     // Print a message
-    std::cout << "- Successfully mutated (new fitness: " << int(10000*fitness(inputDNA))/100.0 << "%)" << std::endl;
+    std::cout << "- Successfully mutated (new fitness: " << int(10000000*fitness(inputDNA))/100.0 << ")" << std::endl;
 
     // Finish
     cairo_surface_destroy(tempSurface);
@@ -148,6 +152,9 @@ void EnvImage::output(cairo_surface_t* inputSurface)
     // Generate an output tag
     std::stringstream convert;
     convert << dataInputFile.substr( 0, dataInputFile.find_last_of(".") ) << "-";
+    int zeros = counter == 0 ? IMAGE_DIGITS : IMAGE_DIGITS-log10(counter);
+    for (int i = 0; i < zeros; i++)
+        convert << "0";
     convert << counter++ << ".png";
 
     // Save the file
@@ -376,7 +383,7 @@ int main(int argc, char** argv)
 	// Message
 	std::cout << "NOTE: population created" << std::endl;
 
-	dataPopulation.evolve_single_straight(1000000000);
+	dataPopulation.evolve_box_straight(1000000000);
 
 	return 0;
 }

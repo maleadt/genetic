@@ -145,7 +145,7 @@ void mutate_list(T& inputObject)
 		// Translocation
 		case 5:
 		{
-		//	T temp = *it1;
+		//	U temp = *it1;
 		//	inputObject.erase(it1);
 		//	inputObject.insert(it2, temp);
 			break;

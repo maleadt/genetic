@@ -68,7 +68,7 @@ void Population::evolve_single_straight(int iterations)
 {
     // Calculate current fitness
     double dataFitness = dataEnvironment->fitness(dataDNA);
-    std::cout << "* Started evolution, initial fitness is " << dataFitness << std::endl;
+    std::cout << "* Started single straight evolution, initial fitness is " << dataFitness << std::endl;
 
     // Loop
     while (iterations > 0)
@@ -97,6 +97,7 @@ void Population::evolve_box_straight(int iterations)
 {
     // Allocate the vector and fill it with the given DNA
     std::vector<DNAfit> tempBox(POPULATION_BOX_SIZE);
+    std::cout << "* Started boxed straight evolution" << std::endl;
 
     // Mutate all but one
     tempBox[0].dna = dataDNA;
@@ -145,11 +146,6 @@ void Population::evolve_box_straight(int iterations)
         int limit = POPULATION_BOX_THRESHOLD;
         while (tempBox[limit].fitness == -1)
             limit--;
-
-        // Debug
-        std::cout << "Box contents:" << std::endl;
-        for (int i = 0; i < limit; i++)
-            std::cout << "\t- " << 100000*tempBox[i].fitness << std::endl;
 
         // Fill the rest of the box with copies of best x mutations
         int j = 0;
