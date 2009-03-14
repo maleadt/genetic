@@ -94,14 +94,21 @@ void Client::mutate()
 // Combine the DNA with another client
 void Client::crossover(Client& inputClient)
 {
-    // Create a new DNA sequence
-    DNA tempDNA;
+    // Acquire DNA queue representation
+    std::deque<int> inputQueue1 = inputClient.get().dequeue();
+    std::deque<int> inputQueue2 = dataDNA.dequeue();
 
-    // Acquire DNA from given client
-    DNA inputDNA = inputClient.get();
+    // Create a new DNA queue
+    std::deque<int> outputQueue;
+    outputQueue.push_back(255);
+
+    // Remove semantics from both queue's, or every DNA string would be invalid
+    inputQueue1.pop_front(); inputQueue1.pop_back();
+    inputQueue2.pop_front(); inputQueue2.pop_back();
+
 
     // Pick a crossover-method
-    int method = random_range(0, 3);
+    int method = random_range(1, 3);
 
     // Crossover!
     switch (method)
@@ -109,24 +116,34 @@ void Client::crossover(Client& inputClient)
         // Sequential merge
         case 1:
         {
-            for (DNA::iterator it = dataDNA.begin(); it != dataDNA.end(); it++)
-                tempDNA.push_back(*it);
-            for (DNA::iterator it = inputDNA.begin(); it != inputDNA.end(); it++)
-                tempDNA.push_back(*it);
+            while (!inputQueue1.empty())
+            {
+                outputQueue.push_back(inputQueue1.front());
+                inputQueue1.pop_front();
+            }
+            while (!inputQueue2.empty())
+            {
+                outputQueue.push_back(inputQueue2.front());
+                inputQueue2.pop_front();
+            }
             break;
         }
 
         // Altering merge
         case 2:
         {
-            DNA::iterator it1 = dataDNA.begin();
-            DNA::iterator it2 = inputDNA.begin();
-            while (it1 != dataDNA.end() || it2 != inputDNA.end())
+            while (!(inputQueue1.empty() && inputQueue2.empty()))
             {
-                if (it1 != dataDNA.end())
-                    tempDNA.push_back(*(it1++));
-                if (it2 != inputDNA.end())
-                    tempDNA.push_back(*(it2++));
+                if (!inputQueue1.empty())
+                {
+                    outputQueue.push_back(inputQueue1.front());
+                    inputQueue1.pop_front();
+                }
+                if (!inputQueue2.empty())
+                {
+                    outputQueue.push_back(inputQueue2.front());
+                    inputQueue2.pop_front();
+                }
             }
             break;
         }
@@ -134,28 +151,36 @@ void Client::crossover(Client& inputClient)
         // Random merge
         case 3:
         {
-            DNA::iterator it1 = dataDNA.begin();
-            DNA::iterator it2 = inputDNA.begin();
-            while (it1 != dataDNA.end() || it2 != inputDNA.end())
+            while (!(inputQueue1.empty() && inputQueue2.empty()))
             {
                 int choice = random_range(0, 1);
-                if (choice == 0 && it1 != dataDNA.end())
-                    tempDNA.push_back(*(it1));
-                else if (it2 != inputDNA.end())
-                    tempDNA.push_back(*(it2));
-
-                if (it1 != dataDNA.end())
-                    it1++;
-                if (it2 != inputDNA.end())
-                    it2++;
+                if (choice == 0 && !inputQueue1.empty())
+                {
+                    outputQueue.push_back(inputQueue1.front());
+                }
+                else if (!inputQueue2.empty())
+                {
+                    outputQueue.push_back(inputQueue2.front());
+                    inputQueue2.pop_front();
+                }
+                if (!inputQueue1.empty())
+                    inputQueue1.pop_front();
+                if (!inputQueue2.empty())
+                    inputQueue2.pop_front();
             }
             break;
         }
     }
 
+    // Finish the queue
+    outputQueue.push_back(255);
 
     // Save the DNA
-    dataDNA = tempDNA;
+    dataDNA = DNA(outputQueue);
+
+    // Mutate?
+    if (random_range(1, 5) == 3)
+        mutate();
 }
 
 // Clean the DNA

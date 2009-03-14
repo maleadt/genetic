@@ -113,11 +113,7 @@ void Population::evolve_box_straight_process(
     // Mutate clients
     process = process_start;
     while (process != process_end)
-    {
-        process->client.mutate();
-        process->fitness = dataEnvironment->fitness( process->client.get() );
-        process++;
-    }
+        (process++)->client.mutate();
 }
 
 // Evolve a box of clients together
@@ -146,11 +142,9 @@ void Population::evolve_box_together_process(
     good = good_start;
     while (process != process_end)
     {
-        process->client.crossover((good++)->client);
+        (process++)->client.crossover((good++)->client);
         if (good == good_end)
             good = good_start;
-        process->fitness = dataEnvironment->fitness( process->client.get() );
-        process++;
     }
 }
 
@@ -233,7 +227,6 @@ void Population::evolve_box(int iterations, int process)
         std::vector<CachedClient>::iterator process_start = tempBox.begin(), process_end = tempBox.end();
         std::advance(process_start, limit+1);
 
-
         // Call a specific function to process the box
         switch (process)
         {
@@ -246,6 +239,12 @@ void Population::evolve_box(int iterations, int process)
             case 3:
                 evolve_box_mix_process(good_start, good_end, process_start, process_end);
                 break;
+        }
+
+        // Calculate fitness of newely modified clients
+        for (int i = limit; i < POPULATION_BOX_SIZE; i++)
+        {
+            tempBox[i].fitness = dataEnvironment->fitness( tempBox[i].client.get() );
         }
 
         // Save the best DNA

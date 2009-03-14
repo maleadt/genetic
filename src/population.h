@@ -48,7 +48,7 @@
 
 // Box
 const int POPULATION_BOX_SIZE = 50;
-const int POPULATION_BOX_THRESHOLD = 5;
+const int POPULATION_BOX_THRESHOLD = 10;
 
 
 //////////////////////

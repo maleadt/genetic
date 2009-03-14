@@ -47,7 +47,7 @@ DNA::DNA()
 }
 
 // Construct dna object with a given string
-DNA::DNA(std::queue<int> inputQueue)
+DNA::DNA(std::deque<int> inputQueue)
 {
 	set(inputQueue);
 }
@@ -68,18 +68,18 @@ void DNA::set(std::list<std::list<int> > inputList)
     data = inputList;
 }
 
-void DNA::set(std::queue<int> inputQueue)
+void DNA::set(std::deque<int> inputQueue)
 {
 	// Reset the list
 	data.clear();
 
 	// Duplicate the list and work with that copy
-	std::queue<int> inputQueueDup(inputQueue);
+	std::deque<int> inputQueueDup(inputQueue);
 
 	// Check semantics
 	if (inputQueueDup.front() != 255)
 		throw(std::string("DNA.toList: saved DNA queue doesn't start with 255"));
-	inputQueueDup.pop();
+	inputQueueDup.pop_front();
 
 	// Process all
 	std::list<int> tempVector;
@@ -94,7 +94,7 @@ void DNA::set(std::queue<int> inputQueue)
 		{
 			tempVector.push_back(inputQueueDup.front());
 		}
-		inputQueueDup.pop();
+		inputQueueDup.pop_front();
 	}
 
 	// Check semantics
@@ -142,6 +142,36 @@ int DNA::size() const
 {
     return data.size();
 }
+
+// Get a queue representation
+std::deque<int> DNA::dequeue() const
+{
+    // Create a queue
+    std::deque<int> outputQueue;
+
+    // Starting semantics
+    outputQueue.push_back(255);
+
+    // Process all genes
+    std::list<std::list<int> >::const_iterator it = data.begin();
+    while (it != data.end())
+    {
+        std::list<int>::const_iterator it2 = it->begin();
+        while (it2 != it->end())
+                outputQueue.push_back(*(it2++));
+        it++;
+
+        // Only add 0 if not at end (can't fix this later on as queue has no pop_back)
+        if (it != data.end())
+            outputQueue.push_back(0);
+    }
+
+    // Ending semantics
+    outputQueue.push_back(255);
+
+    return outputQueue;
+}
+
 
 
 //

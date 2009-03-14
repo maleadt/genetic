@@ -82,18 +82,18 @@ double EnvDebug::fitness(DNA& inputDNA)
 int main()
 {
 	// Generate a DNA string
-	std::queue<int> tempQueue;
-	tempQueue.push(255);
-	tempQueue.push(123);
-	tempQueue.push(64);
-	tempQueue.push(0);
-	tempQueue.push(0);
-	tempQueue.push(48);
-	tempQueue.push(91);
-	tempQueue.push(31);
-	tempQueue.push(0);
-	tempQueue.push(49);
-	tempQueue.push(255);
+	std::deque<int> tempQueue;
+	tempQueue.push_back(255);
+	tempQueue.push_back(123);
+	tempQueue.push_back(64);
+	tempQueue.push_back(0);
+	tempQueue.push_back(0);
+	tempQueue.push_back(48);
+	tempQueue.push_back(91);
+	tempQueue.push_back(31);
+	tempQueue.push_back(0);
+	tempQueue.push_back(49);
+	tempQueue.push_back(255);
 	DNA tempDNA(tempQueue);
     tempDNA.debug();
 

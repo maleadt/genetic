@@ -55,13 +55,12 @@ class DNA
 	public:
 		// Construction and destruction
 		DNA();
-		DNA(std::queue<int> inputQueue);
+		DNA(std::deque<int> inputQueue);
 		DNA(std::list<std::list<int> > inputList);
 
 		// Setters
-		void set(std::queue<int> inputQueue);
+		void set(std::deque<int> inputQueue);
 		void set(std::list<std::list<int> > inputList);
-
         // Const iterators
         typedef std::list<std::list<int> >::const_iterator const_iterator;
         const_iterator begin() const
@@ -92,6 +91,7 @@ class DNA
 		// Informational routines
 		int genes() const;
 		int size() const;
+		std::deque<int> dequeue() const;
 
 		// Debugging routines
 		void debug() const;
