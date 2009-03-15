@@ -201,38 +201,39 @@ void EnvImage::draw(cairo_surface_t* inputSurface, const DNA& inputDNA) const
 // Compare two images
 double EnvImage::compare(cairo_surface_t* inputSurface) const
 {
-	// Get and verify size
-	if ((cairo_image_surface_get_width(inputSurface) != dataInputWidth) || (cairo_image_surface_get_height(inputSurface) != dataInputHeight))
-	{
-		std::cout << "WARNING: cannot calculate resemblance between two different-sized images" << std::endl;
-		return 0;
-	}
+        // Get and verify size
+        if ((cairo_image_surface_get_width(inputSurface) != dataInputWidth) || (cairo_image_surface_get_height(inputSurface) != dataInputHeight))
+        {
+                std::cout << "WARNING: cannot calculate resemblance between two different-sized images" << std::endl;
+                return 0;
+        }
 
-	// Verify formats
-	if (cairo_image_surface_get_format(inputSurface) != CAIRO_FORMAT_RGB24)
-	{
-		std::cout << "WARNING: can only process RGB24 data" << std::endl;
-		return 0;
-	}
+        // Verify formats
+        if (cairo_image_surface_get_format(inputSurface) != CAIRO_FORMAT_RGB24)
+        {
+                std::cout << "WARNING: can only process RGB24 data" << std::endl;
+                return 0;
+        }
 
-	// Get the raw data of the given surface
-	unsigned char* tempData = cairo_image_surface_get_data(inputSurface);
+        // Get the raw data of the given surface
+        unsigned char* tempData1 = dataInputRGB24;
+        unsigned char* tempData2 = cairo_image_surface_get_data(inputSurface);
 
-	// Compare them
-	double difference = 0;
-	register int db, dg, dr;
-	for (int i = 0; i < dataInputWidth*dataInputHeight; i++)
-	{
-		// RGBa
-		db = dataInputRGB24[i] - *(tempData++);
-		dg = dataInputRGB24[i+1] - *(tempData++);
-		dr = dataInputRGB24[i+2] - *(tempData++);
-        ++tempData;
+        // Compare them
+        long int difference = 0;
+        for (int i = 0; i < dataInputWidth*dataInputHeight; i++)
+        {
+                // RGB (GetData always returns RGB, without Alpha)
+                int db = *(tempData1++) - *(tempData2++);
+                int dg = *(tempData1++) - *(tempData2++);
+                int dr = *(tempData1++) - *(tempData2++);
+        int da = *(tempData1++) - *(tempData2++);
 
-		// Calculate difference
-		difference += sqrt(dr*dr + dg*dg + db*db);
-	}
+                // Calculate difference
+                difference += sqrt(dr*dr + dg*dg + db*db);
+        }
 
-	// Get resemblance
-	return dataInputWidth*dataInputHeight / difference;
+        // Get resemblance
+        double resemblance = dataInputWidth*dataInputHeight / double(difference);
+        return resemblance;
 }
