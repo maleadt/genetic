@@ -124,7 +124,6 @@ bool EnvImage::loadImage(std::string inputFile)
     dataInputRGB24[dataInputHeight*dataInputWidth*4] = 0;
 
     // Finish
-	std::cout << "- Successfully loaded initial image" << std::endl;
     cairo_surface_destroy(tempSurface);
 
 	// Return

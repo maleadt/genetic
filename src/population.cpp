@@ -81,7 +81,6 @@ void Population::evolve_single_straight()
 {
     // Calculate current fitness
     double dataFitness = dataEnvironment->fitness(dataDNA);
-    std::cout << "* Started single straight evolution, initial fitness is " << dataFitness << std::endl;
 
     // Loop
     while (dataEnvironment->condition())
@@ -187,7 +186,6 @@ void Population::evolve_box(int process)
 {
     // Allocate the vector and fill it with the given DNA
     std::vector<CachedClient> tempBox(POPULATION_BOX_SIZE);
-    std::cout << "* Started boxed evolution" << std::endl;
 
     // Mutate all but one
     tempBox[0].client = Client(dataDNA, dataEnvironment->alphabet());

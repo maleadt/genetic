@@ -97,8 +97,7 @@ void EnvImgWrite::update(const DNA& inputDNA)
 
     // Print a message
     double ms = 1000*(clock()-start)/CLOCKS_PER_SEC;
-    //std::cout << "\t- " << int(ms*100)/100 << " ms: " << int(10000000*fitness(inputDNA))/100.0 << " points" << std::endl;
-    std::cout << int(ms*100)/100 << " " << int(10000000*fitness(inputDNA))/100.0 << std::endl;
+    std::cout << "\t- " << int(ms*100)/100 << " ms: " << int(10000000*fitness(inputDNA))/100.0 << " points" << std::endl;
 
     // Finish
     cairo_surface_destroy(tempSurface);

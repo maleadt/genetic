@@ -28,6 +28,9 @@ ELSE (HAVE_CAIRO)
 	MESSAGE("!! Cannot link against Cairo")
 ENDIF (HAVE_CAIRO)
 
+# GNUplot
+ADD_SUBDIRECTORY(gnuplot)
+
 # Compile library
 ADD_LIBRARY(image image.h image.cpp)
 TARGET_LINK_LIBRARIES(image ${Cairo_LIBRARIES})
@@ -49,4 +52,5 @@ TARGET_LINK_LIBRARIES(image_benchmark image)
 TARGET_LINK_LIBRARIES(image_benchmark population)
 TARGET_LINK_LIBRARIES(image_benchmark environment)
 TARGET_LINK_LIBRARIES(image_benchmark ${Cairo_LIBRARIES})
+TARGET_LINK_LIBRARIES(image_benchmark gnuplot)
 
