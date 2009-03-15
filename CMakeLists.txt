@@ -16,7 +16,7 @@ MARK_AS_ADVANCED(
     CMAKE_C_FLAGS_PROFILE)
 
 # Type of build ("debug", "release" or "profile")
-set(CMAKE_BUILD_TYPE profile)
+set(CMAKE_BUILD_TYPE release)
 
 # Add individual subdirectories
 ADD_SUBDIRECTORY(src)

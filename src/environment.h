@@ -36,10 +36,6 @@
 #include "dna.h"
 
 
-//
-// Constants
-//
-
 
 //////////////////////
 // CLASS DEFINITION //

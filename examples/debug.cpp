@@ -33,9 +33,7 @@
 #include "../src/environment.h"
 #include <queue>
 
-//
-// Constants
-//
+
 
 /////////////////
 // ENVIRONMENT //
@@ -73,6 +71,7 @@ double EnvDebug::fitness(DNA& inputDNA)
 {
 	return counter++;
 }
+
 
 
 //////////

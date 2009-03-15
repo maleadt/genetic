@@ -28,11 +28,16 @@ ELSE (HAVE_CAIRO)
 	MESSAGE("!! Cannot link against Cairo")
 ENDIF (HAVE_CAIRO)
 
-
-# Build executale
-ADD_EXECUTABLE(image image.cpp)
-
-# Link executable
-TARGET_LINK_LIBRARIES(image population)
-TARGET_LINK_LIBRARIES(image environment)
+# Compile library
+ADD_LIBRARY(image image.h image.cpp)
 TARGET_LINK_LIBRARIES(image ${Cairo_LIBRARIES})
+
+# Build executale 1 (image_write)
+ADD_EXECUTABLE(image_write image_write.cpp)
+
+# Link executable 1 (image_Write)
+TARGET_LINK_LIBRARIES(image_write image)
+TARGET_LINK_LIBRARIES(image_write population)
+TARGET_LINK_LIBRARIES(image_write environment)
+TARGET_LINK_LIBRARIES(image_write ${Cairo_LIBRARIES})
+

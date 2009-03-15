@@ -49,6 +49,7 @@ const int MUTATE_AMOUNT_LOWER = 1;
 const int MUTATE_AMOUNT_UPPER = 50;
 
 
+
 //////////////////////
 // CLASS DEFINITION //
 //////////////////////
