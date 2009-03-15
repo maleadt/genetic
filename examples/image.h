@@ -51,6 +51,7 @@
 #include <string>
 #include <iostream>
 #include <cairo/cairo.h>
+#include <omp.h>
 
 
 //
@@ -63,6 +64,9 @@ const int IMAGE_DIGITS = 5;
 // Polygon limits
 const int LIMIT_POLYGONS = 50;
 const int LIMIT_POLYGON_POINTS = 5;
+
+// Comparison sample rate
+const int COMPARISON_SAMPLE_RATE = 1;
 
 
 

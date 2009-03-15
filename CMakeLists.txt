@@ -20,7 +20,7 @@ MARK_AS_ADVANCED(
     CMAKE_C_FLAGS_PROFILE)
 
 # Type of build ("debug", "release" or "profile")
-set(CMAKE_BUILD_TYPE profile)
+set(CMAKE_BUILD_TYPE debug)
 
 # OpenMP
 INCLUDE(CheckCCompilerFlag)
