@@ -90,7 +90,7 @@ class EnvImage : public Environment
 
 	protected:
 		std::string dataInputFile;
-		unsigned int dataInputWidth, dataInputHeight;
+		int dataInputWidth, dataInputHeight;
 
     private:
 		unsigned char* dataInputRGB24;

@@ -220,14 +220,15 @@ double EnvImage::compare(cairo_surface_t* inputSurface) const
         unsigned char* tempData2 = cairo_image_surface_get_data(inputSurface);
 
         // Compare them
+        int i, db, dg, dr;
         long int difference = 0;
-        for (int i = 0; i < dataInputWidth*dataInputHeight; i++)
+        #pragma omp parallel for private(dr, dg, db) reduction(+:difference)
+        for (i = 0; i < dataInputWidth*dataInputHeight*4; i+=4)
         {
-                // RGB (GetData always returns RGB, without Alpha)
-                int db = *(tempData1++) - *(tempData2++);
-                int dg = *(tempData1++) - *(tempData2++);
-                int dr = *(tempData1++) - *(tempData2++);
-        int da = *(tempData1++) - *(tempData2++);
+                // RGBa
+                db = tempData1[i] - tempData2[i];
+                dg = tempData1[i+1] - tempData2[i+1];
+                dr = tempData1[i+2] - tempData2[i+2];
 
                 // Calculate difference
                 difference += sqrt(dr*dr + dg*dg + db*db);

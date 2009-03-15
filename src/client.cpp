@@ -188,7 +188,6 @@ void Client::crossover(Client& inputClient)
 void Client::clean()
 {
 	// Pick random gene
-	int random = random_range(0, dataDNA.genes()-1);
 	DNA::iterator it = dataDNA.begin();
 	while (it != dataDNA.end())
 	{

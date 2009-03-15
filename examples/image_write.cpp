@@ -56,8 +56,10 @@ class EnvImgWrite : public EnvImage
 
 		// Additional functions
 		void output(cairo_surface_t* inputSurface);
+		void runtime(int inputTime);
 
     private:
+        int dataTime;
 		int counter;
 		clock_t start;
 };
@@ -74,6 +76,7 @@ class EnvImgWrite : public EnvImage
 
 EnvImgWrite::EnvImgWrite()
 {
+    dataTime = -1;
 	counter = 0;
 	start = clock();
 }
@@ -106,7 +109,10 @@ void EnvImgWrite::update(const DNA& inputDNA)
 // Condition call
 bool EnvImgWrite::condition()
 {
-    return true;
+    if (dataTime == -1)
+        return true;
+    double ms = 1000*(clock()-start)/CLOCKS_PER_SEC;
+    return ms < dataTime*1000;
 }
 
 
@@ -129,6 +135,12 @@ void EnvImgWrite::output(cairo_surface_t* inputSurface)
     cairo_surface_write_to_png(inputSurface, convert.str().c_str());
 }
 
+// Set runtime
+void EnvImgWrite::runtime(int inputTime)
+{
+    dataTime = inputTime;
+}
+
 //////////
 // MAIN //
 //////////
@@ -140,7 +152,7 @@ int main(int argc, char** argv)
 	//
 
 	// Check input
-	if (argc != 2)
+	if (argc < 2)
 	{
         std::cout << "ERROR: input filename missing or too many parameters" << std::endl;
         return 1;
@@ -159,6 +171,10 @@ int main(int argc, char** argv)
 
 	// Create object
 	EnvImgWrite dataEnvironment;
+
+	// Max time given?
+	if (argc == 3)
+        dataEnvironment.runtime(atoi(argv[2]));
 
 	// Load base image
 	if (!dataEnvironment.loadImage(inputFile))

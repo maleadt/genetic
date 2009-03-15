@@ -189,6 +189,7 @@ void Population::evolve_box(int process)
 
     // Mutate all but one
     tempBox[0].client = Client(dataDNA, dataEnvironment->alphabet());
+    #pragma omp parallel for
     for (int i = 1; i < POPULATION_BOX_SIZE; i++)
     {
         tempBox[i].client = Client(dataDNA, dataEnvironment->alphabet());
@@ -196,10 +197,11 @@ void Population::evolve_box(int process)
     }
 
     // Fill the initial fitness fields in the box
+    #pragma omp parallel for
     for (int i = 0; i < POPULATION_BOX_SIZE; i++)
     {
-        DNA tempDNA = DNA(tempBox[i].client.get());
-        tempBox[i].fitness = dataEnvironment->fitness(tempDNA);
+        double fitness = dataEnvironment->fitness(tempBox[i].client.get());
+        tempBox[i].fitness = fitness;
     }
 
     // Fitness watcher
@@ -251,9 +253,11 @@ void Population::evolve_box(int process)
         }
 
         // Calculate fitness of newely modified clients
+        #pragma omp parallel for
         for (int i = limit; i < POPULATION_BOX_SIZE; i++)
         {
-            tempBox[i].fitness = dataEnvironment->fitness( tempBox[i].client.get() );
+            double fitness = dataEnvironment->fitness(tempBox[i].client.get());
+            tempBox[i].fitness = fitness;
         }
 
         // Save the best DNA
