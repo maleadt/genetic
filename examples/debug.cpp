@@ -49,6 +49,7 @@ class EnvDebug : public Environment
 		// Required functons
 		double fitness(DNA& inputDNA);
 		int alphabet();
+		bool condition();
 
 	private:
 		int counter;
@@ -70,6 +71,12 @@ int EnvDebug::alphabet()
 double EnvDebug::fitness(DNA& inputDNA)
 {
 	return counter++;
+}
+
+// Condition (mutate 10 times
+bool EnvDebug::condition()
+{
+    return counter<10;
 }
 
 
@@ -105,7 +112,7 @@ int main()
 	// Simulate
 	try
 	{
-		tempPopulation.evolve_single_straight(1);
+		tempPopulation.evolve_single_straight();
 		tempPopulation.get().debug();
 	}
 	catch (std::string error)

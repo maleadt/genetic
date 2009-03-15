@@ -48,6 +48,7 @@ class Environment
 		virtual double fitness(const DNA& inputDNA) const;
 		virtual int alphabet() const;
 		virtual void update(const DNA& inputDNA);
+		virtual bool condition();
 };
 
 

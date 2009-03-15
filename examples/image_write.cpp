@@ -52,6 +52,7 @@ class EnvImgWrite : public EnvImage
 
         // Required functions
 		void update(const DNA& inputDNA);
+		bool condition();
 
 		// Additional functions
 		void output(cairo_surface_t* inputSurface);
@@ -101,6 +102,12 @@ void EnvImgWrite::update(const DNA& inputDNA)
 
     // Finish
     cairo_surface_destroy(tempSurface);
+}
+
+// Condition call
+bool EnvImgWrite::condition()
+{
+    return true;
 }
 
 
@@ -176,7 +183,7 @@ int main(int argc, char** argv)
 	tempQueue.push_back(50);
 	tempQueue.push_back(50);
 	tempQueue.push_back(128);
-	tempQueue.push_back(1);	// Point one: (1, 254)
+	tempQueue.push_back(1);     // Point one: (1, 254)
 	tempQueue.push_back(254);
 	tempQueue.push_back(128);	// Point two: (128, 1)
 	tempQueue.push_back(1);
@@ -192,7 +199,7 @@ int main(int argc, char** argv)
 	std::cout << "NOTE: population created" << std::endl;
 
     // Evolve
-	dataPopulation.evolve_single_straight(10000000);
+	dataPopulation.evolve_single_straight();
 
 	return 0;
 }

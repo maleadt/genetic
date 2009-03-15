@@ -62,19 +62,21 @@ class Population
 {
     public:
         // Construction and destruction
+        Population(Environment* inputEnvironment);
         Population(Environment* inputEnvironment, DNA inputDNA);
 
         // Output routines
+        void set(DNA& inputDNA);
         DNA get() const;
 
         // Evolutionary methods
-        void evolve_single_straight(int iterations);
-        void evolve_box(int iterations, int process);
-        void evolve_box_straight(int iterations);
+        void evolve_single_straight();
+        void evolve_box(int process);
+        void evolve_box_straight();
         void evolve_box_straight_process(std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator);
-        void evolve_box_together(int iterations);
+        void evolve_box_together();
         void evolve_box_together_process(std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator);
-        void evolve_box_mix(int iterations);
+        void evolve_box_mix();
         void evolve_box_mix_process(std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator);
 
     private:

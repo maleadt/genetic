@@ -35,9 +35,18 @@ TARGET_LINK_LIBRARIES(image ${Cairo_LIBRARIES})
 # Build executale 1 (image_write)
 ADD_EXECUTABLE(image_write image_write.cpp)
 
-# Link executable 1 (image_Write)
+# Link executable 1 (image_write)
 TARGET_LINK_LIBRARIES(image_write image)
 TARGET_LINK_LIBRARIES(image_write population)
 TARGET_LINK_LIBRARIES(image_write environment)
 TARGET_LINK_LIBRARIES(image_write ${Cairo_LIBRARIES})
+
+# Build executable 2 (image_benchmark)
+ADD_EXECUTABLE(image_benchmark image_benchmark.cpp)
+
+# Link executable 2 (image_bench)
+TARGET_LINK_LIBRARIES(image_benchmark image)
+TARGET_LINK_LIBRARIES(image_benchmark population)
+TARGET_LINK_LIBRARIES(image_benchmark environment)
+TARGET_LINK_LIBRARIES(image_benchmark ${Cairo_LIBRARIES})
 

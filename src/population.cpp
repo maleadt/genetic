@@ -41,11 +41,18 @@
 // Construction and destruction
 //
 
+// Constructor with given environment
+Population::Population(Environment* inputEnvironment)
+{
+    // Save all data
+    dataEnvironment = inputEnvironment;
+}
+
 // Constructor with given DNA and environment
 Population::Population(Environment* inputEnvironment, DNA inputDNA)
 {
     // Save all data
-    dataDNA = inputDNA;
+    set(inputDNA);
     dataEnvironment = inputEnvironment;
 }
 
@@ -59,20 +66,25 @@ DNA Population::get() const
     return dataDNA;
 }
 
+void Population::set(DNA& inputDNA)
+{
+    dataDNA = inputDNA;
+}
+
 
 //
 // Evolutionary methods
 //
 
 // Evolve a single client straightly
-void Population::evolve_single_straight(int iterations)
+void Population::evolve_single_straight()
 {
     // Calculate current fitness
     double dataFitness = dataEnvironment->fitness(dataDNA);
     std::cout << "* Started single straight evolution, initial fitness is " << dataFitness << std::endl;
 
     // Loop
-    while (iterations > 0)
+    while (dataEnvironment->condition())
     {
         // Create a client, and mutate the DNA
         Client tempClient(dataDNA);
@@ -88,15 +100,13 @@ void Population::evolve_single_straight(int iterations)
             dataDNA = tempClient.get();
             dataEnvironment->update(dataDNA);
         }
-
-        iterations--;
     }
 }
 
 // Evolve a box of clients straightly
-void Population::evolve_box_straight(int iterations)
+void Population::evolve_box_straight()
 {
-    evolve_box(iterations, 1);
+    evolve_box(1);
 }
 void Population::evolve_box_straight_process(
     std::vector<CachedClient>::iterator good_start, std::vector<CachedClient>::iterator good_end,
@@ -118,9 +128,9 @@ void Population::evolve_box_straight_process(
 }
 
 // Evolve a box of clients together
-void Population::evolve_box_together(int iterations)
+void Population::evolve_box_together()
 {
-    evolve_box(iterations, 2);
+    evolve_box(2);
 }
 void Population::evolve_box_together_process(
     std::vector<CachedClient>::iterator good_start, std::vector<CachedClient>::iterator good_end,
@@ -150,9 +160,9 @@ void Population::evolve_box_together_process(
 }
 
 // Evolve a box in a mixed manner
-void Population::evolve_box_mix(int iterations)
+void Population::evolve_box_mix()
 {
-    evolve_box(iterations, 3);
+    evolve_box(3);
 }
 void Population::evolve_box_mix_process(
     std::vector<CachedClient>::iterator good_start, std::vector<CachedClient>::iterator good_end,
@@ -173,7 +183,7 @@ void Population::evolve_box_mix_process(
 }
 
 // Evolve a box
-void Population::evolve_box(int iterations, int process)
+void Population::evolve_box(int process)
 {
     // Allocate the vector and fill it with the given DNA
     std::vector<CachedClient> tempBox(POPULATION_BOX_SIZE);
@@ -198,7 +208,7 @@ void Population::evolve_box(int iterations, int process)
     double fitness_critical = 0;
 
     // Loop
-    while (iterations > 0)
+    while (dataEnvironment->condition())
     {
         // Sort the box by fitness value
         std::sort(tempBox.begin(), tempBox.end());
@@ -250,8 +260,6 @@ void Population::evolve_box(int iterations, int process)
 
         // Save the best DNA
         dataDNA = tempBox[0].client.get();
-
-        iterations--;
     }
 }
 

@@ -67,3 +67,10 @@ void Environment::update(const DNA& inputDNA)
 {
     std::cout << "WARNING: NON-OVERRIDDEN UPDATE FUNCTION CALLED" << std::endl;
 }
+
+// Condition call
+bool Environment::condition()
+{
+    std::cout << "WARNING: NON-OVERRIDDEN CONDITION FUNCTION CALLED" << std::endl;
+    return true;
+}
