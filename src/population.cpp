@@ -103,11 +103,11 @@ void Population::evolve_single_straight()
 }
 
 // Evolve a box of clients straightly
-void Population::evolve_box_straight()
+void Population::evolve_population_straight()
 {
-    evolve_box(1);
+    evolve_population(1);
 }
-void Population::evolve_box_straight_process(
+void Population::evolve_population_straight_process(
     std::vector<CachedClient>::iterator good_start, std::vector<CachedClient>::iterator good_end,
     std::vector<CachedClient>::iterator process_start, std::vector<CachedClient>::iterator process_end)
 {
@@ -127,11 +127,11 @@ void Population::evolve_box_straight_process(
 }
 
 // Evolve a box of clients together
-void Population::evolve_box_together()
+void Population::evolve_population_together()
 {
-    evolve_box(2);
+    evolve_population(2);
 }
-void Population::evolve_box_together_process(
+void Population::evolve_population_together_process(
     std::vector<CachedClient>::iterator good_start, std::vector<CachedClient>::iterator good_end,
     std::vector<CachedClient>::iterator process_start, std::vector<CachedClient>::iterator process_end)
 {
@@ -152,18 +152,18 @@ void Population::evolve_box_together_process(
     good = good_start;
     while (process != process_end)
     {
-        (process++)->client.crossover((good++)->client);
+        (process++)->client.recombine((good++)->client);
         if (good == good_end)
             good = good_start;
     }
 }
 
 // Evolve a box in a mixed manner
-void Population::evolve_box_mix()
+void Population::evolve_population_mix()
 {
-    evolve_box(3);
+    evolve_population(3);
 }
-void Population::evolve_box_mix_process(
+void Population::evolve_population_mix_process(
     std::vector<CachedClient>::iterator good_start, std::vector<CachedClient>::iterator good_end,
     std::vector<CachedClient>::iterator process_start, std::vector<CachedClient>::iterator process_end)
 {
@@ -177,12 +177,12 @@ void Population::evolve_box_mix_process(
         process_mid++;
 
     // Call both process routines independantly
-    evolve_box_straight_process(good_start, good_end, process_start, process_mid++);
-    evolve_box_together_process(good_start, good_end, process_mid, process_end);
+    evolve_population_straight_process(good_start, good_end, process_start, process_mid++);
+    evolve_population_together_process(good_start, good_end, process_mid, process_end);
 }
 
 // Evolve a box
-void Population::evolve_box(int process)
+void Population::evolve_population(int process)
 {
     // Allocate the vector and fill it with the given DNA
     std::vector<CachedClient> tempBox(POPULATION_BOX_SIZE);
@@ -242,13 +242,13 @@ void Population::evolve_box(int process)
         switch (process)
         {
             case 1:
-                evolve_box_straight_process(good_start, good_end, process_start, process_end);
+                evolve_population_straight_process(good_start, good_end, process_start, process_end);
                 break;
             case 2:
-                evolve_box_together_process(good_start, good_end, process_start, process_end);
+                evolve_population_together_process(good_start, good_end, process_start, process_end);
                 break;
             case 3:
-                evolve_box_mix_process(good_start, good_end, process_start, process_end);
+                evolve_population_mix_process(good_start, good_end, process_start, process_end);
                 break;
         }
 

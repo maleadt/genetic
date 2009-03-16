@@ -259,16 +259,16 @@ int main(int argc, char** argv)
         return 1;
     }
 
-	// Boxed straight
-	std::cout << "\t- Testing BOXED STRAIGHT evolution" << std::endl;
-	std::vector<double> dataBoxedStraightTime;
-	std::vector<double> dataBoxedStraightFitness;
+	// Population straight
+	std::cout << "\t- Testing POPULATION STRAIGHT evolution" << std::endl;
+	std::vector<double> dataPopulationStraightTime;
+	std::vector<double> dataPopulationStraightFitness;
 	try
     {
         dataEnvironment.reset();
-        dataEnvironment.setVector(&dataBoxedStraightTime, &dataBoxedStraightFitness);
+        dataEnvironment.setVector(&dataPopulationStraightTime, &dataPopulationStraightFitness);
         dataPopulation.set(tempDNA);
-        dataPopulation.evolve_box_straight();
+        dataPopulation.evolve_population_straight();
     }
     catch (std::string error)
     {
@@ -276,16 +276,16 @@ int main(int argc, char** argv)
         return 1;
     }
 
-	// Boxed together
-	std::cout << "\t- Testing BOXED TOGETHER evolution" << std::endl;
-	std::vector<double> dataBoxedTogetherTime;
-	std::vector<double> dataBoxedTogetherFitness;
+	// Population together
+	std::cout << "\t- Testing POPULATION TOGETHER evolution" << std::endl;
+	std::vector<double> dataPopulationTogetherTime;
+	std::vector<double> dataPopulationTogetherFitness;
 	try
     {
         dataEnvironment.reset();
-        dataEnvironment.setVector(&dataBoxedTogetherTime, &dataBoxedTogetherFitness);
+        dataEnvironment.setVector(&dataPopulationTogetherTime, &dataPopulationTogetherFitness);
         dataPopulation.set(tempDNA);
-        dataPopulation.evolve_box_together();
+        dataPopulation.evolve_population_together();
     }
     catch (std::string error)
     {
@@ -293,16 +293,16 @@ int main(int argc, char** argv)
         return 1;
     }
 
-	// Boxed mixed
-	std::cout << "\t- Testing BOXED MIXED evolution" << std::endl;
-	std::vector<double> dataBoxedMixedTime;
-	std::vector<double> dataBoxedMixedFitness;
+	// Population mixed
+	std::cout << "\t- Testing POPULATION MIXED evolution" << std::endl;
+	std::vector<double> dataPopulationMixedTime;
+	std::vector<double> dataPopulationMixedFitness;
 	try
     {
         dataEnvironment.reset();
-        dataEnvironment.setVector(&dataBoxedMixedTime, &dataBoxedMixedFitness);
+        dataEnvironment.setVector(&dataPopulationMixedTime, &dataPopulationMixedFitness);
         dataPopulation.set(tempDNA);
-        dataPopulation.evolve_box_mix();
+        dataPopulation.evolve_population_mix();
     }
     catch (std::string error)
     {
@@ -326,9 +326,9 @@ int main(int argc, char** argv)
 
     // Add data sets
     plot.plot_xy(dataSingleStraightTime, dataSingleStraightFitness, "single-straight evolution");
-    plot.plot_xy(dataBoxedStraightTime, dataBoxedStraightFitness, "boxed-straight evolution");
-    plot.plot_xy(dataBoxedTogetherTime, dataBoxedTogetherFitness, "boxed-together evolution");
-    plot.plot_xy(dataBoxedMixedTime, dataBoxedMixedFitness, "boxed-mixed evolution");
+    plot.plot_xy(dataPopulationStraightTime, dataPopulationStraightFitness, "boxed-straight evolution");
+    plot.plot_xy(dataPopulationTogetherTime, dataPopulationTogetherFitness, "boxed-together evolution");
+    plot.plot_xy(dataPopulationMixedTime, dataPopulationMixedFitness, "boxed-mixed evolution");
 
     // Save to file
     plot.savetops(inputFileOutput);

@@ -71,13 +71,13 @@ class Population
 
         // Evolutionary methods
         void evolve_single_straight();
-        void evolve_box(int process);
-        void evolve_box_straight();
-        void evolve_box_straight_process(std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator);
-        void evolve_box_together();
-        void evolve_box_together_process(std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator);
-        void evolve_box_mix();
-        void evolve_box_mix_process(std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator);
+        void evolve_population(int process);
+        void evolve_population_straight();
+        void evolve_population_straight_process(std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator);
+        void evolve_population_together();
+        void evolve_population_together_process(std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator);
+        void evolve_population_mix();
+        void evolve_population_mix_process(std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator);
 
     private:
         // Current DNA

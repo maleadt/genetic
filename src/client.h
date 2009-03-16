@@ -64,7 +64,7 @@ class Client
 
 		// DNA alteration
 		void mutate();
-		void crossover(Client& inputClient);
+		void recombine(Client& inputClient);
 		void clean();
 
 		// DNA output

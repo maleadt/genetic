@@ -93,7 +93,7 @@ void Client::mutate()
 }
 
 // Combine the DNA slightly with another client
-void Client::crossover(Client& inputClient)
+void Client::recombine(Client& inputClient)
 {
     // Acquire DNA queue representation
     std::deque<int> inputQueue1 = inputClient.get().dequeue();
