@@ -246,37 +246,69 @@ int main(int argc, char** argv)
 	std::cout << "\t- Testing SINGLE STRAIGHT evolution" << std::endl;
 	std::vector<double> dataSingleStraightTime;
 	std::vector<double> dataSingleStraightFitness;
-	dataEnvironment.reset();
-	dataEnvironment.setVector(&dataSingleStraightTime, &dataSingleStraightFitness);
-	dataPopulation.set(tempDNA);
-	dataPopulation.evolve_single_straight();
+	try
+    {
+        dataEnvironment.reset();
+        dataEnvironment.setVector(&dataSingleStraightTime, &dataSingleStraightFitness);
+        dataPopulation.set(tempDNA);
+        dataPopulation.evolve_single_straight();
+    }
+    catch (std::string error)
+    {
+        std::cout << "! Error: " << error << std::endl;
+        return 1;
+    }
 
 	// Boxed straight
 	std::cout << "\t- Testing BOXED STRAIGHT evolution" << std::endl;
 	std::vector<double> dataBoxedStraightTime;
 	std::vector<double> dataBoxedStraightFitness;
-	dataEnvironment.reset();
-	dataEnvironment.setVector(&dataBoxedStraightTime, &dataBoxedStraightFitness);
-	dataPopulation.set(tempDNA);
-	dataPopulation.evolve_box_straight();
+	try
+    {
+        dataEnvironment.reset();
+        dataEnvironment.setVector(&dataBoxedStraightTime, &dataBoxedStraightFitness);
+        dataPopulation.set(tempDNA);
+        dataPopulation.evolve_box_straight();
+    }
+    catch (std::string error)
+    {
+        std::cout << "! Error: " << error << std::endl;
+        return 1;
+    }
 
 	// Boxed together
 	std::cout << "\t- Testing BOXED TOGETHER evolution" << std::endl;
 	std::vector<double> dataBoxedTogetherTime;
 	std::vector<double> dataBoxedTogetherFitness;
-	dataEnvironment.reset();
-	dataEnvironment.setVector(&dataBoxedTogetherTime, &dataBoxedTogetherFitness);
-	dataPopulation.set(tempDNA);
-	dataPopulation.evolve_box_together();
+	try
+    {
+        dataEnvironment.reset();
+        dataEnvironment.setVector(&dataBoxedTogetherTime, &dataBoxedTogetherFitness);
+        dataPopulation.set(tempDNA);
+        dataPopulation.evolve_box_together();
+    }
+    catch (std::string error)
+    {
+        std::cout << "! Error: " << error << std::endl;
+        return 1;
+    }
 
 	// Boxed mixed
 	std::cout << "\t- Testing BOXED MIXED evolution" << std::endl;
 	std::vector<double> dataBoxedMixedTime;
 	std::vector<double> dataBoxedMixedFitness;
-	dataEnvironment.reset();
-	dataEnvironment.setVector(&dataBoxedMixedTime, &dataBoxedMixedFitness);
-	dataPopulation.set(tempDNA);
-	dataPopulation.evolve_box_mix();
+	try
+    {
+        dataEnvironment.reset();
+        dataEnvironment.setVector(&dataBoxedMixedTime, &dataBoxedMixedFitness);
+        dataPopulation.set(tempDNA);
+        dataPopulation.evolve_box_mix();
+    }
+    catch (std::string error)
+    {
+        std::cout << "! Error: " << error << std::endl;
+        return 1;
+    }
 
 
 	//

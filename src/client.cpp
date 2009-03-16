@@ -92,7 +92,7 @@ void Client::mutate()
 	}
 }
 
-// Combine the DNA with another client
+// Combine the DNA slightly with another client
 void Client::crossover(Client& inputClient)
 {
     // Acquire DNA queue representation
@@ -114,60 +114,157 @@ void Client::crossover(Client& inputClient)
     // Crossover!
     switch (method)
     {
-        // Sequential merge
+        // Crossover
         case 1:
         {
-            while (!inputQueue1.empty())
+            unsigned int size1 = inputQueue1.size();
+            unsigned int size2 = inputQueue2.size();
+            if (size1 <= 3 && size2 <= 3)
             {
-                outputQueue.push_back(inputQueue1.front());
-                inputQueue1.pop_front();
+                // Calculate part to exchange out of DNA 1
+                unsigned int p1 = random_range(0, size1-1);
+                unsigned int p2 = random_range(1, size1);
+                if (p1 > p2)
+                {
+                    int temp = p1;
+                    p1 = p2;
+                    p2 = temp;
+                }
+                while (p2 == p1)
+                    p2 = random_range(p1+1, size1);
+
+                // Calculate part to exchange out of DNA 2
+                unsigned int p3 = random_range(0, size2-1);
+                unsigned int p4 = random_range(1, size2);
+                if (p3 > p4)
+                {
+                    int temp = p3;
+                    p3 = p4;
+                    p4 = temp;
+                }
+                while (p4 == p3)
+                    p4 = random_range(p3+1, size2);
+
+                // First part
+                for (unsigned int i = 0; i < p1; i++)
+                {
+                    outputQueue.push_back(inputQueue1.front());
+                    inputQueue1.pop_front();
+                }
+                for (unsigned int i = 0; i < p3; i++)
+                    inputQueue2.pop_front();
+
+                // Middle part
+                for (unsigned int i = p3; i < p4; i++)
+                {
+                    outputQueue.push_back(inputQueue2.front());
+                    inputQueue2.pop_front();
+                }
+                for (unsigned int i = p1; i < p2; i++)
+                    inputQueue1.pop_front();
+
+                // End part
+                for (unsigned int i = p2; i < size1; i++)
+                {
+                    outputQueue.push_back(inputQueue1.front());
+                    inputQueue1.pop_front();
+                }
             }
-            while (!inputQueue2.empty())
+            else
             {
-                outputQueue.push_back(inputQueue2.front());
-                inputQueue2.pop_front();
+                // Do nothing
+                outputQueue = inputQueue1;
+                outputQueue.push_front(255);
             }
             break;
         }
 
-        // Altering merge
+        // Insertion
         case 2:
         {
-            while (!(inputQueue1.empty() && inputQueue2.empty()))
+            unsigned int size1 = inputQueue1.size();
+            unsigned int size2 = inputQueue2.size();
+            if (size1 <= 2 && size2 <= 3)
             {
-                if (!inputQueue1.empty())
+                // Calculate insertion spot of DNA 1
+                unsigned int p1 = random_range(1, size1-1);
+
+                // Calculate part to get out of DNA 2
+                unsigned int p3 = random_range(0, size2-1);
+                unsigned int p4 = random_range(1, size2);
+                if (p3 > p4)
+                {
+                    int temp = p3;
+                    p3 = p4;
+                    p4 = temp;
+                }
+                while (p4 == p3)
+                    p4 = random_range(p3+1, size2);
+
+                // First part
+                for (unsigned int i = 0; i < p1; i++)
                 {
                     outputQueue.push_back(inputQueue1.front());
                     inputQueue1.pop_front();
                 }
-                if (!inputQueue2.empty())
+                for (unsigned int i = 0; i < p3; i++)
+                    inputQueue2.pop_front();
+
+                // Middle part
+                for (unsigned int i = p3; i < p4; i++)
+                {
+                    outputQueue.push_back(inputQueue2.front());
+                    inputQueue2.pop_front();
+                }
+
+                // End part
+                for (unsigned int i = p1; i < size1; i++)
+                {
+                    outputQueue.push_back(inputQueue1.front());
+                    inputQueue1.pop_front();
+                }
+            }
+            else
+            {
+                // Do nothing
+                outputQueue = inputQueue1;
+                outputQueue.push_front(255);
+            }
+            break;
+        }
+
+        // Gene conversion
+        case 3:
+        {
+            unsigned int size1 = inputQueue1.size();
+            unsigned int size2 = inputQueue2.size();
+            if (size1 <= 3 && size2 <= 3)
+            {
+                // Calculate split points
+                unsigned int p1 = random_range(1, size1-1);
+                unsigned int p2 = random_range(1, size2-1);
+
+                // First part
+                for (unsigned int i = 0; i < p1; i++)
+                {
+                    outputQueue.push_back(inputQueue1.front());
+                    inputQueue1.pop_front();
+                }
+
+                // Second part
+                for (unsigned int i = 0; i < p2; i++)
+                    inputQueue2.pop_front();
+                for (unsigned int i = p2; i < size2; i++)
                 {
                     outputQueue.push_back(inputQueue2.front());
                     inputQueue2.pop_front();
                 }
             }
-            break;
-        }
-
-        // Random merge
-        case 3:
-        {
-            while (!(inputQueue1.empty() && inputQueue2.empty()))
+            else
             {
-                int choice = random_range(0, 1);
-                if (choice == 0 && !inputQueue1.empty())
-                {
-                    outputQueue.push_back(inputQueue1.front());
-                }
-                else if (!inputQueue2.empty())
-                {
-                    outputQueue.push_back(inputQueue2.front());
-                    inputQueue2.pop_front();
-                }
-                if (!inputQueue1.empty())
-                    inputQueue1.pop_front();
-                if (!inputQueue2.empty())
-                    inputQueue2.pop_front();
+                // Do nothing
+                outputQueue = inputQueue1;
+                outputQueue.push_front(255);
             }
             break;
         }

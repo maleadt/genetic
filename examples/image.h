@@ -63,7 +63,7 @@ const int IMAGE_DIGITS = 5;
 
 // Polygon limits
 const int LIMIT_POLYGONS = 150;
-const int LIMIT_POLYGON_POINTS = 3;
+const int LIMIT_POLYGON_POINTS = 10;
 
 // Comparison sample rate
 const int COMPARISON_SAMPLE_RATE = 1;

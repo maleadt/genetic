@@ -4,6 +4,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 # Project name
 PROJECT(Evolve)
 
+# Project settings
+SET(WITH_OPENMP false)
+
 # Enable warnings
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 SET(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
@@ -22,16 +25,20 @@ MARK_AS_ADVANCED(
 # Type of build ("debug", "release" or "profile")
 set(CMAKE_BUILD_TYPE release)
 
-# OpenMP
+# Use OpenMP?
 INCLUDE(CheckCCompilerFlag)
-CHECK_C_COMPILER_FLAG(-fopenmp HAVE_OPENMP)
-IF (HAVE_OPENMP)
-	MESSAGE("** Using OpenMP multithreading")
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -openmp")
-	SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fopenmp -openmp")
-ELSE (HAVE_OPENMP)
-	MESSAGE("!! Compiler doesn't support OpenMP multithreading, disabling multithreading")
-ENDIF (HAVE_OPENMP)
+IF (WITH_OPENMP)
+        CHECK_C_COMPILER_FLAG(-fopenmp HAVE_OPENMP)
+        IF (HAVE_OPENMP)
+                MESSAGE("** Using OpenMP multithreading")
+                ADD_DEFINITIONS(-DWITH_OPENMP)
+                SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -openmp")
+                SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fopenmp")
+        ELSE (HAVE_OPENMP)
+                MESSAGE("!! Compiler doesn't support OpenMP multithreading, disabling multithreading")
+        ENDIF (HAVE_OPENMP)
+ENDIF (WITH_OPENMP)
+
 
 # Add individual subdirectories
 ADD_SUBDIRECTORY(src)

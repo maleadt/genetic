@@ -219,20 +219,32 @@ double EnvImage::compare(cairo_surface_t* inputSurface) const
         unsigned char* tempData1 = dataInputRGB24;
         unsigned char* tempData2 =cairo_image_surface_get_data(inputSurface);
 
-        // Split the image in some parts
+        // Total difference
+        long int difference = 0;
+
+        #ifdef WITH_OPENMP
+         // Split the image in some parts
         int parts = omp_get_num_threads();
         long int* difference_part = new long int[parts];
         int x;
 
+        // Set all values to 0
+        for (x = 0; x < parts; x++)
+            difference_part[x] = 0;
+
         // Process each part
         #pragma omp parallel for
         for(x = 0; x < parts; x++)
+        #endif
         {
             // Variables
             int i, db, dg, dr;
-            difference_part[x] = 0;
 
+            #ifdef WITH_OPENMP
             for (i = ((dataInputWidth*dataInputHeight*4)/parts) * x; i < ((dataInputWidth*dataInputHeight*4)/parts) * (x+1); i+=4)
+            #else
+            for (i = 0; i < dataInputWidth*dataInputHeight*4; i+=4)
+            #endif
             {
                 // RGBa
                 db = tempData1[i] - tempData2[i];
@@ -240,17 +252,22 @@ double EnvImage::compare(cairo_surface_t* inputSurface) const
                 dr = tempData1[i+2] - tempData2[i+2];
 
                 // Calculate difference
+                #ifdef WITH_OPENMP
                 difference_part[x] += sqrt(dr*dr + dg*dg + db*db);
+                #else
+                difference += sqrt(dr*dr + dg*dg + db*db);
+                #endif
             }
         }
 
         // Sum the total difference
-        long int difference = 0;
+        #ifdef WITH_OPENMP
         for(x = 0; x < parts; x++)
         {
             difference += difference_part[x];
         }
         delete[] difference_part;
+        #endif
 
         // Get resemblance
         double resemblance = dataInputWidth*dataInputHeight / (COMPARISON_SAMPLE_RATE*double(difference));
