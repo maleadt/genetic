@@ -75,7 +75,7 @@ class EnvImgBenchmark : public EnvImage
         std::vector<double>* dataTime;
         std::vector<double>* dataFitness;
 		int counter;
-		clock_t start;
+		double start;
 };
 
 
@@ -104,7 +104,11 @@ void EnvImgBenchmark::update(const DNA& inputDNA)
 {
     // Ge the fitness and elapsed time
     double tempFitness = 100000*fitness(inputDNA);
-    double tempTime = double(clock()-start)/CLOCKS_PER_SEC;
+    #ifdef WITH_OPENMP
+    double tempTime = omp_get_wtime()-start;
+    #else
+    double tempTime = (double(clock())-start)/CLOCKS_PER_SEC;
+    #endif
 
     // Add values to map
     dataTime->push_back(tempTime);
@@ -114,8 +118,12 @@ void EnvImgBenchmark::update(const DNA& inputDNA)
 // Condition call
 bool EnvImgBenchmark::condition()
 {
-    double ms = 1000*(clock()-start)/CLOCKS_PER_SEC;
-    return ms < runtime*1000;
+    #ifdef WITH_OPENMP
+    double sec = omp_get_wtime()-start;
+    #else
+    double sec = (double(clock())-start)/CLOCKS_PER_SEC;
+    #endif
+    return sec < runtime;
 }
 
 
@@ -127,7 +135,12 @@ bool EnvImgBenchmark::condition()
 void EnvImgBenchmark::reset()
 {
     counter = 0;
-	start = clock();
+
+    #ifdef WITH_OPENMP
+    start = omp_get_wtime();
+    #else
+	start = (double)clock();
+	#endif
 }
 
 // Add the output map
@@ -309,7 +322,6 @@ int main(int argc, char** argv)
         std::cout << "! Error: " << error << std::endl;
         return 1;
     }
-
 
 	//
 	// Plot

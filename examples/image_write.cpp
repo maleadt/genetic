@@ -78,7 +78,12 @@ EnvImgWrite::EnvImgWrite()
 {
     dataTime = -1;
 	counter = 0;
-	start = clock();
+
+    #ifdef WITH_OPENMP
+    start = omp_get_wtime();
+    #else
+	start = (double)clock();
+	#endif
 }
 
 
@@ -99,7 +104,11 @@ void EnvImgWrite::update(const DNA& inputDNA)
     output(tempSurface);
 
     // Print a message
-    double ms = 1000*(clock()-start)/CLOCKS_PER_SEC;
+    #ifdef WITH_OPENMP
+    double ms = 1000*(omp_get_wtime()-start);
+    #else
+    double ms = 1000*(double(clock())-start)/CLOCKS_PER_SEC;
+    #endif
     std::cout << "\t- " << int(ms*100)/100 << " ms: " << int(10000000*fitness(inputDNA))/100.0 << " points" << std::endl;
 
     // Finish
@@ -111,7 +120,11 @@ bool EnvImgWrite::condition()
 {
     if (dataTime == -1)
         return true;
-    double ms = 1000*(clock()-start)/CLOCKS_PER_SEC;
+    #ifdef WITH_OPENMP
+    double ms = 1000*(omp_get_wtime()-start);
+    #else
+    double ms = 1000*(double(clock())-start)/CLOCKS_PER_SEC;
+    #endif
     return ms < dataTime*1000;
 }
 
