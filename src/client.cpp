@@ -276,9 +276,8 @@ void Client::recombine(Client& inputClient)
     // Save the DNA
     dataDNA = DNA(outputQueue);
 
-    // Mutate?
-    if (random_range(1, 5) == 3)
-        mutate();
+    // Mutate
+    mutate();
 }
 
 // Clean the DNA
@@ -337,7 +336,7 @@ void Client::mutate_dna()
 		it2++;
 
 	// Pick mutation
-	int mutation = random_range(1, 6);
+	int mutation = random_range(1, 2);
 
 	switch (mutation)
 	{
@@ -355,7 +354,7 @@ void Client::mutate_dna()
 			break;
 		}
 
-		default:
+		case 2:
 			mutate_list(dataDNA);
 			break;
 	}
@@ -379,7 +378,7 @@ void Client::mutate_gen()
 		return;
 
 	// Pick mutation
-	int mutation = random_range(1, 6);
+	int mutation = random_range(1, 2);
 
 	// Pick a mutation
 	switch (mutation)
@@ -392,7 +391,7 @@ void Client::mutate_gen()
 			break;
 		}
 
-		default:
+		case 2:
 			mutate_list(*it);
 			break;
 	}

@@ -102,166 +102,234 @@ void Population::evolve_single_straight()
     }
 }
 
-// Evolve a box of clients straightly
-void Population::evolve_population_straight()
+// Evolve a population
+void Population::evolve_population()
 {
-    evolve_population(1);
-}
-void Population::evolve_population_straight_process(
-    std::vector<CachedClient>::iterator good_start, std::vector<CachedClient>::iterator good_end,
-    std::vector<CachedClient>::iterator process_start, std::vector<CachedClient>::iterator process_end)
-{
-    // Fill the rest of the box with copies of best x mutations
-    std::vector<CachedClient>::iterator good = good_start, process = process_start;
-    while (process != process_end)
-    {
-        *(process++) = *(good++);
-        if (good == good_end)
-            good = good_start;
-    }
+    // Allocate new population
+    std::vector<CachedClient> population(POPULATION_BOX_SIZE);
+    population[0].fitness = dataEnvironment->fitness(dataDNA);
+    population[0].client = dataDNA;
+    population[0].client.dataAlphabet = dataEnvironment->alphabet();
+    fill(population, 1);
 
-    // Mutate clients
-    process = process_start;
-    while (process != process_end)
-        (process++)->client.mutate();
-}
+    // Initial mutation
+    mutate(population, 1);
 
-// Evolve a box of clients together
-void Population::evolve_population_together()
-{
-    evolve_population(2);
-}
-void Population::evolve_population_together_process(
-    std::vector<CachedClient>::iterator good_start, std::vector<CachedClient>::iterator good_end,
-    std::vector<CachedClient>::iterator process_start, std::vector<CachedClient>::iterator process_end)
-{
-    // Fill the rest of the box with copies of best x mutations
-    std::vector<CachedClient>::iterator good = good_start, process = process_start;
-    while (process != process_end)
-    {
-        *(process++) = *(good++);
-        if (good == good_end)
-            good = good_start;
-    }
-
-    // Shuffle that part
-    std::random_shuffle(process_start, process_end);
-
-    // Convolute clients
-    process = process_start;
-    good = good_start;
-    while (process != process_end)
-    {
-        (process++)->client.recombine((good++)->client);
-        if (good == good_end)
-            good = good_start;
-    }
-}
-
-// Evolve a box in a mixed manner
-void Population::evolve_population_mix()
-{
-    evolve_population(3);
-}
-void Population::evolve_population_mix_process(
-    std::vector<CachedClient>::iterator good_start, std::vector<CachedClient>::iterator good_end,
-    std::vector<CachedClient>::iterator process_start, std::vector<CachedClient>::iterator process_end)
-{
-    // Get the distance between the two iterators
-    int size = 0;
-    std::vector<CachedClient>::iterator process = process_start;
-    while ((process++) != process_end)
-        size++;
-    std::vector<CachedClient>::iterator process_mid = process_start;
-    for (int i = 0; i < size/2; i++)
-        process_mid++;
-
-    // Call both process routines independantly
-    evolve_population_straight_process(good_start, good_end, process_start, process_mid++);
-    evolve_population_together_process(good_start, good_end, process_mid, process_end);
-}
-
-// Evolve a box
-void Population::evolve_population(int process)
-{
-    // Allocate the vector and fill it with the given DNA
-    std::vector<CachedClient> tempBox(POPULATION_BOX_SIZE);
-
-    // Mutate all but one
-    tempBox[0].client = Client(dataDNA, dataEnvironment->alphabet());
-    #pragma omp parallel for
-    for (int i = 1; i < POPULATION_BOX_SIZE; i++)
-    {
-        tempBox[i].client = Client(dataDNA, dataEnvironment->alphabet());
-        tempBox[i].client.mutate();
-    }
-
-    // Fill the initial fitness fields in the box
-    #pragma omp parallel for
-    for (int i = 0; i < POPULATION_BOX_SIZE; i++)
-    {
-        double fitness = dataEnvironment->fitness(tempBox[i].client.get());
-        tempBox[i].fitness = fitness;
-    }
-
-    // Fitness watcher
+    // Critical fitness
     double fitness_critical = 0;
 
     // Loop
     while (dataEnvironment->condition())
     {
-        // Sort the box by fitness value
-        std::sort(tempBox.begin(), tempBox.end());
+        // Check if we got good mutations
+        if (population[0].fitness == -1)
+            throw std::string("No successfull mutations...");
 
-        // Check if we have any legal mutation
-        if (tempBox[0].fitness == -1)
+        // Get good region
+        int threshold = POPULATION_BOX_THRESHOLD -1;
+        while (population[threshold].fitness == -1)
+            threshold--;
+
+        // Update?
+        if (population[0].fitness > fitness_critical)
         {
-            std::cout << "ERROR: evolution failed, every mutation is invalid" << std::endl;
-            return;
+            fitness_critical = population[0].fitness;
+            dataDNA = population[0].client.get();
+            dataEnvironment->update(dataDNA);    // TODO: pass fitness
         }
 
-        // Call for an update
-        if (tempBox[0].fitness > fitness_critical)
-        {
-            fitness_critical = tempBox[0].fitness;
-            dataEnvironment->update(tempBox[0].client.get());
-        }
+        // Refill the population
+        clean(population, threshold+1);
+        fill(population, threshold+1);
 
-        // Look up valid threshold
-        int limit = POPULATION_BOX_THRESHOLD;
-        while (tempBox[limit].fitness == -1)
-            limit--;
+        // Shuffle the population
+        std::vector<CachedClient>::iterator it = population.begin();
+        std::advance(it, threshold+1);
+        std::random_shuffle(it, population.end());
 
-        // Get some iterators
-        std::vector<CachedClient>::iterator good_start = tempBox.begin(), good_end = good_start;
-        std::advance(good_end , limit);
-        std::vector<CachedClient>::iterator process_start = tempBox.begin(), process_end = tempBox.end();
-        std::advance(process_start, limit+1);
-
-        // Call a specific function to process the box
-        switch (process)
-        {
-            case 1:
-                evolve_population_straight_process(good_start, good_end, process_start, process_end);
-                break;
-            case 2:
-                evolve_population_together_process(good_start, good_end, process_start, process_end);
-                break;
-            case 3:
-                evolve_population_mix_process(good_start, good_end, process_start, process_end);
-                break;
-        }
-
-        // Calculate fitness of newely modified clients
-        #pragma omp parallel for
-        for (int i = limit; i < POPULATION_BOX_SIZE; i++)
-        {
-            double fitness = dataEnvironment->fitness(tempBox[i].client.get());
-            tempBox[i].fitness = fitness;
-        }
-
-        // Save the best DNA
-        dataDNA = tempBox[0].client.get();
+        // Mutate new ones
+        recombine(population, threshold+1);
     }
 }
 
+// Evolve a population straightly
+void Population::evolve_population_straight()
+{
+    // Allocate new population
+    std::vector<CachedClient> population(POPULATION_BOX_SIZE);
+    population[0].fitness = dataEnvironment->fitness(dataDNA);
+    population[0].client = dataDNA;
+    population[0].client.dataAlphabet = dataEnvironment->alphabet();
+    fill(population, 1);
+
+    // Initial mutation
+    mutate(population, 1);
+
+    // Critical fitness
+    double fitness_critical = 0;
+
+    // Loop
+    while (dataEnvironment->condition())
+    {
+        // Check if we got good mutations
+        if (population[0].fitness == -1)
+            throw std::string("No successfull mutations...");
+
+        // Get good region
+        int threshold = POPULATION_BOX_THRESHOLD -1;
+        while (population[threshold].fitness == -1)
+            threshold--;
+
+        // Update?
+        if (population[0].fitness > fitness_critical)
+        {
+            fitness_critical = population[0].fitness;
+            dataDNA = population[0].client.get();
+            dataEnvironment->update(dataDNA);    // TODO: pass fitness
+        }
+
+        // Refill the population
+        clean(population, threshold+1);
+        fill(population, threshold+1);
+
+        // Mutate new ones
+        mutate(population, threshold+1);
+    }
+}
+
+// Evolve two populations simulteanously
+void Population::evolve_population_dual()
+{
+    // Allocate first population
+    std::vector<CachedClient> population1(POPULATION_BOX_SIZE);
+    population1[0].fitness = dataEnvironment->fitness(dataDNA);
+    population1[0].client = dataDNA;
+    population1[0].client.dataAlphabet = dataEnvironment->alphabet();
+    fill(population1, 1);
+    mutate(population1, 1);
+
+    // Allocate second population
+    std::vector<CachedClient> population2(POPULATION_BOX_SIZE);
+    population2[0].fitness = dataEnvironment->fitness(dataDNA);
+    population2[0].client = dataDNA;
+    population2[0].client.dataAlphabet = dataEnvironment->alphabet();
+    fill(population2, 1);
+    mutate(population2, 1);
+
+    // Critical fitness
+    double fitness_critical = 0;
+
+    // Population pointer
+    std::vector<CachedClient>* population = &population1;
+    std::vector<CachedClient>* population_other = &population2;
+
+    // Loop
+    while (dataEnvironment->condition())
+    {
+        // Alter populations
+        std::vector<CachedClient>* temp = population;
+        population = population_other;
+        population_other = temp;
+
+        // Check if we got good mutations
+        if ((*population)[0].fitness == -1 && (*population)[0].fitness == -1)
+            throw std::string("No successfull mutations...");
+
+        // Get good region
+        int threshold = POPULATION_BOX_THRESHOLD -1;
+        while ((*population)[threshold].fitness == -1)
+            threshold--;
+
+        // Update?
+        if ((*population)[0].fitness > fitness_critical)
+        {
+            fitness_critical = (*population)[0].fitness;
+            dataDNA = (*population)[0].client.get();
+            dataEnvironment->update(dataDNA);    // TODO: pass fitness
+        }
+
+        // Refill the population
+        clean(*population, threshold+1);
+        fill((*population), threshold+1);
+
+        // Shuffle the population
+        std::vector<CachedClient>::iterator it = population->begin();
+        std::advance(it, threshold+1);
+        std::random_shuffle(it, population->end());
+
+        // Population cross-contamination!
+        if (random_range(1, 26) == 13)
+            std::swap( (*population)[0], (*population_other)[0] );
+
+        // Mutate new ones
+        recombine((*population), threshold+1);
+    }
+}
+
+//
+// Population helper functions
+//
+
+// Clean the DNA of a population
+void Population::clean(std::vector<CachedClient>& population, int start)
+{
+    for (int i = 0; i < start; i++)
+        population[i].client.clean();
+}
+
+// Fill a population with the starting DNA
+void Population::fill(std::vector<CachedClient>& population, int start)
+{
+    // Copy the DNA of the first clients to the rest of the population
+    int j = 0;
+    for (unsigned int i = start; i < population.size(); i++)
+    {
+        population[i].client = population[j++].client;
+        if (j == start)
+            j = 0;
+    }
+
+    // Copy the fitness of the first clients
+    j = 0;
+    for (unsigned int i = start; i < population.size(); i++)
+    {
+        population[i].fitness = population[j++].fitness;
+        if (j == start)
+            j = 0;
+    }
+}
+
+// Mutate clients
+void Population::mutate(std::vector<CachedClient>& population, int start)
+{
+    // Mutate clients
+    for (unsigned int i = start; i < population.size(); i++)
+        population[i].client.mutate();
+
+    // Calculate new fitness
+    for (unsigned int i = start; i < population.size(); i++)
+        population[i].fitness = dataEnvironment->fitness(population[i].client.get());
+
+    // Sort the population
+    std::sort(population.begin(), population.end());
+}
+
+// Recombine clients
+void Population::recombine(std::vector<CachedClient>& population, int start)
+{
+    // Recombine clients
+    int j = 0;
+    for (unsigned int i = start; i < population.size(); i++)
+    {
+        population[i].client.recombine(population[j].client);
+        if (j == start)
+            j = 0;
+    }
+
+    // Calculate new fitness
+    for (unsigned int i = start; i < population.size(); i++)
+        population[i].fitness = dataEnvironment->fitness(population[i].client.get());
+
+    // Sort the population
+    std::sort(population.begin(), population.end());
+}

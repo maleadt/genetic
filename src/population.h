@@ -71,13 +71,15 @@ class Population
 
         // Evolutionary methods
         void evolve_single_straight();
-        void evolve_population(int process);
+        void evolve_population();
         void evolve_population_straight();
-        void evolve_population_straight_process(std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator);
-        void evolve_population_together();
-        void evolve_population_together_process(std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator);
-        void evolve_population_mix();
-        void evolve_population_mix_process(std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator, std::vector<CachedClient>::iterator);
+        void evolve_population_dual();
+
+        // Population helper methods
+        void clean(std::vector<CachedClient>& population, int start);
+        void fill(std::vector<CachedClient>& population, int start);
+        void mutate(std::vector<CachedClient>& population, int start);
+        void recombine(std::vector<CachedClient>& population, int start);
 
     private:
         // Current DNA

@@ -259,6 +259,23 @@ int main(int argc, char** argv)
         return 1;
     }
 
+	// Population
+	std::cout << "\t- Testing POPULATION evolution" << std::endl;
+	std::vector<double> dataPopulationTime;
+	std::vector<double> dataPopulationFitness;
+	try
+    {
+        dataEnvironment.reset();
+        dataEnvironment.setVector(&dataPopulationTime, &dataPopulationFitness);
+        dataPopulation.set(tempDNA);
+        dataPopulation.evolve_population();
+    }
+    catch (std::string error)
+    {
+        std::cout << "! Error: " << error << std::endl;
+        return 1;
+    }
+
 	// Population straight
 	std::cout << "\t- Testing POPULATION STRAIGHT evolution" << std::endl;
 	std::vector<double> dataPopulationStraightTime;
@@ -276,33 +293,16 @@ int main(int argc, char** argv)
         return 1;
     }
 
-	// Population together
-	std::cout << "\t- Testing POPULATION TOGETHER evolution" << std::endl;
-	std::vector<double> dataPopulationTogetherTime;
-	std::vector<double> dataPopulationTogetherFitness;
+	// Population dual
+	std::cout << "\t- Testing POPULATION DUAL evolution" << std::endl;
+	std::vector<double> dataPopulationDualTime;
+	std::vector<double> dataPopulationDualFitness;
 	try
     {
         dataEnvironment.reset();
-        dataEnvironment.setVector(&dataPopulationTogetherTime, &dataPopulationTogetherFitness);
+        dataEnvironment.setVector(&dataPopulationDualTime, &dataPopulationDualFitness);
         dataPopulation.set(tempDNA);
-        dataPopulation.evolve_population_together();
-    }
-    catch (std::string error)
-    {
-        std::cout << "! Error: " << error << std::endl;
-        return 1;
-    }
-
-	// Population mixed
-	std::cout << "\t- Testing POPULATION MIXED evolution" << std::endl;
-	std::vector<double> dataPopulationMixedTime;
-	std::vector<double> dataPopulationMixedFitness;
-	try
-    {
-        dataEnvironment.reset();
-        dataEnvironment.setVector(&dataPopulationMixedTime, &dataPopulationMixedFitness);
-        dataPopulation.set(tempDNA);
-        dataPopulation.evolve_population_mix();
+        dataPopulation.evolve_population_dual();
     }
     catch (std::string error)
     {
@@ -326,9 +326,9 @@ int main(int argc, char** argv)
 
     // Add data sets
     plot.plot_xy(dataSingleStraightTime, dataSingleStraightFitness, "single-straight evolution");
-    plot.plot_xy(dataPopulationStraightTime, dataPopulationStraightFitness, "boxed-straight evolution");
-    plot.plot_xy(dataPopulationTogetherTime, dataPopulationTogetherFitness, "boxed-together evolution");
-    plot.plot_xy(dataPopulationMixedTime, dataPopulationMixedFitness, "boxed-mixed evolution");
+    plot.plot_xy(dataPopulationTime, dataPopulationFitness, "population evolution");
+    plot.plot_xy(dataPopulationStraightTime, dataPopulationStraightFitness, "population-straight evolution");
+    plot.plot_xy(dataPopulationDualTime, dataPopulationDualFitness, "population-dual evolution");
 
     // Save to file
     plot.savetops(inputFileOutput);

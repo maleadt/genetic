@@ -45,8 +45,8 @@
 //
 
 // Mutation: amount of mutations
-const int MUTATE_AMOUNT_LOWER = 1;
-const int MUTATE_AMOUNT_UPPER = 50;
+const int MUTATE_AMOUNT_LOWER = 0;
+const int MUTATE_AMOUNT_UPPER = 5;
 
 
 
@@ -89,7 +89,7 @@ template <class T>
 void mutate_list(T& inputObject)
 {
 	// Pick mutation
-	 int mutation = 0;
+	 int mutation;
 	 int size = inputObject.size();
 	 if (size > 1)
 	 {

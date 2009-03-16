@@ -251,11 +251,11 @@ double EnvImage::compare(cairo_surface_t* inputSurface) const
                 dg = tempData1[i+1] - tempData2[i+1];
                 dr = tempData1[i+2] - tempData2[i+2];
 
-                // Calculate difference
+                // Calculate difference (Manhatten distance)
                 #ifdef WITH_OPENMP
-                difference_part[x] += sqrt(dr*dr + dg*dg + db*db);
+                difference_part[x] += dr*dr + dg*dg + db*db;
                 #else
-                difference += sqrt(dr*dr + dg*dg + db*db);
+                difference += dr*dr + dg*dg + db*db;
                 #endif
             }
         }
