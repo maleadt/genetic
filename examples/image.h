@@ -51,7 +51,9 @@
 #include <string>
 #include <iostream>
 #include <cairo/cairo.h>
+#ifdef WITH_OPENMP
 #include <omp.h>
+#endif
 
 
 //
@@ -67,6 +69,13 @@ const int LIMIT_POLYGON_POINTS = 15;
 
 // Comparison sample rate
 const int COMPARISON_SAMPLE_RATE = 1;
+
+// Division settings
+const int AVERAGE_DIV_X = 32;
+const int AVERAGE_DIV_Y = 32;
+
+// Comparison method
+const int COMPARISON_METHOD = 1;
 
 
 
@@ -90,14 +99,28 @@ class EnvImage : public Environment
 		bool loadImage(std::string inputFile);
 		bool valid_limits(const DNA& inputDNA) const;
 		void draw(cairo_surface_t* inputSurface, const DNA& inputDNA) const;
+
+                // Comparison setup
+                void setup(cairo_surface_t* inputSurface);
+                void setup_manhattan(cairo_surface_t* inputSurface);
+                void setup_average(cairo_surface_t* inputSurface);
+                
+                // Image comparison
 		double compare(cairo_surface_t* inputSurface) const;
+                double compare_manhattan(cairo_surface_t* inputSurface) const;
+		double compare_average(cairo_surface_t* inputSurface) const;
+
+        private:
+                // Comparison helper functions
+                void help_average_divide(unsigned char* rgb, int* avg, int width, int height) const;
+
+                // Comparison data
+                unsigned char* data_manhattan;
+                int* data_average;
 
 	protected:
 		std::string dataInputFile;
 		int dataInputWidth, dataInputHeight;
-
-    private:
-		unsigned char* dataInputRGB24;
 };
 
 // Include guard

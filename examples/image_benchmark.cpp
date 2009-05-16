@@ -103,7 +103,7 @@ EnvImgBenchmark::EnvImgBenchmark()
 void EnvImgBenchmark::update(const DNA& inputDNA)
 {
     // Ge the fitness and elapsed time
-    double tempFitness = 100000*fitness(inputDNA);
+    double tempFitness = 100*fitness(inputDNA);
     #ifdef WITH_OPENMP
     double tempTime = omp_get_wtime()-start;
     #else

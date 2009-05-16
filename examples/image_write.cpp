@@ -83,7 +83,7 @@ EnvImgWrite::EnvImgWrite()
     start = omp_get_wtime();
     #else
 	start = (double)clock();
-	#endif
+    #endif
 }
 
 
@@ -109,7 +109,7 @@ void EnvImgWrite::update(const DNA& inputDNA)
     #else
     double ms = 1000*(double(clock())-start)/CLOCKS_PER_SEC;
     #endif
-    std::cout << "\t- " << int(ms*100)/100 << " ms: " << int(10000000*fitness(inputDNA))/100.0 << " points" << std::endl;
+    std::cout << "\t- " << int(ms*100)/100 << " ms: " << 100*fitness(inputDNA) << " points" << std::endl;
 
     // Finish
     cairo_surface_destroy(tempSurface);
@@ -226,7 +226,7 @@ int main(int argc, char** argv)
 	// Message
 	std::cout << "NOTE: population created" << std::endl;
 
-    // Evolve
+        // Evolve
 	dataPopulation.evolve_population();
 
 	return 0;

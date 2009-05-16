@@ -44,14 +44,19 @@
 // Constructor
 EnvImage::EnvImage()
 {
-    dataInputRGB24 = NULL;
+    // Reset comparison data
+    data_manhattan = NULL;
+    data_average = NULL;
 }
 
 // Destructor
 EnvImage::~EnvImage()
 {
-    if (dataInputRGB24 != NULL)
-        delete[] dataInputRGB24;
+    // Delete comparison data
+    if (data_manhattan != NULL)
+        delete[] data_manhattan;
+    if (data_average != NULL)
+        delete[] data_average;
 }
 
 
@@ -67,7 +72,7 @@ double EnvImage::fitness(const DNA& inputDNA) const
 		return -1;
 
 	// Create a DC for the generated image
-    cairo_surface_t* tempSurface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, dataInputWidth, dataInputHeight);
+        cairo_surface_t* tempSurface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, dataInputWidth, dataInputHeight);
 
 	// Draw the DNA onto the DC
 	draw(tempSurface, inputDNA);
@@ -110,21 +115,15 @@ bool EnvImage::loadImage(std::string inputFile)
 	    return false;
 	}
 
-	// Get data
-	unsigned char* tempRGB24 = cairo_image_surface_get_data(tempSurface);
-
 	// Save size
 	dataInputWidth = cairo_image_surface_get_width(tempSurface);
 	dataInputHeight = cairo_image_surface_get_height(tempSurface);
 
-	// Save data
-	dataInputRGB24 = new unsigned char[dataInputHeight*dataInputWidth*4+1];
-	for (int i = 0; i < dataInputHeight*dataInputWidth*4; i++)
-        dataInputRGB24[i] = *(tempRGB24++);
-    dataInputRGB24[dataInputHeight*dataInputWidth*4] = 0;
+        // Setup the comparison
+        setup(tempSurface);
 
-    // Finish
-    cairo_surface_destroy(tempSurface);
+        // Finish
+        cairo_surface_destroy(tempSurface);
 
 	// Return
 	return true;
@@ -198,8 +197,71 @@ void EnvImage::draw(cairo_surface_t* inputSurface, const DNA& inputDNA) const
 	cairo_destroy(cr);
 }
 
+
+//
+// Comparison setup
+//
+
+// Setup the comparison data
+void EnvImage::setup(cairo_surface_t* inputSurface) {
+    switch(COMPARISON_METHOD)
+    {
+        case 0:
+            setup_manhattan(inputSurface);
+            break;
+        case 1:
+            setup_average(inputSurface);
+            break;
+    }
+}
+
+// Setup the comparison data -- Manhattan method
+void EnvImage::setup_manhattan(cairo_surface_t* inputSurface) {
+        std::cout << "NOTE: using Manhattan comparison method" << std::endl;
+
+        // Get data
+        unsigned char* tempData = cairo_image_surface_get_data(inputSurface);
+
+        // Copy data (TODO: memcpy)
+        data_manhattan = new unsigned char[dataInputHeight*dataInputWidth*4+1];
+        for (int i = 0; i < dataInputHeight*dataInputWidth*4; i++)
+            data_manhattan[i] = *(tempData++);
+}
+
+// Setup the comparison data -- averaging method
+void EnvImage::setup_average(cairo_surface_t* inputSurface) {
+        std::cout << "NOTE: using block-averaging comparison method" << std::endl;
+
+        // Get data
+        unsigned char* tempData = cairo_image_surface_get_data(inputSurface);
+
+	// Calculate 32x32 colour matrixes for image A
+	data_average = new int[3*AVERAGE_DIV_X*AVERAGE_DIV_Y];
+	help_average_divide(tempData, data_average, dataInputWidth, dataInputHeight);
+}
+
+
+//
+// Image comparison
+//
+
 // Compare two images
-double EnvImage::compare(cairo_surface_t* inputSurface) const
+double EnvImage::compare(cairo_surface_t* inputSurface) const {
+    switch(COMPARISON_METHOD)
+    {
+        case 0:
+            return compare_manhattan(inputSurface);
+            break;
+        case 1:
+            return compare_average(inputSurface);
+            break;
+        default:
+            return 0;
+    }
+}
+
+// Compare two images -- Manhattan method (TODO: return value between 0 and 1)
+double EnvImage::compare_manhattan(cairo_surface_t* inputSurface) const
 {
     // Get and verify size
     if ((cairo_image_surface_get_width(inputSurface) != dataInputWidth) || (cairo_image_surface_get_height(inputSurface) != dataInputHeight))
@@ -216,8 +278,8 @@ double EnvImage::compare(cairo_surface_t* inputSurface) const
     }
 
     // Get the raw data of the given surface
-    unsigned char* tempData1 = dataInputRGB24;
-    unsigned char* tempData2 =cairo_image_surface_get_data(inputSurface);
+    unsigned char* tempData1 = data_manhattan;
+    unsigned char* tempData2 = cairo_image_surface_get_data(inputSurface);
 
     // Total difference
     long int difference = 0;
@@ -272,4 +334,78 @@ double EnvImage::compare(cairo_surface_t* inputSurface) const
     // Get resemblance
     double resemblance = dataInputWidth*dataInputHeight / (COMPARISON_SAMPLE_RATE*double(difference));
     return resemblance;
+}
+
+
+// Compare two images -- averaging method
+double EnvImage::compare_average(cairo_surface_t* inputSurface) const
+{
+    // Verify formats
+    if (cairo_image_surface_get_format(inputSurface) != CAIRO_FORMAT_RGB24)
+    {
+        std::cout << "WARNING: can only process RGB24 data" << std::endl;
+        return 0;
+    }
+
+    // Get the raw data of the given surface
+    unsigned char* tempDataB = cairo_image_surface_get_data(inputSurface);
+
+    // Calculate 32x32 colour matrixes for image B
+    int* avgB = new int[3 * AVERAGE_DIV_X * AVERAGE_DIV_Y];
+    help_average_divide(tempDataB, avgB, dataInputWidth, dataInputHeight);
+
+    // Compare colour matrices
+    int difference = 0;
+    for (int i = 0; i < 3 * AVERAGE_DIV_X * AVERAGE_DIV_Y; i++) {
+        difference += std::abs(data_average[i] - avgB[i]);
+    }
+    double similarity = 1.0 - ((double) difference / (255.0 * AVERAGE_DIV_X * AVERAGE_DIV_Y * 3.0));
+
+    // Clean up
+    delete[] avgB;
+
+    // Return similarity
+    return similarity;
+}
+
+
+//
+// Comparison helper routines
+//
+
+// Subdivide an image into 32x32 blocks
+void EnvImage::help_average_divide(unsigned char* rgb, int* avg, int width, int height) const {
+	// Calculate step sizes
+	int step_x = width/AVERAGE_DIV_X;
+	int step_y = height/AVERAGE_DIV_Y;
+
+	// Process all blocks
+	int y_max = 0;
+	for (int ys = 0; ys < AVERAGE_DIV_Y; ys++) {
+		int x_max = 0;
+		for (int xs = 0; xs < AVERAGE_DIV_X; xs++) {
+			int r = 0, g = 0, b = 0;
+
+			// Calculate colour in block
+			for (int y = y_max; y < y_max+step_y; y++) {
+				for (int x = x_max; x < x_max+step_x; x++) {
+					r += *(rgb++);
+					g += *(rgb++);
+					b += *(rgb++);
+					rgb++;		// Skip alpha
+				}
+				x_max += step_x;
+			}
+			y_max += step_y;
+
+			r /= step_x*step_y;
+			g /= step_x*step_y;
+			b /= step_x*step_y;
+
+			// Save colours
+			*(avg++) = r;
+			*(avg++) = g;
+			*(avg++) = b;
+		}
+	}
 }
