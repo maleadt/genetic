@@ -47,6 +47,7 @@
 #include "../src/population.h"
 #include "../src/environment.h"
 #include "../src/dna.h"
+#include <vector>
 #include <cmath>
 #include <string>
 #include <iostream>
@@ -65,10 +66,7 @@ const int IMAGE_DIGITS = 5;
 
 // Polygon limits
 const int LIMIT_POLYGONS = 50;
-const int LIMIT_POLYGON_POINTS = 15;
-
-// Comparison sample rate
-const int COMPARISON_SAMPLE_RATE = 1;
+const int LIMIT_POLYGON_POINTS = 5;
 
 // Division settings
 const int AVERAGE_DIV_X = 32;
@@ -76,6 +74,18 @@ const int AVERAGE_DIV_Y = 32;
 
 // Comparison method
 const int COMPARISON_METHOD = 1;
+
+
+//
+// Additional structures
+//
+
+struct vertex {
+    int x;
+    int y;
+    bool drawn;
+    double angle;
+};
 
 
 
@@ -99,15 +109,16 @@ class EnvImage : public Environment
 		bool loadImage(std::string inputFile);
 		bool valid_limits(const DNA& inputDNA) const;
 		void draw(cairo_surface_t* inputSurface, const DNA& inputDNA) const;
+                void explain(const DNA& inputDNA) const;
 
                 // Comparison setup
                 void setup(cairo_surface_t* inputSurface);
-                void setup_manhattan(cairo_surface_t* inputSurface);
+                void setup_nmse(cairo_surface_t* inputSurface);
                 void setup_average(cairo_surface_t* inputSurface);
-                
+
                 // Image comparison
 		double compare(cairo_surface_t* inputSurface) const;
-                double compare_manhattan(cairo_surface_t* inputSurface) const;
+                double compare_nmse(cairo_surface_t* inputSurface) const;
 		double compare_average(cairo_surface_t* inputSurface) const;
 
         private:
@@ -115,7 +126,7 @@ class EnvImage : public Environment
                 void help_average_divide(unsigned char* rgb, int* avg, int width, int height) const;
 
                 // Comparison data
-                unsigned char* data_manhattan;
+                unsigned char* data_nmse;
                 int* data_average;
 
 	protected:

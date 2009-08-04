@@ -44,24 +44,23 @@
 //////////////////////
 
 // Environment
-class EnvImgWrite : public EnvImage
-{
-    public:
-        // Construction & destruction
-        EnvImgWrite();
+class EnvImgWrite : public EnvImage {
+public:
+    // Construction & destruction
+    EnvImgWrite();
 
-        // Required functions
-		void update(const DNA& inputDNA);
-		bool condition();
+    // Required functions
+    void update(const DNA& inputDNA);
+    bool condition();
 
-		// Additional functions
-		void output(cairo_surface_t* inputSurface);
-		void runtime(int inputTime);
+    // Additional functions
+    void output(cairo_surface_t* inputSurface);
+    void runtime(int inputTime);
 
-    private:
-        int dataTime;
-		int counter;
-		clock_t start;
+private:
+    int dataTime;
+    int counter;
+    clock_t start;
 };
 
 
@@ -74,16 +73,15 @@ class EnvImgWrite : public EnvImage
 // Construction and destruction
 //
 
-EnvImgWrite::EnvImgWrite()
-{
+EnvImgWrite::EnvImgWrite() {
     dataTime = -1;
-	counter = 0;
+    counter = 0;
 
-    #ifdef WITH_OPENMP
+#ifdef WITH_OPENMP
     start = omp_get_wtime();
-    #else
-	start = (double)clock();
-    #endif
+#else
+    start = (double) clock();
+#endif
 }
 
 
@@ -92,40 +90,38 @@ EnvImgWrite::EnvImgWrite()
 //
 
 // Update call
-void EnvImgWrite::update(const DNA& inputDNA)
-{
+void EnvImgWrite::update(const DNA& inputDNA) {
     // Create surface
     cairo_surface_t* tempSurface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, dataInputWidth, dataInputHeight);
 
-	// Draw the DNA onto the DC
-	draw(tempSurface, inputDNA);
+    // Draw the DNA onto the DC
+    draw(tempSurface, inputDNA);
 
     // Let the application output the bitmap
     output(tempSurface);
 
     // Print a message
-    #ifdef WITH_OPENMP
-    double ms = 1000*(omp_get_wtime()-start);
-    #else
-    double ms = 1000*(double(clock())-start)/CLOCKS_PER_SEC;
-    #endif
-    std::cout << "\t- " << int(ms*100)/100 << " ms: " << 100*fitness(inputDNA) << " points" << std::endl;
+#ifdef WITH_OPENMP
+    double ms = 1000 * (omp_get_wtime() - start);
+#else
+    long seconds = (double(clock()) - start) / CLOCKS_PER_SEC;
+#endif
+    std::cout << "\t- " << seconds << " sec: " << 100 * fitness(inputDNA) << " points" << std::endl;
 
     // Finish
     cairo_surface_destroy(tempSurface);
 }
 
 // Condition call
-bool EnvImgWrite::condition()
-{
+bool EnvImgWrite::condition() {
     if (dataTime == -1)
         return true;
-    #ifdef WITH_OPENMP
-    double ms = 1000*(omp_get_wtime()-start);
-    #else
-    double ms = 1000*(double(clock())-start)/CLOCKS_PER_SEC;
-    #endif
-    return ms < dataTime*1000;
+#ifdef WITH_OPENMP
+    double ms = 1000 * (omp_get_wtime() - start);
+#else
+    double ms = 1000 * (double(clock()) - start) / CLOCKS_PER_SEC;
+#endif
+    return ms < dataTime * 1000;
 }
 
 
@@ -134,12 +130,11 @@ bool EnvImgWrite::condition()
 //
 
 // Output call
-void EnvImgWrite::output(cairo_surface_t* inputSurface)
-{
+void EnvImgWrite::output(cairo_surface_t* inputSurface) {
     // Generate an output tag
     std::stringstream convert;
-    convert << dataInputFile.substr( 0, dataInputFile.find_last_of(".") ) << "-";
-    int zeros = counter == 0 ? IMAGE_DIGITS : IMAGE_DIGITS-log10(counter);
+    convert << dataInputFile.substr(0, dataInputFile.find_last_of(".")) << "-";
+    int zeros = counter == 0 ? IMAGE_DIGITS : IMAGE_DIGITS - log10(counter);
     for (int i = 0; i < zeros; i++)
         convert << "0";
     convert << counter++ << ".png";
@@ -149,8 +144,7 @@ void EnvImgWrite::output(cairo_surface_t* inputSurface)
 }
 
 // Set runtime
-void EnvImgWrite::runtime(int inputTime)
-{
+void EnvImgWrite::runtime(int inputTime) {
     dataTime = inputTime;
 }
 
@@ -158,76 +152,77 @@ void EnvImgWrite::runtime(int inputTime)
 // MAIN //
 //////////
 
-int main(int argc, char** argv)
-{
-	//
-	// Load image
-	//
+int main(int argc, char** argv) {
+    //
+    // Load image
+    //
 
-	// Check input
-	if (argc < 2)
-	{
+    // Check input
+    if (argc < 2) {
         std::cout << "ERROR: input filename missing or too many parameters" << std::endl;
         return 1;
-	}
+    }
 
-	// Save input file
-	std::string inputFile = argv[1];
+    // Save input file
+    std::string inputFile = argv[1];
 
-	// Message
-	std::cout << "NOTE: configured" << std::endl;
+    // Message
+    std::cout << "NOTE: configured" << std::endl;
 
 
-	//
-	// Create environment
-	//
+    //
+    // Create environment
+    //
 
-	// Create object
-	EnvImgWrite dataEnvironment;
+    // Create object
+    EnvImgWrite dataEnvironment;
 
-	// Max time given?
-	if (argc == 3)
+    // Max time given?
+    if (argc == 3)
         dataEnvironment.runtime(atoi(argv[2]));
 
-	// Load base image
-	if (!dataEnvironment.loadImage(inputFile))
-	{
-	    std::cout << "ERROR: could not load image" << std::endl;
-	    return 1;
-	}
+    // Load base image
+    if (!dataEnvironment.loadImage(inputFile)) {
+        std::cout << "ERROR: could not load image" << std::endl;
+        return 1;
+    }
 
-	// Message
-	std::cout << "NOTE: environment created" << std::endl;
+    // Message
+    std::cout << "NOTE: environment created" << std::endl;
 
 
-	//
-	// Create population
-	//
+    //
+    // Create population
+    //
 
-	// Initial DNA (triangle)
-	std::deque<int> tempQueue;
-	tempQueue.push_back(255);	// Start of DNA
-	tempQueue.push_back(50);	// Semi transparent grey brush (RGB = 50 50 50, with 50% opacity)
-	tempQueue.push_back(50);
-	tempQueue.push_back(50);
-	tempQueue.push_back(128);
-	tempQueue.push_back(1);     // Point one: (1, 254)
-	tempQueue.push_back(254);
-	tempQueue.push_back(128);	// Point two: (128, 1)
-	tempQueue.push_back(1);
-	tempQueue.push_back(254);	// Point three: (254, 254)
-	tempQueue.push_back(254);
-	tempQueue.push_back(255);	// End of DNA
-	DNA tempDNA(tempQueue);
+    // Initial DNA (triangle)
+    std::deque<int> tempQueue;
+    tempQueue.push_back(255); // Start of DNA
+    tempQueue.push_back(50); // Semi transparent grey brush (RGB = 50 50 50, with 50% opacity)
+    tempQueue.push_back(50);
+    tempQueue.push_back(50);
+    tempQueue.push_back(128);
+    tempQueue.push_back(1); // Point one: (1, 254)
+    tempQueue.push_back(254);
+    tempQueue.push_back(128); // Point two: (128, 1)
+    tempQueue.push_back(1);
+    tempQueue.push_back(254); // Point three: (254, 254)
+    tempQueue.push_back(254);
+    tempQueue.push_back(255); // End of DNA
+    DNA tempDNA(tempQueue);
 
-	// Create object
-	Population dataPopulation(&dataEnvironment, tempDNA);
+    // Create object
+    Population dataPopulation(&dataEnvironment, tempDNA);
 
-	// Message
-	std::cout << "NOTE: population created" << std::endl;
+    // Message
+    std::cout << "NOTE: population created" << std::endl;
 
-        // Evolve
-	dataPopulation.evolve_population();
+    // Evolve
+    dataPopulation.evolve_population();
 
-	return 0;
+    // Fetch and print the resulting DNA
+    DNA outputDNA = dataPopulation.get();
+    dataEnvironment.explain(outputDNA);
+
+    return 0;
 }
