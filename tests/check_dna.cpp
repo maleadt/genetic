@@ -84,6 +84,23 @@ START_TEST(test_dna_compare) {
 }
 END_TEST
 
+START_TEST(test_dna_erase) {
+    unsigned char dna1[] = {0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+        0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
+        0x03, 0x04, 0x05, 0x04, 0x03, 0x00,
+        0x04, 0x05, 0x06, 0x05, 0x04};
+    DNA tempDNA1(dna1, 23);
+    tempDNA1.erase(1);
+    unsigned char dna1_check[] = {0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+        0x03, 0x04, 0x05, 0x04, 0x03, 0x00,
+        0x04, 0x05, 0x06, 0x05, 0x04};
+    DNA tempDNA1_check(dna1_check, 17);
+    fail_unless(tempDNA1 == tempDNA1_check, "Simple erase");
+    // TODO: toch iet doen met lege genes, 0x00 ALTIJD laten meecounten voor next gene
+    // anders lyk hoe erasen, lege gene?
+}
+END_TEST
+
 
 Suite * dna_suite() {
     Suite* s = suite_create("DNA");
@@ -92,6 +109,7 @@ Suite * dna_suite() {
     TCase* tc_core = tcase_create("Core");
     tcase_add_test(tc_core, test_dna_count);
     tcase_add_test(tc_core, test_dna_compare);
+    tcase_add_test(tc_core, test_dna_erase);
     suite_add_tcase(s, tc_core);
 
     return s;

@@ -11,7 +11,7 @@ SET(WITH_OPENMP false)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 SET(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
-# Handle testing
+# Handle testing (tests are specified in "tests" subfolder")
 ENABLE_TESTING()
 
 # Add an "profile" build type
@@ -26,7 +26,7 @@ MARK_AS_ADVANCED(
     CMAKE_C_FLAGS_PROFILE)
 
 # Type of build ("debug", "release" or "profile")
-set(CMAKE_BUILD_TYPE release)
+set(CMAKE_BUILD_TYPE debug)
 
 # Use OpenMP?
 INCLUDE(CheckCCompilerFlag)
