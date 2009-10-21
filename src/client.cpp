@@ -61,6 +61,21 @@ Client::Client(const DNA& inputDNA, int inputAlphabet)
 
 
 //
+// DNA IO
+//
+
+void Client::set(const DNA& inputDNA)
+{
+	dataDNA = DNA(inputDNA);
+}
+
+DNA& Client::get() const
+{
+	return dataDNA;
+}
+
+
+//
 // DNA alteration
 //
 
@@ -111,7 +126,7 @@ void Client::recombine(Client& inputClient)
     // Pick a crossover-method
     int method = random_range(1, 3);
 
-    // Crossover!
+    // Recombine!
     switch (method)
     {
         // Crossover
@@ -293,21 +308,6 @@ void Client::clean()
 		}
 		++it;
 	}
-}
-
-
-//
-// DNA IO
-//
-
-void Client::set(const DNA& inputDNA)
-{
-	dataDNA = DNA(inputDNA);
-}
-
-DNA Client::get() const
-{
-	return dataDNA;
 }
 
 

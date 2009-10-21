@@ -11,6 +11,9 @@ SET(WITH_OPENMP false)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 SET(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
+# Handle testing
+ENABLE_TESTING()
+
 # Add an "profile" build type
 SET(CMAKE_CXX_FLAGS_PROFILE "-pg" CACHE STRING
     "Flags used by the C++ compiler during profiled builds."
@@ -39,7 +42,8 @@ IF (WITH_OPENMP)
         ENDIF (HAVE_OPENMP)
 ENDIF (WITH_OPENMP)
 
-
 # Add individual subdirectories
+ADD_SUBDIRECTORY(lib)
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(examples)
+ADD_SUBDIRECTORY(tests)

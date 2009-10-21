@@ -76,7 +76,7 @@ class Client
 
 	private:
 		// DNA
-		DNA dataDNA;
+		DNA& dataDNA;
 
 		// Mutation routines
 		void mutate_dna();

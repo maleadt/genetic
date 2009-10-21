@@ -34,8 +34,9 @@
 
 // Headers
 #include <iostream>
-#include <queue>
-#include <list>
+#include <iomanip>
+#include <cstring>
+#include <cstdlib>
 
 
 //
@@ -52,49 +53,36 @@ class DNA
 	public:
 		// Construction and destruction
 		DNA();
-		DNA(std::deque<int> inputQueue);
-		DNA(std::list<std::list<int> > inputList);
-
-		// Setters
-		void set(std::deque<int> inputQueue);
-		void set(std::list<std::list<int> > inputList);
-        // Const iterators
-        typedef std::list<std::list<int> >::const_iterator const_iterator;
-        const_iterator begin() const
-        {
-                return data.begin();
-        }
-        const_iterator end() const
-        {
-                return data.end();
-        }
-
-        // Normal iterators
-        typedef std::list<std::list<int> >::iterator iterator;
-        iterator begin()
-        {
-                return data.begin();
-        }
-        iterator end()
-        {
-                return data.end();
-        }
-
-        // Modifyers
-        iterator erase(iterator it);
-        iterator insert(iterator it, std::list<int>& item);
-        void push_back(std::list<int>& item);
+		DNA(const DNA& inputData);
+                DNA(const unsigned char* inputData, int inputSize);
 
 		// Informational routines
-		int genes() const;
-		int size() const;
-		std::deque<int> dequeue() const;
+		unsigned int genes() const;
+		unsigned int length() const;
+
+                // Modifiers
+                bool erase(unsigned int index);
+                bool insert(unsigned int index, unsigned char* gene, unsigned int size);
+                void push_back(unsigned char* item, unsigned int size);
+
+                // Operators
+                bool operator== (const DNA& dna);
+                bool operator!= (const DNA& dna);
 
 		// Debugging routines
 		void debug() const;
 
 	private:
-		std::list<std::list<int> > data;
+                // Auxiliary
+                unsigned char* ptr_move(unsigned int inputLocation);
+                unsigned char* ptr_set(unsigned int inputLocation);
+                unsigned int gene_location(unsigned int index);
+
+                // Member data
+		unsigned char* dataGenes;
+                unsigned int dataSize;
+                unsigned char* dataPointer;
+                unsigned int dataPointerLocation;
 };
 
 

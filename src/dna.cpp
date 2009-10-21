@@ -41,91 +41,22 @@
 // Construction and destruction
 //
 
-// Empty constructor (should not be used, only to be able to use in class definitions)
-DNA::DNA()
-{
+// Default constructor
+DNA::DNA() {
 }
 
-// Construct dna object with a given string
-DNA::DNA(std::deque<int> inputQueue)
-{
-	set(inputQueue);
+// Copy constructor
+DNA::DNA(const DNA& inputDNA) {
+    DNA(inputDNA.dataGenes, inputDNA.dataSize);
 }
 
-// Construct dna object with a given list
-DNA::DNA(std::list<std::list<int> > inputList)
-{
-	set(inputList);
-}
+// Constructor with parameters
+DNA::DNA(const unsigned char* inputGenes, int inputSize) {
+    dataSize = inputSize;
 
-
-//
-// Setters
-//
-
-void DNA::set(std::list<std::list<int> > inputList)
-{
-    data = inputList;
-}
-
-void DNA::set(std::deque<int> inputQueue)
-{
-	// Reset the list
-	data.clear();
-
-	// Duplicate the list and work with that copy
-	std::deque<int> inputQueueDup(inputQueue);
-
-	// Check semantics
-	if (inputQueueDup.front() != 255)
-		throw(std::string("DNA.toList: saved DNA queue doesn't start with 255"));
-	inputQueueDup.pop_front();
-
-	// Process all
-	std::list<int> tempVector;
-	while (!inputQueueDup.empty() && inputQueueDup.front() != 255)
-	{
-		if (inputQueueDup.front() == 0)
-		{
-			data.push_back(tempVector);
-			tempVector.clear();
-		}
-		else
-		{
-			tempVector.push_back(inputQueueDup.front());
-		}
-		inputQueueDup.pop_front();
-	}
-
-	// Check semantics
-	if (inputQueueDup.front() != 255)
-		throw(std::string("DNA.toList: saved DNA queue doesn't end with 255"));
-
-	// Save last vector
-	data.push_back(tempVector);
-}
-
-
-//
-// Modifyers
-//
-
-// Erase an element
-DNA::iterator DNA::erase(iterator it)
-{
-    return data.erase(it);
-}
-
-// Insert a gene
-DNA::iterator DNA::insert(iterator it, std::list<int>& item)
-{
-    return data.insert(it, item);
-}
-
-// Add an element
-void DNA::push_back(std::list<int>& item)
-{
-    data.push_back(item);
+    // Deep copy of genes
+    dataGenes = new unsigned char[inputSize];
+    std::memcpy(dataGenes, inputGenes, inputSize);
 }
 
 
@@ -134,42 +65,103 @@ void DNA::push_back(std::list<int>& item)
 //
 
 // Amount of genes
-int DNA::genes() const
-{
-    return data.size();
+unsigned int DNA::genes() const {
+    int genes = 0;
+    bool data = false;
+
+    for (unsigned int i = 0; i < dataSize; i++) {
+        if (dataGenes[i] == 0) {
+            data = false;
+        } else if (!data) {
+            data = true;
+            genes++;
+        }
+    }
+    return genes;
 }
-int DNA::size() const
+unsigned int DNA::length() const
 {
-    return data.size();
+    return dataSize;
 }
 
-// Get a queue representation
-std::deque<int> DNA::dequeue() const
-{
-    // Create a queue
-    std::deque<int> outputQueue;
 
-    // Starting semantics
-    outputQueue.push_back(255);
+//
+// Modifiers
+//
 
-    // Process all genes
-    std::list<std::list<int> >::const_iterator it = data.begin();
-    while (it != data.end())
-    {
-        std::list<int>::const_iterator it2 = it->begin();
-        while (it2 != it->end())
-                outputQueue.push_back(*(it2++));
-        it++;
-
-        // Only add 0 if not at end (can't fix this later on as queue has no pop_back)
-        if (it != data.end())
-            outputQueue.push_back(0);
+// Erase a gene
+bool DNA::erase(unsigned int index) {
+    unsigned int amountgenes = genes();
+    if (index < 0 || index >= amountgenes) {
+        return false;
     }
 
-    // Ending semantics
-    outputQueue.push_back(255);
+    // Determine part which should be deleted
+    unsigned int startdel = gene_location(index);
+    unsigned char* startdelloc = ptr_move(startdel);;
+    unsigned enddel = dataSize;
+    if (index < amountgenes) {
+        enddel = gene_location(index+1);
+    }
+    unsigned char* enddelloc = ptr_move(enddel);
 
-    return outputQueue;
+    // Alter DNA
+    memcpy(startdelloc, enddelloc, dataSize-enddel);
+    dataGenes = (unsigned char*) std::realloc(dataGenes, dataSize-(enddel-startdel));
+    return true;
+}
+
+// Insert a gene
+bool DNA::insert(unsigned int index, unsigned char* gene, unsigned int size) {
+    unsigned int amountgenes = genes();
+    if (index < 0 || index >= amountgenes-1) {
+        return false;
+    }
+
+    // Enlarge data
+    dataGenes = (unsigned char*) std::realloc(dataGenes, dataSize+size);
+
+    // Preserve old data
+    int startinsert = gene_location(index);
+    unsigned char* startinsertloc = ptr_move(startinsert);
+    int endinsert = gene_location(index+1);
+    unsigned char* endinsertloc = ptr_move(endinsert);
+    memmove(startinsertloc, endinsertloc, dataSize-startinsert);
+
+    // Insert new data
+    memcpy(startinsertloc, gene, size);
+
+    return true;
+}
+
+// Add an element
+void DNA::push_back(unsigned char* gene, unsigned int size) {
+    dataGenes = (unsigned char*) std::realloc(dataGenes, dataSize+size);
+    for (unsigned int i = 0; i < size; i++) {
+        dataGenes[dataSize+i] = gene[i];
+    }
+    dataSize += size;
+}
+
+
+//
+// Operators
+//
+
+// Comparison
+bool DNA::operator== (const DNA& dna) {
+    if (dataSize != dna.dataSize)
+        return false;
+
+    for (unsigned int i = 0; i < dataSize; i++) {
+        if (dataGenes[i] != dna.dataGenes[i])
+            return false;
+    }
+
+    return true;
+}
+bool DNA::operator!= (const DNA& dna) {
+    return !(*this == dna);
 }
 
 
@@ -183,17 +175,71 @@ void DNA::debug() const
 	// Debug message
 	std::cout << "* DNA.debug" << std::endl;
 
-	// Process list
-	std::cout << "Contents of list with size " << std::dec << data.size() << ":" << std::endl;
-	std::list<std::list<int> >::const_iterator it = data.begin();
-	while (it != data.end())
-	{
-		std::cout << "\tlist<int>: ";
-		std::list<int>::const_iterator it2 = it->begin();
-		while (it2 != it->end())
-			std::cout << std::hex << "0x" << *(it2++) << " ";
-		std::cout << std::endl;
-		it++;
-	}
+	// Process chararray
+	std::cout << "Contents of DNA object (" << genes() << " genes): " << std::endl;
+        int genes = 0;
+        bool data = false;
+        for (unsigned int i = 0; i < dataSize; i++) {
+            if (dataGenes[i] == 0) {
+                if (data)
+                    std::cout << std::endl;
+                data = false;
+            } else {
+                if (!data) {
+                    data = true;
+                    std::cout << "\tgene " << ++genes << ": ";
+                }
+                std::cout << "0x" << std::hex << std::setfill('0') << std::setw(2) << (int)dataGenes[i] << " ";
+            }
+        }
+        if (data)
+           std::cout << std::endl;
+    }
+
+
+//
+// Auxiliary
+//
+
+// Move the pointer relatively
+unsigned char* DNA::ptr_move(unsigned int inputLocation) {
+    // Move forward
+    for (; dataPointerLocation < inputLocation; dataPointerLocation++) {
+        dataPointer++;
+    }
+
+    // Move backwards
+    for (; dataPointerLocation > inputLocation; dataPointerLocation--) {
+        dataPointer--;
+    }
+
+    return dataPointer;
 }
 
+// Set the pointer absolutely
+unsigned char* DNA::ptr_set(unsigned int inputLocation) {
+    dataPointer = dataGenes;
+    for (unsigned int i = 0; i < inputLocation; i++) {
+        dataPointer++;
+    }
+
+    return dataPointer;
+}
+
+// Find the location of a gene
+unsigned int DNA::gene_location(unsigned int index) {
+    unsigned int genes = 0;
+    bool data = false;
+
+    for (unsigned int i = 0; i < dataSize; i++) {
+        if (dataGenes[i] == 0) {
+            data = false;
+        } else if (!data) {
+            data = true;
+            if (genes++ == index) {
+                return i;
+            }
+        }
+    }
+    return 0;
+}
