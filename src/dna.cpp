@@ -43,11 +43,13 @@
 
 // Default constructor
 DNA::DNA() {
+    dataSize = 0;
 }
 
 // Copy constructor
 DNA::DNA(const DNA& inputDNA) {
     DNA(inputDNA.dataGenes, inputDNA.dataSize);
+    ptr_set(0);
 }
 
 // Constructor with parameters
@@ -55,8 +57,15 @@ DNA::DNA(const unsigned char* inputGenes, int inputSize) {
     dataSize = inputSize;
 
     // Deep copy of genes
-    dataGenes = new unsigned char[inputSize];
+    dataGenes = (unsigned char*) malloc(inputSize * sizeof(unsigned char));
     std::memcpy(dataGenes, inputGenes, inputSize);
+    ptr_set(0);
+}
+
+// Destructor
+DNA::~DNA() {
+    if (dataSize > 0)
+        free(dataGenes);
 }
 
 
@@ -67,17 +76,15 @@ DNA::DNA(const unsigned char* inputGenes, int inputSize) {
 // Amount of genes
 unsigned int DNA::genes() const {
     int genes = 0;
-    bool data = false;
+    if (dataSize == 0)
+        return 0;
 
     for (unsigned int i = 0; i < dataSize; i++) {
         if (dataGenes[i] == 0) {
-            data = false;
-        } else if (!data) {
-            data = true;
             genes++;
         }
     }
-    return genes;
+    return genes+1;
 }
 unsigned int DNA::length() const
 {
@@ -91,23 +98,50 @@ unsigned int DNA::length() const
 
 // Erase a gene
 bool DNA::erase(unsigned int index) {
+    // Check boundaries
     unsigned int amountgenes = genes();
-    if (index < 0 || index >= amountgenes) {
+    if (index < 0 || index >= amountgenes)
         return false;
+
+    // Case 1: gene at start
+    if (index == 0) {
+        if (amountgenes > 1) {
+            unsigned int i_next = gene_start(1);
+            unsigned char* p_next = ptr_move(i_next);
+            memmove(dataGenes, p_next, dataSize-i_next);
+            dataGenes = (unsigned char*) std::realloc(dataGenes, dataSize-i_next * sizeof(unsigned char));
+            dataSize -= i_next;
+        } else {
+            free(dataGenes);
+            dataGenes = 0;
+            dataSize = 0;
+        }
     }
 
-    // Determine part which should be deleted
-    unsigned int startdel = gene_location(index);
-    unsigned char* startdelloc = ptr_move(startdel);;
-    unsigned enddel = dataSize;
-    if (index < amountgenes) {
-        enddel = gene_location(index+1);
-    }
-    unsigned char* enddelloc = ptr_move(enddel);
+    // Case 2: gene at midst
+    else if (index < amountgenes-1) {
+        unsigned int i_self = gene_start(index);
+        unsigned char* p_self = ptr_move(i_self);
+        unsigned int i_next = gene_start(index+1);
+        unsigned char* p_next = ptr_move(i_next);
 
-    // Alter DNA
-    memcpy(startdelloc, enddelloc, dataSize-enddel);
-    dataGenes = (unsigned char*) std::realloc(dataGenes, dataSize-(enddel-startdel));
+        memmove(p_self, p_next, dataSize-i_next);
+        dataGenes = (unsigned char*) std::realloc(dataGenes, dataSize-(i_next-i_self) * sizeof(unsigned char));
+        dataSize -= i_next-i_self;
+    }
+
+    // Case 3: gene at end
+    else {
+        if (amountgenes > 1) {
+            unsigned int i_prev = gene_end(index-1);
+            dataGenes = (unsigned char*) std::realloc(dataGenes, i_prev * sizeof(unsigned char));
+            dataSize = i_prev;
+        } else {
+            delete[] dataGenes;
+            dataGenes = 0;
+            dataSize = 0;
+        }
+    }
     return true;
 }
 
@@ -121,14 +155,18 @@ bool DNA::insert(unsigned int index, unsigned char* gene, unsigned int size) {
     // Enlarge data
     dataGenes = (unsigned char*) std::realloc(dataGenes, dataSize+size);
 
-    // Preserve old data
-    int startinsert = gene_location(index);
+    // Get start part
+    int startinsert = 0;
+    if (index > 0)
+        startinsert = separator(index);
     unsigned char* startinsertloc = ptr_move(startinsert);
-    int endinsert = gene_location(index+1);
-    unsigned char* endinsertloc = ptr_move(endinsert);
-    memmove(startinsertloc, endinsertloc, dataSize-startinsert);
 
-    // Insert new data
+    // Get end part
+    int endinsert = separator(index+1);
+    unsigned char* endinsertloc = ptr_move(endinsert);
+
+    // Alter DNA
+    memmove(startinsertloc, endinsertloc, dataSize-startinsert);
     memcpy(startinsertloc, gene, size);
 
     return true;
@@ -177,24 +215,32 @@ void DNA::debug() const
 
 	// Process chararray
 	std::cout << "Contents of DNA object (" << genes() << " genes): " << std::endl;
-        int genes = 0;
-        bool data = false;
-        for (unsigned int i = 0; i < dataSize; i++) {
-            if (dataGenes[i] == 0) {
-                if (data)
-                    std::cout << std::endl;
-                data = false;
-            } else {
-                if (!data) {
-                    data = true;
-                    std::cout << "\tgene " << ++genes << ": ";
-                }
-                std::cout << "0x" << std::hex << std::setfill('0') << std::setw(2) << (int)dataGenes[i] << " ";
+        for (unsigned int i = 0; i < genes(); i++) {
+            std::cout << "\tgene " << i+1 << ":";
+            unsigned int start = gene_start(i);
+            unsigned int end = gene_end(i);
+            while (start < end) {
+                std::cout << " 0x" << std::hex << std::setfill('0') << std::setw(2) << (int)dataGenes[start++] << std::dec;
             }
+            std::cout << std::endl;
         }
-        if (data)
-           std::cout << std::endl;
-    }
+}
+
+void DNA::debug_raw() const {
+	// Debug message
+	std::cout << "* DNA.debug_raw" << std::endl;
+
+        std::cout << "\t";
+        unsigned char* start = dataGenes;
+        for (unsigned int i = 0; i < dataSize; i++) {
+            std::cout << " 0x" << std::hex << std::setfill('0') << std::setw(2) << (int)*start << std::dec;
+            if (*start == 0) {
+                std::cout << std::endl << "\t";
+            }
+            start++;
+        }
+        std::cout << std::endl;
+}
 
 
 //
@@ -203,6 +249,10 @@ void DNA::debug() const
 
 // Move the pointer relatively
 unsigned char* DNA::ptr_move(unsigned int inputLocation) {
+    // Prefer cheap moves
+    if (inputLocation < (unsigned) std::abs((signed)dataPointerLocation - (signed)inputLocation))
+        return ptr_set(0);
+
     // Move forward
     for (; dataPointerLocation < inputLocation; dataPointerLocation++) {
         dataPointer++;
@@ -223,23 +273,36 @@ unsigned char* DNA::ptr_set(unsigned int inputLocation) {
         dataPointer++;
     }
 
+    dataPointerLocation = inputLocation;
     return dataPointer;
 }
 
-// Find the location of a gene
-unsigned int DNA::gene_location(unsigned int index) {
-    unsigned int genes = 0;
-    bool data = false;
-
+// Find the location of a separator
+unsigned int DNA::separator(unsigned int index) const {
+    unsigned int sep = 0;
     for (unsigned int i = 0; i < dataSize; i++) {
         if (dataGenes[i] == 0) {
-            data = false;
-        } else if (!data) {
-            data = true;
-            if (genes++ == index) {
+            if (++sep == index) {
                 return i;
             }
         }
     }
     return 0;
+}
+
+// Returns the index of the first data part of a gene (inclusive)
+unsigned int DNA::gene_start(unsigned int index) const {
+    if (index > 0)
+        return separator(index) + 1;
+    else
+        return 0;
+}
+
+// Returns the index of the last data part of a gene (exclusive)
+// NOTE: this value is not guaranteed to be accessible!
+unsigned int DNA::gene_end(unsigned int index) const {
+    if (index < genes()-1)
+        return separator(index+1);
+    else
+        return dataSize;
 }

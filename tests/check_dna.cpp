@@ -42,26 +42,82 @@
 // TESTS //
 ///////////
 
-START_TEST(test_dna_count) {
+
+//
+// Auxiliary
+//
+
+START_TEST(test_aux_genloc) {
+    unsigned char dna1[] = {0x00,
+        0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+        0x00,
+        0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
+        0x03, 0x04, 0x05, 0x04, 0x03};
+    DNA tempDNA1(dna1, 19);
+
+    fail_unless(tempDNA1.gene_start(1) == 1, "Regular gene start index");
+    fail_unless(tempDNA1.gene_end(1) == 6, "Regular gene end index");
+
+    fail_unless(tempDNA1.gene_start(0) == 0, "Empty top gene start index");
+    fail_unless(tempDNA1.gene_end(0) == 0, "Empty top gene end index");
+
+    fail_unless(tempDNA1.gene_start(2) == 7, "Empty mid gene start index");
+    fail_unless(tempDNA1.gene_end(2) == 7, "Empty mid gene end index");
+    
+    fail_unless(tempDNA1.gene_start(4) == 14, "Regular end gene start index");
+    fail_unless(tempDNA1.gene_end(4) == 19, "Regular end gene end index");
+
+
+    unsigned char dna2[] = {0x00,
+        0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+        0x00,
+        0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
+        0x03, 0x04, 0x05, 0x04, 0x03, 0x00};
+    DNA tempDNA2(dna2, 19);
+
+    fail_unless(tempDNA2.gene_start(4) == 14, "Regular end gene start index (empty end gene)");
+    fail_unless(tempDNA2.gene_end(4) == 19, "Regular end gene end index (empty end gene");
+}
+END_TEST
+
+
+//
+// Informational
+//
+
+START_TEST(test_inf_count) {
     unsigned char dna1[] = {0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
         0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
         0x03, 0x04, 0x05, 0x04, 0x03, 0x00,
         0x04, 0x05, 0x06, 0x05, 0x04};
     DNA tempDNA1(dna1, 23);
-    fail_unless(tempDNA1.genes() == 4, "Amount of genes not counted correctly");
+    fail_unless(tempDNA1.genes() == 4, "Gene count");
 
-    unsigned char dna2[] = {0x00, 0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+    unsigned char dna2[] = {0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+        0x00,
+        0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
+        0x03, 0x04, 0x05, 0x04, 0x03, 0x00,
+        0x04, 0x05, 0x06, 0x05, 0x04};
+    DNA tempDNA2(dna2, 24);
+    fail_unless(tempDNA2.genes() == 5, "Gene count with empty genes");
+
+    unsigned char dna3[] = {0x00,
+    0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
         0x00,
         0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
         0x03, 0x04, 0x05, 0x04, 0x03, 0x00,
         0x04, 0x05, 0x06, 0x05, 0x04, 0x00};
-    DNA tempDNA2(dna2, 26);
-
-    fail_unless(tempDNA2.genes() == 4, "Amount of genes not counted correctly when empty genes occur");
+    DNA tempDNA3(dna3, 26);
+    fail_unless(tempDNA3.genes() == 7, "Gene count with empty begin and end");
 }
 END_TEST
 
-START_TEST(test_dna_compare) {
+
+//
+// Operators
+//
+
+START_TEST(test_op_compare) {
     unsigned char dna1[] = {0x01, 0x02, 0x00, 0x03, 0x02, 0x01, 0x00};
     DNA tempDNA1(dna1, 7);
 
@@ -84,36 +140,181 @@ START_TEST(test_dna_compare) {
 }
 END_TEST
 
-START_TEST(test_dna_erase) {
-    unsigned char dna1[] = {0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+
+//
+// Modifiers
+//
+
+START_TEST(test_mod_erase_simple_start) {
+    unsigned char dnastring[] = {0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+        0x00,
         0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
         0x03, 0x04, 0x05, 0x04, 0x03, 0x00,
         0x04, 0x05, 0x06, 0x05, 0x04};
-    DNA tempDNA1(dna1, 23);
-    tempDNA1.erase(1);
-    unsigned char dna1_check[] = {0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+    DNA dna = DNA(dnastring, 24);
+
+    dna.erase(0);
+    unsigned char dnastring_check[] = {0x00,
+        0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
         0x03, 0x04, 0x05, 0x04, 0x03, 0x00,
         0x04, 0x05, 0x06, 0x05, 0x04};
-    DNA tempDNA1_check(dna1_check, 17);
-    fail_unless(tempDNA1 == tempDNA1_check, "Simple erase");
-    // TODO: toch iet doen met lege genes, 0x00 ALTIJD laten meecounten voor next gene
-    // anders lyk hoe erasen, lege gene?
+    DNA dna_check(dnastring_check, 18);
+    fail_unless(dna_check == dna, "Simple start erase");
 }
 END_TEST
+
+START_TEST(test_mod_erase_simple_mid) {
+    unsigned char dnastring[] = {0x00,
+        0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+        0x00,
+        0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
+        0x03, 0x04, 0x05, 0x04, 0x03, 0x00,
+        0x04, 0x05, 0x06, 0x05, 0x04};
+    DNA dna = DNA(dnastring, 25);
+
+    dna.erase(1);
+    unsigned char dnastring_check[] = {0x00,
+        0x00,
+        0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
+        0x03, 0x04, 0x05, 0x04, 0x03, 0x00,
+        0x04, 0x05, 0x06, 0x05, 0x04};
+    DNA dna_check(dnastring_check, 19);
+    fail_unless(dna_check == dna, "Simple middle erase");
+}
+END_TEST
+
+START_TEST(test_mod_erase_simple_end) {
+    unsigned char dnastring[] = {0x00,
+        0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+        0x00,
+        0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
+        0x03, 0x04, 0x05, 0x04, 0x03, 0x00,
+        0x04, 0x05, 0x06, 0x05, 0x04};
+    DNA dna = DNA(dnastring, 25);
+
+    dna.erase(5);
+    unsigned char dnastring_check[] = {0x00,
+        0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+        0x00,
+        0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
+        0x03, 0x04, 0x05, 0x04, 0x03};
+    DNA dna_check(dnastring_check, 19);
+    fail_unless(dna_check == dna, "Simple end erase");
+}
+END_TEST
+
+START_TEST(test_mod_erase_empty_start) {
+    unsigned char dnastring[] = {0x00,
+        0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+        0x00,
+        0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
+        0x03, 0x04, 0x05, 0x04, 0x03, 0x00,
+        0x04, 0x05, 0x06, 0x05, 0x04};
+    DNA dna = DNA(dnastring, 25);
+
+    dna.erase(0);
+    unsigned char dnastring_check[] = {0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+        0x00,
+        0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
+        0x03, 0x04, 0x05, 0x04, 0x03, 0x00,
+        0x04, 0x05, 0x06, 0x05, 0x04};
+    DNA dna_check(dnastring_check, 24);
+    fail_unless(dna_check == dna, "Empty start erase");
+}
+END_TEST
+
+START_TEST(test_mod_erase_empty_mid) {
+    unsigned char dnastring[] = {0x00,
+        0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+        0x00,
+        0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
+        0x03, 0x04, 0x05, 0x04, 0x03, 0x00,
+        0x04, 0x05, 0x06, 0x05, 0x04};
+    DNA dna = DNA(dnastring, 25);
+
+    dna.erase(2);
+    unsigned char dnastring_check[] = {0x00,
+        0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+        0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
+        0x03, 0x04, 0x05, 0x04, 0x03, 0x00,
+        0x04, 0x05, 0x06, 0x05, 0x04};
+    DNA dna_check(dnastring_check, 24);
+    fail_unless(dna_check == dna, "Empty middle erase");
+}
+END_TEST
+
+START_TEST(test_mod_erase_empty_end) {
+    unsigned char dnastring[] = {0x00,
+        0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+        0x00,
+        0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
+        0x03, 0x04, 0x05, 0x04, 0x03, 0x00,
+        0x04, 0x05, 0x06, 0x05, 0x04, 0x00};
+    DNA dna = DNA(dnastring, 26);
+
+    dna.erase(6);
+    unsigned char dnastring_check[] = {0x00,
+        0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+        0x00,
+        0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
+        0x03, 0x04, 0x05, 0x04, 0x03, 0x00,
+        0x04, 0x05, 0x06, 0x05, 0x04};
+    DNA dna_check(dnastring_check, 25);
+    fail_unless(dna_check == dna, "Empty end erase");
+}
+END_TEST
+
+START_TEST(test_mod_erase_corner_empty) {
+    unsigned char dnastring[] = {0x01, 0x02, 0x03, 0x02, 0x01};
+    DNA dna = DNA(dnastring, 5);
+
+    dna.erase(0);
+    fail_unless(dna.genes() == 0, "Corner-case erase (removing all genes)");
+}
+END_TEST
+
+
+//
+// DNA suite
+//
 
 
 Suite * dna_suite() {
     Suite* s = suite_create("DNA");
 
-    /* Core test case */
-    TCase* tc_core = tcase_create("Core");
-    tcase_add_test(tc_core, test_dna_count);
-    tcase_add_test(tc_core, test_dna_compare);
-    tcase_add_test(tc_core, test_dna_erase);
-    suite_add_tcase(s, tc_core);
+    // Auxiliary functionality
+    TCase* tc_aux = tcase_create("Auxiliary");
+    tcase_add_test(tc_aux, test_aux_genloc);
+    suite_add_tcase(s, tc_aux);
+
+    // Informational routines
+    TCase* tc_inf = tcase_create("Informational");
+    tcase_add_test(tc_inf, test_inf_count);
+    suite_add_tcase(s, tc_inf);
+
+    // Operators
+    TCase* tc_op = tcase_create("Operators");
+    tcase_add_test(tc_op, test_op_compare);
+    suite_add_tcase(s, tc_op);
+
+    // Modifiers
+    TCase* tc_mod = tcase_create("Modifiers");
+    tcase_add_test(tc_mod, test_mod_erase_simple_start);
+    tcase_add_test(tc_mod, test_mod_erase_simple_mid);
+    tcase_add_test(tc_mod, test_mod_erase_simple_end);
+    tcase_add_test(tc_mod, test_mod_erase_empty_start);
+    tcase_add_test(tc_mod, test_mod_erase_empty_mid);
+    tcase_add_test(tc_mod, test_mod_erase_empty_end);
+    tcase_add_test(tc_mod, test_mod_erase_corner_empty);
+    suite_add_tcase(s, tc_mod);
 
     return s;
 }
+
+
+//
+// Runner
+//
 
 
 int main() {
@@ -124,7 +325,7 @@ int main() {
     SRunner* sr = srunner_create(s);
     srunner_run_all(sr, CK_NORMAL);
 
-    // Free resources, and return correectly
+    // Free resources, and return accordingly
     number_failed = srunner_ntests_failed(sr);
     srunner_free(sr);
     return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;

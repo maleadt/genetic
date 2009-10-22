@@ -55,6 +55,7 @@ class DNA
 		DNA();
 		DNA(const DNA& inputData);
                 DNA(const unsigned char* inputData, int inputSize);
+                ~DNA();
 
 		// Informational routines
 		unsigned int genes() const;
@@ -71,13 +72,16 @@ class DNA
 
 		// Debugging routines
 		void debug() const;
-
-	private:
+		void debug_raw() const;
+                
                 // Auxiliary
                 unsigned char* ptr_move(unsigned int inputLocation);
                 unsigned char* ptr_set(unsigned int inputLocation);
-                unsigned int gene_location(unsigned int index);
+                unsigned int separator(unsigned int index) const;
+                unsigned int gene_start(unsigned int index) const;
+                unsigned int gene_end(unsigned int index) const;
 
+	private:
                 // Member data
 		unsigned char* dataGenes;
                 unsigned int dataSize;
