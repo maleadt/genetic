@@ -64,6 +64,7 @@ class DNA
                 // Modifiers
                 bool erase(unsigned int index);
                 bool insert(unsigned int index, unsigned char* gene, unsigned int size);
+                //bool replace(unsigned int index, unsigned char* gene, unsigned int size);
                 void push_back(unsigned char* item, unsigned int size);
 
                 // Operators
@@ -73,8 +74,8 @@ class DNA
 		// Debugging routines
 		void debug() const;
 		void debug_raw() const;
-                
-                // Auxiliary
+
+                // Auxiliary (should be private, public due to unit testing)
                 unsigned char* ptr_move(unsigned int inputLocation);
                 unsigned char* ptr_set(unsigned int inputLocation);
                 unsigned int separator(unsigned int index) const;

@@ -107,7 +107,7 @@ bool DNA::erase(unsigned int index) {
     if (index == 0) {
         if (amountgenes > 1) {
             unsigned int i_next = gene_start(1);
-            unsigned char* p_next = ptr_move(i_next);
+            unsigned char* p_next = ptr_set(i_next);
             memmove(dataGenes, p_next, dataSize-i_next);
             dataGenes = (unsigned char*) std::realloc(dataGenes, dataSize-i_next * sizeof(unsigned char));
             dataSize -= i_next;
@@ -121,9 +121,9 @@ bool DNA::erase(unsigned int index) {
     // Case 2: gene at midst
     else if (index < amountgenes-1) {
         unsigned int i_self = gene_start(index);
-        unsigned char* p_self = ptr_move(i_self);
+        unsigned char* p_self = ptr_set(i_self);
         unsigned int i_next = gene_start(index+1);
-        unsigned char* p_next = ptr_move(i_next);
+        unsigned char* p_next = ptr_set(i_next);
 
         memmove(p_self, p_next, dataSize-i_next);
         dataGenes = (unsigned char*) std::realloc(dataGenes, dataSize-(i_next-i_self) * sizeof(unsigned char));
@@ -147,28 +147,25 @@ bool DNA::erase(unsigned int index) {
 
 // Insert a gene
 bool DNA::insert(unsigned int index, unsigned char* gene, unsigned int size) {
+    // Check boundaries
     unsigned int amountgenes = genes();
-    if (index < 0 || index >= amountgenes-1) {
+    if (index < 0 || index > amountgenes) {
         return false;
     }
 
-    // Enlarge data
+    // Enlarge array
     dataGenes = (unsigned char*) std::realloc(dataGenes, dataSize+size);
 
-    // Get start part
-    int startinsert = 0;
-    if (index > 0)
-        startinsert = separator(index);
-    unsigned char* startinsertloc = ptr_move(startinsert);
+    // Move data
+    int i_start = gene_start(index);
+    unsigned char* p_start = ptr_set(i_start);
+    unsigned char* p_backup = ptr_set(i_start + size);
+    memmove(p_backup, p_start, dataSize-i_start);
 
-    // Get end part
-    int endinsert = separator(index+1);
-    unsigned char* endinsertloc = ptr_move(endinsert);
-
-    // Alter DNA
-    memmove(startinsertloc, endinsertloc, dataSize-startinsert);
-    memcpy(startinsertloc, gene, size);
-
+    // Copy new data
+    memcpy(p_start, gene, size);
+    dataSize += size;
+    
     return true;
 }
 
