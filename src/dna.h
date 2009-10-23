@@ -61,11 +61,17 @@ class DNA
 		unsigned int genes() const;
 		unsigned int length() const;
 
-                // Modifiers
-                bool erase(unsigned int index);
-                bool insert(unsigned int index, unsigned char* gene, unsigned int size);
-                //bool replace(unsigned int index, unsigned char* gene, unsigned int size);
+                // Raw modifiers
+                void erase(unsigned int i_start, unsigned int i_end);
+                void insert(unsigned int i_start, unsigned char* gene, unsigned int size);
+                void replace(unsigned int i_start, unsigned char* gene, unsigned int size);
                 void push_back(unsigned char* item, unsigned int size);
+
+                // Gene modifiers
+                bool erase_gene(unsigned int index);
+                bool insert_gene(unsigned int index, unsigned char* gene, unsigned int size);
+                bool replace_gene(unsigned int index, unsigned char* gene, unsigned int size);
+                bool push_back_gene(unsigned char* item, unsigned int size);
 
                 // Operators
                 bool operator== (const DNA& dna);

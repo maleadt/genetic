@@ -93,24 +93,75 @@ unsigned int DNA::length() const
 
 
 //
-// Modifiers
+// Raw modifiers
+//
+
+// Erase data
+//   erases data from i_start (inclusive) to i_end (exclusive)
+void DNA::erase(unsigned int i_start, unsigned int i_end) {
+    // Get pointers
+    unsigned char* p_start = ptr_set(i_start);
+    unsigned char* p_end = ptr_set(i_end);
+
+    // Move genes
+    memmove(p_start, p_end, dataSize-i_end);
+
+    // Shrink data container
+    dataGenes = (unsigned char*) std::realloc(dataGenes, dataSize-(i_end-i_start) * sizeof(unsigned char));
+    dataSize -= i_end-i_start;
+}
+
+// Insert data
+//   inserts data before i_start
+void DNA::insert(unsigned int i_start, unsigned char* gene, unsigned int size) {
+    // Enlarge array
+    dataGenes = (unsigned char*) std::realloc(dataGenes, dataSize+size);
+
+    // Get pointers
+    unsigned char* p_start = ptr_set(i_start);
+    unsigned char* p_backup = ptr_set(i_start + size);
+
+    // Move genes
+    memmove(p_backup, p_start, dataSize-i_start);
+
+    // Copy new data
+    memcpy(p_start, gene, size);
+    dataSize += size;
+}
+
+// Replace data
+//   replaces data from i_start (inclusive)
+void DNA::replace(unsigned int i_start, unsigned char* gene, unsigned int size) {
+    erase(i_start, i_start+size);
+    if (i_start == dataSize)
+        push_back(gene, size);
+    else
+        insert(i_start, gene, size);
+}
+
+// Append data
+void DNA::push_back(unsigned char* gene, unsigned int size) {
+    dataGenes = (unsigned char*) std::realloc(dataGenes, dataSize+size);
+    for (unsigned int i = 0; i < size; i++) {
+        dataGenes[dataSize+i] = gene[i];
+    }
+    dataSize += size;
+}
+
+
+//
+// Gene modifiers
 //
 
 // Erase a gene
-bool DNA::erase(unsigned int index) {
-    // Check boundaries
+bool DNA::erase_gene(unsigned int index) {
     unsigned int amountgenes = genes();
-    if (index < 0 || index >= amountgenes)
-        return false;
-
+    
     // Case 1: gene at start
     if (index == 0) {
         if (amountgenes > 1) {
             unsigned int i_next = gene_start(1);
-            unsigned char* p_next = ptr_set(i_next);
-            memmove(dataGenes, p_next, dataSize-i_next);
-            dataGenes = (unsigned char*) std::realloc(dataGenes, dataSize-i_next * sizeof(unsigned char));
-            dataSize -= i_next;
+            erase(0, i_next);
         } else {
             free(dataGenes);
             dataGenes = 0;
@@ -121,24 +172,17 @@ bool DNA::erase(unsigned int index) {
     // Case 2: gene at midst
     else if (index < amountgenes-1) {
         unsigned int i_self = gene_start(index);
-        unsigned char* p_self = ptr_set(i_self);
         unsigned int i_next = gene_start(index+1);
-        unsigned char* p_next = ptr_set(i_next);
-
-        memmove(p_self, p_next, dataSize-i_next);
-        dataGenes = (unsigned char*) std::realloc(dataGenes, dataSize-(i_next-i_self) * sizeof(unsigned char));
-        dataSize -= i_next-i_self;
+        erase(i_self, i_next);
     }
 
     // Case 3: gene at end
     else {
         if (amountgenes > 1) {
             unsigned int i_prev = gene_end(index-1);
-            dataGenes = (unsigned char*) std::realloc(dataGenes, i_prev * sizeof(unsigned char));
-            dataSize = i_prev;
+            erase(i_prev, dataSize);
         } else {
-            delete[] dataGenes;
-            dataGenes = 0;
+            free(dataGenes);
             dataSize = 0;
         }
     }
@@ -146,38 +190,27 @@ bool DNA::erase(unsigned int index) {
 }
 
 // Insert a gene
-bool DNA::insert(unsigned int index, unsigned char* gene, unsigned int size) {
-    // Check boundaries
-    unsigned int amountgenes = genes();
-    if (index < 0 || index > amountgenes) {
-        return false;
-    }
-
-    // Enlarge array
-    dataGenes = (unsigned char*) std::realloc(dataGenes, dataSize+size);
-
-    // Move data
+bool DNA::insert_gene(unsigned int index, unsigned char* gene, unsigned int size) {
     int i_start = gene_start(index);
-    unsigned char* p_start = ptr_set(i_start);
-    unsigned char* p_backup = ptr_set(i_start + size);
-    memmove(p_backup, p_start, dataSize-i_start);
+    insert(i_start, gene, size);
 
-    // Copy new data
-    memcpy(p_start, gene, size);
-    dataSize += size;
-    
     return true;
 }
 
-// Add an element
-void DNA::push_back(unsigned char* gene, unsigned int size) {
-    dataGenes = (unsigned char*) std::realloc(dataGenes, dataSize+size);
-    for (unsigned int i = 0; i < size; i++) {
-        dataGenes[dataSize+i] = gene[i];
-    }
-    dataSize += size;
+// Replace a gene
+bool DNA::replace_gene(unsigned int index, unsigned char* gene, unsigned int size) {
+    int i_start = gene_start(index);
+    replace(i_start, gene, size);
+
+    return true;
 }
 
+// Add a gene
+bool DNA::push_back_gene(unsigned char* gene, unsigned int size) {
+    push_back(gene, size);
+    
+    return true;
+}
 
 //
 // Operators
