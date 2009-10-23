@@ -148,6 +148,14 @@ void DNA::push_back(unsigned char* gene, unsigned int size) {
     dataSize += size;
 }
 
+// Extract data
+//   extracts data from i_start (inclusive) to i_end (exclusive)
+void DNA::extract(unsigned int i_start, unsigned int i_end, unsigned char*& gene) {
+    gene = (unsigned char*) malloc((i_end-i_start) * sizeof(unsigned char));
+    unsigned char* p_start = ptr_set(i_start);
+    memcpy(gene, p_start, i_end-i_start);
+}
+
 
 //
 // Gene modifiers
@@ -248,6 +256,16 @@ bool DNA::push_back_gene(unsigned char* gene, unsigned int size) {
         free(gene_mod);
     }
     
+    return true;
+}
+
+// Extract a gene
+bool DNA::extract_gene(unsigned int index, unsigned char*& gene, unsigned int& size) {
+    unsigned int i_start = gene_start(index);
+    unsigned int i_end = gene_end(index);
+    size = i_end-i_start;
+    extract(i_start, i_end, gene);
+
     return true;
 }
 

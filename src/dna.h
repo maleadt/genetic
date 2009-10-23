@@ -66,12 +66,14 @@ class DNA
                 void insert(unsigned int i_start, unsigned char* gene, unsigned int size);
                 void replace(unsigned int i_start, unsigned char* gene, unsigned int size);
                 void push_back(unsigned char* item, unsigned int size);
+                void extract(unsigned int i_start, unsigned int i_end, unsigned char*& gene);
 
                 // Gene modifiers
                 bool erase_gene(unsigned int index);
                 bool insert_gene(unsigned int index, unsigned char* gene, unsigned int size);
                 bool replace_gene(unsigned int index, unsigned char* gene, unsigned int size);
                 bool push_back_gene(unsigned char* item, unsigned int size);
+                bool extract_gene(unsigned int index, unsigned char*& gene, unsigned int& size);
 
                 // Operators
                 bool operator== (const DNA& dna);

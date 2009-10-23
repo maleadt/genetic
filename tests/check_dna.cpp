@@ -353,6 +353,57 @@ START_TEST(test_rawmod_replace_end) {
 }
 END_TEST
 
+START_TEST(test_rawmod_extract_start) {
+    unsigned char dnastring[] = {0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+        0x00,
+        0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
+        0x03, 0x04, 0x05, 0x04, 0x03, 0x00,
+        0x04, 0x05, 0x06, 0x05, 0x04};
+    DNA dna = DNA(dnastring, 24);
+
+    unsigned char* extract = 0;
+    dna.extract(0, 5, extract);
+
+    unsigned char dnastring_check[] = {0x01, 0x02, 0x03, 0x02, 0x01};
+    fail_unless(memcmp(extract, dnastring_check, 5) == 0, "Start extract");
+    free(extract);
+}
+END_TEST
+
+START_TEST(test_rawmod_extract_mid) {
+    unsigned char dnastring[] = {0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+        0x00,
+        0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
+        0x03, 0x04, 0x05, 0x04, 0x03, 0x00,
+        0x04, 0x05, 0x06, 0x05, 0x04};
+    DNA dna = DNA(dnastring, 24);
+
+    unsigned char* extract = 0;
+    dna.extract(8, 14, extract);
+
+    unsigned char dnastring_check[] = {0x03, 0x04, 0x03, 0x02, 0x00, 0x03};
+    fail_unless(memcmp(extract, dnastring_check, 6) == 0, "Mid extract");
+    free(extract);
+}
+END_TEST
+
+START_TEST(test_rawmod_extract_end) {
+    unsigned char dnastring[] = {0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+        0x00,
+        0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
+        0x03, 0x04, 0x05, 0x04, 0x03, 0x00,
+        0x04, 0x05, 0x06, 0x05, 0x04};
+    DNA dna = DNA(dnastring, 24);
+
+    unsigned char* extract = 0;
+    dna.extract(20, 24, extract);
+
+    unsigned char dnastring_check[] = {0x05, 0x06, 0x05, 0x04};
+    fail_unless(memcmp(extract, dnastring_check, 4) == 0, "End extract");
+    free(extract);
+}
+END_TEST
+
 
 //
 // Gene modifiers
@@ -663,6 +714,9 @@ Suite * dna_suite() {
     tcase_add_test(tc_rawmod, test_rawmod_replace_start);
     tcase_add_test(tc_rawmod, test_rawmod_replace_mid);
     tcase_add_test(tc_rawmod, test_rawmod_replace_end);
+    tcase_add_test(tc_rawmod, test_rawmod_extract_start);
+    tcase_add_test(tc_rawmod, test_rawmod_extract_mid);
+    tcase_add_test(tc_rawmod, test_rawmod_extract_end);
     suite_add_tcase(s, tc_rawmod);
 
     // Gene modifiers
