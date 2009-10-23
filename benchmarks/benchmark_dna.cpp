@@ -31,6 +31,7 @@
 // Headers
 #include "../src/dna.h"
 #include "benchmark.h"
+#include "../src/generic.h"
 
 //
 // Constants
@@ -79,6 +80,43 @@ int main() {
     benchmark.start();
     while (benchmark.next()) {
         tempDNA.genes();
+    }
+    benchmark.stop();
+
+    benchmark.print();
+
+
+    //
+    // Erases
+    //
+
+    benchmark.init("erases");
+    int i = 0;
+    int max = tempDNA.genes();
+    benchmark.start();
+    while (benchmark.next()) {
+        DNA tempDNA(dna1, 19);
+        tempDNA.erase_gene(i++);
+        i %= max;
+    }
+    benchmark.stop();
+
+    benchmark.print();
+
+
+    //
+    // Inserts
+    //
+
+    benchmark.init("insertions");
+    unsigned char dna2[] = {0x02, 0x03, 0x02, 0x01, 0x02, 0x03};
+    i = 0;
+    max = tempDNA.genes();
+    benchmark.start();
+    while (benchmark.next()) {
+        DNA tempDNA(dna1, 19);
+        tempDNA.insert_gene(i++, dna2, 6);
+        i %= max;
     }
     benchmark.stop();
 

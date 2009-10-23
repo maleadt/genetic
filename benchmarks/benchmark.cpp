@@ -58,14 +58,14 @@ Benchmark::~Benchmark() {
 
 // Initialise a new test run
 void Benchmark::init(std::string name) {
-    std::cout << "- Initialising test '" << name << "'" << std::endl;
+    std::cout << "- Testing '" << name << "'" << std::endl;
     dataTestName = name;
     dataOperations = -1;
 }
 
 // Start the clock
 void Benchmark::start() {
-    std::cout << "\t- Starting clock" << std::endl;
+    std::cout << "\t- Running" << std::endl;
     dataTestStart = clock();
 }
 
@@ -82,14 +82,11 @@ bool Benchmark::next() {
 
 // Stop the test
 void Benchmark::stop() {
-    std::cout << "\t- Stopping clock" << std::endl;
     dataTestStop = clock();
 }
 
 // Print results
 void Benchmark::print() {
-    std::cout << "- Results for test '" << dataTestName << "': " << std::endl;
-
     double millisec = diff_ms(dataTestStop, dataTestStart);
     std::cout << "\t- Time elapsed: " << smart_time(millisec) << std::endl;
 
@@ -111,7 +108,7 @@ double Benchmark::diff_ms(clock_t clock1, clock_t clock2) {
 
 // Round a double to a given amount of decimals
 double Benchmark::round(double input, int decimals) {
-    int factor = 1;
+    double factor = 1;
     for (int i = 0; i < decimals; i++)
         factor *= 10;
     return ((int)(input*factor))/factor;

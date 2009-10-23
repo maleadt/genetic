@@ -41,6 +41,7 @@ bool GENERIC_SRAND = false;
 //////////////
 
 // Generate a number from lower up to (and with) upper
+//TODO: modify to exclusive upper
 int random_range(int lowest_number, int highest_number)
 {
 	// Set seed
