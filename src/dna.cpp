@@ -191,23 +191,62 @@ bool DNA::erase_gene(unsigned int index) {
 
 // Insert a gene
 bool DNA::insert_gene(unsigned int index, unsigned char* gene, unsigned int size) {
-    int i_start = gene_start(index);
-    insert(i_start, gene, size);
+    unsigned int amountgenes = genes();
 
+    // Case 1: gene at start
+    if (index == 0) {
+        if (amountgenes > 1) {
+            unsigned char* gene_mod = (unsigned char*) malloc((size+1) * sizeof(unsigned char));
+            memcpy(gene_mod, gene, size);
+            gene_mod[size] = 0;
+            insert(0, gene_mod, size+1);
+            free(gene_mod);
+        } else {
+            dataGenes = (unsigned char*) malloc(size * sizeof(unsigned char));
+            memcpy(dataGenes, gene, size);
+            dataSize = size;
+        }
+    }
+
+    // Case 2: gene at midst
+    else if (index < amountgenes) {
+        unsigned char* gene_mod = (unsigned char*) malloc((size+1) * sizeof(unsigned char));
+        memcpy(gene_mod, gene, size);
+        gene_mod[size] = 0;
+
+        unsigned int i_self = gene_start(index);
+        insert(i_self, gene_mod, size+1);
+        free(gene_mod);
+    }
+
+    // Case 3: gene at end
+    else {
+        push_back_gene(gene, size);
+    }
     return true;
 }
 
 // Replace a gene
 bool DNA::replace_gene(unsigned int index, unsigned char* gene, unsigned int size) {
-    int i_start = gene_start(index);
-    replace(i_start, gene, size);
+    erase_gene(index);
+    insert_gene(index, gene, size);
 
     return true;
 }
 
 // Add a gene
 bool DNA::push_back_gene(unsigned char* gene, unsigned int size) {
-    push_back(gene, size);
+    unsigned int amountgenes = genes();
+
+    if (amountgenes == 0)
+        push_back(gene, size);
+    else {
+        unsigned char* gene_mod = (unsigned char*) malloc((size+1) * sizeof(unsigned char));
+        memcpy(gene_mod+1, gene, size);
+        gene_mod[0] = 0;
+        push_back(gene_mod, size+1);
+        free(gene_mod);
+    }
     
     return true;
 }
