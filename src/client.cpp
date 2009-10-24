@@ -42,21 +42,23 @@
 //
 
 // Default constructor
-Client::Client()
-{
+Client::Client() {
 }
 
 // Create client with given DNA
-Client::Client(const DNA& inputDNA)
-{
-	dataDNA = DNA(inputDNA);
+Client::Client(const DNA& inputDNA) {
+	dataDNA = new DNA(inputDNA);
 }
 
 // Create client with given DNA and alphabet
-Client::Client(const DNA& inputDNA, int inputAlphabet)
-{
-	dataDNA = DNA(inputDNA);
+Client::Client(const DNA& inputDNA, int inputAlphabet) {
+	dataDNA = new DNA(inputDNA);
 	dataAlphabet = inputAlphabet;
+}
+
+// Destructor
+Client::~Client() {
+    delete dataDNA;
 }
 
 
@@ -64,13 +66,7 @@ Client::Client(const DNA& inputDNA, int inputAlphabet)
 // DNA IO
 //
 
-void Client::set(const DNA& inputDNA)
-{
-	dataDNA = DNA(inputDNA);
-}
-
-DNA& Client::get() const
-{
+const DNA* Client::get() const {
 	return dataDNA;
 }
 
@@ -88,339 +84,268 @@ void Client::mutate()
 	// Process all mutations
 	for (int i = 0; i < tempAmount; i++)
 	{
-		// Pick level of mutation
-		int level = random_int(1, 4);
+		// Pick a mutation
+		int mutation = random_int(1, 6);
 
-		// Call correct mutation routine
-		switch (level)
+		// Process a mutation
+		switch (mutation)
 		{
 			case 1:
-				mutate_dna();
+				mutate_point();
 				break;
 			case 2:
-				mutate_gen();
+				mutate_delete();
 				break;
 			case 3:
-				mutate_codon();
+				mutate_duplicate();
+				break;
+			case 4:
+				mutate_amplify();
+				break;
+			case 5:
+				mutate_inverse();
 				break;
 		}
 	}
 }
 
 // Combine the DNA slightly with another client
-void Client::recombine(Client& inputClient)
-{
-    // Acquire DNA queue representation
-    std::deque<int> inputQueue1 = inputClient.get().dequeue();
-    std::deque<int> inputQueue2 = dataDNA.dequeue();
+void Client::recombine(Client& inputClient) {
 
-    // Create a new DNA queue
-    std::deque<int> outputQueue;
-    outputQueue.push_back(255);
+	// Amount of recombinations
+	int tempAmount = random_int(RECOMBINE_AMOUNT_LOWER, RECOMBINE_AMOUNT_UPPER);
 
-    // Remove semantics from both queue's, or every DNA string would be invalid
-    inputQueue1.pop_front(); inputQueue1.pop_back();
-    inputQueue2.pop_front(); inputQueue2.pop_back();
+	// Process all recombinations
+	for (int i = 0; i < tempAmount; i++)
+	{
+		// Pick a recombinations
+		int recombination = random_int(1, 4);
 
-
-    // Pick a crossover-method
-    int method = random_int(1, 4);
-
-    // Recombine!
-    switch (method)
-    {
-        // Crossover
-        case 1:
-        {
-            unsigned int size1 = inputQueue1.size();
-            unsigned int size2 = inputQueue2.size();
-            if (size1 <= 3 && size2 <= 3)
-            {
-                // Calculate part to exchange out of DNA 1
-                unsigned int p1 = random_int(0, size1);
-                unsigned int p2 = random_int(1, size1+1);
-                if (p1 > p2)
-                {
-                    int temp = p1;
-                    p1 = p2;
-                    p2 = temp;
-                }
-                while (p2 == p1)
-                    p2 = random_int(p1+1, size1+1);
-
-                // Calculate part to exchange out of DNA 2
-                unsigned int p3 = random_int(0, size2);
-                unsigned int p4 = random_int(1, size2+1);
-                if (p3 > p4)
-                {
-                    int temp = p3;
-                    p3 = p4;
-                    p4 = temp;
-                }
-                while (p4 == p3)
-                    p4 = random_int(p3+1, size2+1);
-
-                // First part
-                for (unsigned int i = 0; i < p1; i++)
-                {
-                    outputQueue.push_back(inputQueue1.front());
-                    inputQueue1.pop_front();
-                }
-                for (unsigned int i = 0; i < p3; i++)
-                    inputQueue2.pop_front();
-
-                // Middle part
-                for (unsigned int i = p3; i < p4; i++)
-                {
-                    outputQueue.push_back(inputQueue2.front());
-                    inputQueue2.pop_front();
-                }
-                for (unsigned int i = p1; i < p2; i++)
-                    inputQueue1.pop_front();
-
-                // End part
-                for (unsigned int i = p2; i < size1; i++)
-                {
-                    outputQueue.push_back(inputQueue1.front());
-                    inputQueue1.pop_front();
-                }
-            }
-            else
-            {
-                // Do nothing
-                outputQueue = inputQueue1;
-                outputQueue.push_front(255);
-            }
-            break;
-        }
-
-        // Insertion
-        case 2:
-        {
-            unsigned int size1 = inputQueue1.size();
-            unsigned int size2 = inputQueue2.size();
-            if (size1 <= 2 && size2 <= 3)
-            {
-                // Calculate insertion spot of DNA 1
-                unsigned int p1 = random_int(1, size1);
-
-                // Calculate part to get out of DNA 2
-                unsigned int p3 = random_int(0, size2);
-                unsigned int p4 = random_int(1, size2+1);
-                if (p3 > p4)
-                {
-                    int temp = p3;
-                    p3 = p4;
-                    p4 = temp;
-                }
-                while (p4 == p3)
-                    p4 = random_int(p3+1, size2+1);
-
-                // First part
-                for (unsigned int i = 0; i < p1; i++)
-                {
-                    outputQueue.push_back(inputQueue1.front());
-                    inputQueue1.pop_front();
-                }
-                for (unsigned int i = 0; i < p3; i++)
-                    inputQueue2.pop_front();
-
-                // Middle part
-                for (unsigned int i = p3; i < p4; i++)
-                {
-                    outputQueue.push_back(inputQueue2.front());
-                    inputQueue2.pop_front();
-                }
-
-                // End part
-                for (unsigned int i = p1; i < size1; i++)
-                {
-                    outputQueue.push_back(inputQueue1.front());
-                    inputQueue1.pop_front();
-                }
-            }
-            else
-            {
-                // Do nothing
-                outputQueue = inputQueue1;
-                outputQueue.push_front(255);
-            }
-            break;
-        }
-
-        // Gene conversion
-        case 3:
-        {
-            unsigned int size1 = inputQueue1.size();
-            unsigned int size2 = inputQueue2.size();
-            if (size1 <= 3 && size2 <= 3)
-            {
-                // Calculate split points
-                unsigned int p1 = random_int(1, size1);
-                unsigned int p2 = random_int(1, size2);
-
-                // First part
-                for (unsigned int i = 0; i < p1; i++)
-                {
-                    outputQueue.push_back(inputQueue1.front());
-                    inputQueue1.pop_front();
-                }
-
-                // Second part
-                for (unsigned int i = 0; i < p2; i++)
-                    inputQueue2.pop_front();
-                for (unsigned int i = p2; i < size2; i++)
-                {
-                    outputQueue.push_back(inputQueue2.front());
-                    inputQueue2.pop_front();
-                }
-            }
-            else
-            {
-                // Do nothing
-                outputQueue = inputQueue1;
-                outputQueue.push_front(255);
-            }
-            break;
-        }
-    }
-
-    // Finish the queue
-    outputQueue.push_back(255);
-
-    // Save the DNA
-    dataDNA = DNA(outputQueue);
-
-    // Mutate
-    mutate();
+		// Process a recombinations
+		switch (recombination)
+		{
+			case 1:
+				recombine_insert(inputClient);
+				break;
+			case 2:
+				recombine_crossover_single(inputClient);
+				break;
+			case 3:
+				recombine_crossover_double(inputClient);
+				break;
+		}
+	}
 }
 
 // Clean the DNA
 void Client::clean()
 {
-	// Pick random gene
-	DNA::iterator it = dataDNA.begin();
-	while (it != dataDNA.end())
-	{
-		if (it->empty())
-		{
-			it = dataDNA.erase(it);
-		}
-		++it;
-	}
+	// Remove empty genes
 }
 
 
 //
-// Mutation routines
+// Mutation methods
 //
 
-void Client::mutate_dna()
-{
-	// Prevent mutation of empty lists
-	if (dataDNA.genes() < 1)
-		return;
+// Change one or more bytes randomly
+void Client::mutate_point() {
+    // Pick a random byte to start
+    unsigned int start = random_int(0, dataDNA->length());
 
-	 // Pick random gene(s)
-	 int size = dataDNA.genes();
-	 int random1 = random_int(0, size);
-	 int random2 = random_int(0, size);
-	 while (size > 1 && random1 == random2)
-	 	random2 = random_int(0, size);
+    // Determine the window size
+    unsigned int amount = random_int(1, 5);
+    if (start+amount > dataDNA->length())
+        amount = dataDNA->length() - start;
 
-	// Calculate iterators to those genes
-	DNA::iterator it1 = dataDNA.begin(), it2 = dataDNA.begin();
-	for (int i = 0; i < random1; i++)
-		it1++;
-	for (int i = 0; i < random2; i++)
-		it2++;
+    // Generate replacment gen
+    unsigned char* replace = (unsigned char*) malloc(amount * sizeof(unsigned char));
+    for (unsigned int i = 0; i < amount; i++)
+        replace[i] = (unsigned char) random_int(0, dataAlphabet);
 
-	// Pick mutation
-	int mutation = random_int(1, 3);
-
-	switch (mutation)
-	{
-		// Creation
-		case 1:
-		{
-			// Generate random gene
-			int size = random_int((int)it1->size()/2, (int)it1->size()*4+1);
-			if (size == 0)
-				size = random_int(5, 11);
-			std::list<int> tempList;
-			for (int i = 0; i < size; i++)
-				tempList.push_back(random_int(0, dataAlphabet+1));
-			dataDNA.insert(it1, tempList);
-			break;
-		}
-
-		case 2:
-			mutate_list(dataDNA);
-			break;
-	}
+    // Commit the replacment
+    dataDNA->replace(start, replace, amount);
+    free(replace);
 }
 
-void Client::mutate_gen()
-{
-	// Prevent mutation of empty lists
-    int size = dataDNA.genes();
-	if (size < 1)
-		return;
+// Delete one or more bytes
+void Client::mutate_delete() {
+    // Pick a random byte to start
+    unsigned int start = random_int(0, dataDNA->length());
 
-	// Pick random gene
-	int random = random_int(0, size);
-	DNA::iterator it = dataDNA.begin();
-	for (int i = 0; i < random; i++)
-		it++;
+    // Determine the window size
+    unsigned int amount = random_int(1, 5);
+    if (start+amount > dataDNA->length())
+        amount = dataDNA->length() - start;
+    int end = start + amount;
 
-	// Prevent mutation of empty gene
-	if (it->size() < 1)
-		return;
-
-	// Pick mutation
-	int mutation = random_int(1, 3);
-
-	// Pick a mutation
-	switch (mutation)
-	{
-		// Creation
-		case 1:
-		{
-			// Generate and insert
-			it->push_back(random_int(1, dataAlphabet+1));
-			break;
-		}
-
-		case 2:
-			mutate_list(*it);
-			break;
-	}
+    // Commit the deletion
+    dataDNA->erase(start, end);
 }
 
-void Client::mutate_codon()
-{
-	// Prevent mutation of empty lists
-    int size = dataDNA.genes();
-	if (size < 1)
+// Copy a selection of bytes one time
+void Client::mutate_duplicate() {
+    // Pick a random byte to start
+    unsigned int start = random_int(0, dataDNA->length());
+
+    // Determine the window size
+    unsigned int window_size = random_int(1, 5);
+    if (start+window_size >= dataDNA->length())
+        window_size = dataDNA->length() - start;
+    unsigned int end = start + window_size;
+
+    // Extract the window
+    unsigned char* window;
+    dataDNA->extract(start, end, window);
+
+    // Commit the duplication
+    end++;
+    if (end == dataDNA->length())
+        dataDNA->push_back(window, window_size);
+    else
+        dataDNA->insert(end, window, window_size);
+    free(window);
+}
+
+// Amplify a selection of bytes
+void Client::mutate_amplify() {
+    // Pick a random byte to start
+    unsigned int start = random_int(0, dataDNA->length());
+
+    // Determine the window size
+    unsigned int window_size = random_int(1, 5);
+    if (start+window_size >= dataDNA->length())
+        window_size = dataDNA->length() - start;
+    unsigned int end = start + window_size;
+
+    // Extract the window
+    unsigned char* window;
+    dataDNA->extract(start, end, window);
+
+    // Amplificate the window
+    int amplify = random_int(2, 10);
+    window = (unsigned char*) realloc(window, window_size * amplify * sizeof(unsigned char));
+    for (int i = 1; i < amplify; i++)
+        memcpy(&window[i * window_size], &window[0], window_size);
+
+    // Commit the duplication
+    end++;
+    if (end == dataDNA->length())
+        dataDNA->push_back(window, window_size*amplify);
+    else
+        dataDNA->insert(end, window, window_size*amplify);
+    free(window);
+}
+
+// Inverse a selection of bytes
+void Client::mutate_inverse() {
+    // Pick a random byte to start
+    unsigned int start = random_int(0, dataDNA->length());
+
+    // Determine the window size
+    unsigned int window_size = random_int(1, 5);
+    if (start+window_size >= dataDNA->length())
+        window_size = dataDNA->length() - start;
+    unsigned int end = start + window_size;
+
+    // Extract the window
+    unsigned char* window;
+    dataDNA->extract(start, end, window);
+
+    // Inverse the window order
+    unsigned char* window_copy = (unsigned char*) malloc(window_size * sizeof(unsigned char));
+    for (unsigned int i = 0; i < window_size; i++)
+        window_copy[i] = window[window_size - i - 1];
+    memcpy(window, window_copy, window_size);
+    free(window_copy);
+
+    // Commit the duplication
+    dataDNA->replace(start, window, window_size);
+    free(window);
+}
+
+
+//
+// Recombination methods
+//
+
+// Insert foreign bytes in the DNA
+void Client::recombine_insert(Client& inputClient) {
+    // Extract foreign DNA //
+
+    // Pick a random byte to start
+    unsigned int start = random_int(0, inputClient.get()->length());
+
+    // Determine the window size
+    unsigned int window_size = random_int(1, 5);
+    if (start+window_size >= inputClient.get()->length())
+        window_size = inputClient.get()->length() - start;
+    unsigned int end = start + window_size;
+
+    // Extract the window
+    unsigned char* window;
+    inputClient.get()->extract(start, end, window);
+
+
+    // Insert the DNA //
+
+    // Pick a random byte to start
+    int i_start = random_int(0, dataDNA->length());
+
+    // Insert the DNA
+    dataDNA->insert(i_start, window, window_size);
+
+
+    // Clean //
+
+    free(window);
+}
+
+// Perform a single crossover
+void Client::recombine_crossover_single(Client& inputClient) {
+    // Determine crossover point
+    int max = std::min(dataDNA->length(), inputClient.get()->length());
+    int crossover_point = random_int(0, max);
+
+    // Wipe own DNA
+    dataDNA->erase(crossover_point, dataDNA->length());
+
+    // Extract foreign DNA
+    int window_size = inputClient.get()->length() - crossover_point;
+    unsigned char* window;
+    inputClient.get()->extract(crossover_point, crossover_point+window_size, window);
+
+    // Append foreign DNA
+    dataDNA->push_back(window, window_size);
+
+    // Clean
+    free(window);
+}
+
+// Perform a double crossover
+void Client::recombine_crossover_double(Client& inputClient) {
+    // Determine starting crossover region
+    unsigned int max = std::min(dataDNA->length(), inputClient.get()->length());
+    unsigned int crossover_start = random_int(0, max);
+    unsigned int crossover_end = random_int(crossover_start, max);
+    if (crossover_end <= crossover_start)
         return;
 
-	// Pick random gene
-	int random = random_int(0, size);
-	DNA::iterator it = dataDNA.begin();
-	for (int i = 0; i < random; i++)
-		it++;
+    // Wipe own DNA
+    dataDNA->erase(crossover_start, crossover_end);
 
-	// Avoid altering empty gene
-	if (it->empty())
-		return;
+    // Extract foreign DNA
+    unsigned int window_size = crossover_end - crossover_start;
+    unsigned char* window;
+    inputClient.get()->extract(crossover_start, crossover_end, window);
 
-	// Pick random codon
-	random = random_int(0, it->size());
-	std::list<int>::iterator it2 = it->begin();
-	for (int i = 0; i < random; i++)
-		it2++;
+    // Append foreign DNA
+    crossover_end++;
+    if (crossover_end == dataDNA->length())
+        dataDNA->push_back(window, window_size);
+    else
+        dataDNA->insert(crossover_end, window, window_size);
 
-	// Point mutate
-	*it2 = random_int(1, dataAlphabet+1);
+    // Clean
+    free(window);
 }
-

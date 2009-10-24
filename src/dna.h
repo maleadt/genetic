@@ -66,14 +66,14 @@ class DNA
                 void insert(unsigned int i_start, unsigned char* gene, unsigned int size);
                 void replace(unsigned int i_start, unsigned char* gene, unsigned int size);
                 void push_back(unsigned char* item, unsigned int size);
-                void extract(unsigned int i_start, unsigned int i_end, unsigned char*& gene);
+                void extract(unsigned int i_start, unsigned int i_end, unsigned char*& gene) const;
 
                 // Gene modifiers
                 bool erase_gene(unsigned int index);
                 bool insert_gene(unsigned int index, unsigned char* gene, unsigned int size);
                 bool replace_gene(unsigned int index, unsigned char* gene, unsigned int size);
                 bool push_back_gene(unsigned char* item, unsigned int size);
-                bool extract_gene(unsigned int index, unsigned char*& gene, unsigned int& size);
+                bool extract_gene(unsigned int index, unsigned char*& gene, unsigned int& size) const;
 
                 // Operators
                 bool operator== (const DNA& dna);
@@ -84,8 +84,6 @@ class DNA
 		void debug_raw() const;
 
                 // Auxiliary (should be private, public due to unit testing)
-                unsigned char* ptr_move(unsigned int inputLocation);
-                unsigned char* ptr_set(unsigned int inputLocation);
                 unsigned int separator(unsigned int index) const;
                 unsigned int gene_start(unsigned int index) const;
                 unsigned int gene_end(unsigned int index) const;
@@ -94,8 +92,6 @@ class DNA
                 // Member data
 		unsigned char* dataGenes;
                 unsigned int dataSize;
-                unsigned char* dataPointer;
-                unsigned int dataPointerLocation;
 };
 
 

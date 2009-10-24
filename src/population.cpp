@@ -91,7 +91,7 @@ void Population::evolve_single_straight()
         tempClient.mutate();
 
         // Compare the new DNA
-        DNA tempDNA = tempClient.get();
+        const DNA* tempDNA = tempClient.get();
         double tempFitness = dataEnvironment->fitness(tempDNA);
         if (tempFitness > dataFitness)
         {

@@ -34,7 +34,6 @@
 
 // Headers
 #include <iostream>
-#include <list>
 #include <algorithm>
 #include "generic.h"
 #include "dna.h"
@@ -44,9 +43,15 @@
 // Constants
 //
 
-// Mutation: amount of mutations
+// Amount of mutations
 const int MUTATE_AMOUNT_LOWER = 0;
 const int MUTATE_AMOUNT_UPPER = 5;
+
+// Amount of recombinations
+const int RECOMBINE_AMOUNT_LOWER = 0;
+const int RECOMBINE_AMOUNT_UPPER = 5;
+
+// TODO: move constant usage from recombine() to caller
 
 
 
@@ -61,6 +66,7 @@ class Client
 		Client();
 		Client(const DNA& inputDNA);
 		Client(const DNA& inputDNA, int inputAlphabet);
+                ~Client();
 
 		// DNA alteration
 		void mutate();
@@ -68,95 +74,27 @@ class Client
 		void clean();
 
 		// DNA output
-		void set(const DNA& inputDNA);
-		DNA get() const;
+		const DNA* get() const;
 
 		// Alphabet
 		int dataAlphabet;
 
 	private:
 		// DNA
-		DNA& dataDNA;
+		DNA* dataDNA;
 
-		// Mutation routines
-		void mutate_dna();
-		void mutate_gen();
-		void mutate_codon();
+                // Mutation methods
+                void mutate_point();
+                void mutate_delete();
+                void mutate_duplicate();
+                void mutate_amplify();
+                void mutate_inverse();
+
+                // Recombination methods
+                void recombine_insert(Client& inputClient);
+                void recombine_crossover_single(Client& inputClient);
+                void recombine_crossover_double(Client& inputClient);
 };
-
-// Mutate a list structurally
-template <class T>
-void mutate_list(T& inputObject)
-{
-	// Pick mutation
-	 int mutation;
-	 int size = inputObject.size();
-	 if (size > 1)
-	 {
-	 	mutation = random_int(1, 5);
-	 } else {
-	 	mutation = random_int(1, 2);
-	 }
-
-	 // Pick random gene(s)
-	 int random1 = random_int(0, size-1);
-	 int random2 = random_int(0, size-1);
-	 while (size > 1 && random1 == random2)
-	 	random2 = random_int(0, size-1);
-
-	// Calculate iterators to those genes
-	typename T::iterator it1 = inputObject.begin(), it2 = inputObject.begin();
-	for (int i = 0; i < random1; i++)
-		it1++;
-	for (int i = 0; i < random2; i++)
-		it2++;
-
-
-	// Mutate
-	switch (mutation)
-	{
-		// Deletion
-		case 1:
-		{
-			inputObject.erase(it1);
-			break;
-		}
-
-		// Amplification (at current spot)
-		case 2:
-		{
-			int randAmp = random_int(1, 5);
-			for (int i = 0; i < randAmp; i++)
-				inputObject.insert(it1, *(it1));
-			break;
-		}
-
-		// Duplication (at random spot)
-		case 3:
-		{
-			inputObject.insert(it2, *(it1));
-			break;
-		}
-
-		// Inversion
-		case 4:
-		{
-			std::swap(*(it1), *(it2));
-			break;
-		}
-
-		// Translocation
-		case 5:
-		{
-		//	U temp = *it1;
-		//	inputObject.erase(it1);
-		//	inputObject.insert(it2, temp);
-			break;
-		}
-
-		// Merge
-	}
-}
 
 // Include guard
 #endif
