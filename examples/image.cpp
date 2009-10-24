@@ -140,7 +140,7 @@ bool EnvImage::valid_limits(const DNA& inputDNA) const
 	DNA::const_iterator it = inputDNA.begin();
 	while (it != inputDNA.end())
 	{
-		int size = (it++)->size();
+		unsigned int size = (it++)->size();
 
 		// 10 bytes at minimum
 		if ((size-4)/2 > LIMIT_POLYGON_POINTS || size < 10)

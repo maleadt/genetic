@@ -42,11 +42,11 @@
 //
 
 // Constructor with given DNA and environment
-Population::Population(Environment* inputEnvironment, DNA& inputDNA)
-{
+Population::Population(Environment* inputEnvironment, const DNA& inputDNA) {
     // Save all data
     dataDNA = new DNA(inputDNA);
     dataEnvironment = inputEnvironment;
+    dataDNA->debug();
 }
 
 // Destructor

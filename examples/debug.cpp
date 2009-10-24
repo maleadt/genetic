@@ -40,15 +40,15 @@
 /////////////////
 
 // Class definition
-class EnvDebug : public Environment
-{
+class EnvDebug : public Environment {
 	public:
 		// Constructor
 		EnvDebug();
 
 		// Required functons
-		double fitness(DNA& inputDNA);
-		int alphabet();
+		double fitness(const DNA* inputDNA);
+		int alphabet() const;
+		void update(const DNA* inputDNA);
 		bool condition();
 
 	private:
@@ -56,27 +56,27 @@ class EnvDebug : public Environment
 };
 
 // Constructor
-EnvDebug::EnvDebug()
-{
+EnvDebug::EnvDebug() {
 	counter = 0;
 }
 
 // Alphabet (maximal amount of instructions)
-int EnvDebug::alphabet()
-{
+int EnvDebug::alphabet() const {
 	return 254;	// Pick maximum as of debugging purposes
 }
 
 // Fitness function
-double EnvDebug::fitness(DNA& inputDNA)
-{
+double EnvDebug::fitness(const DNA* inputDNA) {
 	return counter++;
 }
 
 // Condition (mutate 10 times
-bool EnvDebug::condition()
-{
+bool EnvDebug::condition() {
     return counter<10;
+}
+
+// Update function (does nothing)
+void EnvDebug::update(const DNA* inputDNA) {
 }
 
 
@@ -88,6 +88,7 @@ bool EnvDebug::condition()
 int main()
 {
     // Generate a DNA string
+    std::cout << "* Initial construct" << std::endl;
     unsigned char dna1[] = {0x00,
         0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
         0x00,
@@ -101,6 +102,7 @@ int main()
 
     // Create a population with initial DNA
     Population tempPopulation(&tempEnvironment, tempDNA);
+    std::cout << "* Evolving" << std::endl;
 
     // Simulate
     try

@@ -49,7 +49,7 @@ WARNING:
 */
 
 // Fitness functions
-double Environment::fitness(const DNA* inputDNA) const
+double Environment::fitness(const DNA* inputDNA)
 {
     std::cout << "WARNING: NON-OVERRIDDEN FITNESS FUNCTION CALLED" << std::endl;
 	return 0;

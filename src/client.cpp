@@ -154,17 +154,17 @@ void Client::mutate_point() {
     unsigned int start = random_int(0, dataDNA->length());
 
     // Determine the window size
-    unsigned int amount = random_int(1, 5);
-    if (start+amount > dataDNA->length())
-        amount = dataDNA->length() - start;
+    unsigned int window_size = random_int(1, 5);
+    if (start+window_size > dataDNA->length())
+        window_size = dataDNA->length() - start - 1;
 
     // Generate replacment gen
-    unsigned char* replace = (unsigned char*) malloc(amount * sizeof(unsigned char));
-    for (unsigned int i = 0; i < amount; i++)
+    unsigned char* replace = (unsigned char*) malloc(window_size * sizeof(unsigned char));
+    for (unsigned int i = 0; i < window_size; i++)
         replace[i] = (unsigned char) random_int(0, dataAlphabet);
 
     // Commit the replacment
-    dataDNA->replace(start, replace, amount);
+    dataDNA->replace(start, replace, window_size);
     free(replace);
 }
 
@@ -174,10 +174,10 @@ void Client::mutate_delete() {
     unsigned int start = random_int(0, dataDNA->length());
 
     // Determine the window size
-    unsigned int amount = random_int(1, 5);
-    if (start+amount > dataDNA->length())
-        amount = dataDNA->length() - start;
-    int end = start + amount;
+    unsigned int window_size = random_int(1, 5);
+    if (start+window_size > dataDNA->length())
+        window_size = dataDNA->length() - start - 1;
+    int end = start + window_size;
 
     // Commit the deletion
     dataDNA->erase(start, end);
@@ -191,12 +191,13 @@ void Client::mutate_duplicate() {
     // Determine the window size
     unsigned int window_size = random_int(1, 5);
     if (start+window_size >= dataDNA->length())
-        window_size = dataDNA->length() - start;
+        window_size = dataDNA->length() - start - 1;
     unsigned int end = start + window_size;
 
     // Extract the window
     unsigned char* window;
     dataDNA->extract(start, end, window);
+    DNA tempDNA(window, window_size);
 
     // Commit the duplication
     end++;
@@ -215,14 +216,14 @@ void Client::mutate_amplify() {
     // Determine the window size
     unsigned int window_size = random_int(1, 5);
     if (start+window_size >= dataDNA->length())
-        window_size = dataDNA->length() - start;
+        window_size = dataDNA->length() - start - 1;
     unsigned int end = start + window_size;
 
     // Extract the window
     unsigned char* window;
     dataDNA->extract(start, end, window);
 
-    // Amplificate the window
+    // Amplify the window
     int amplify = random_int(2, 10);
     window = (unsigned char*) realloc(window, window_size * amplify * sizeof(unsigned char));
     for (int i = 1; i < amplify; i++)
@@ -245,7 +246,7 @@ void Client::mutate_inverse() {
     // Determine the window size
     unsigned int window_size = random_int(1, 5);
     if (start+window_size >= dataDNA->length())
-        window_size = dataDNA->length() - start;
+        window_size = dataDNA->length() - start - 1;
     unsigned int end = start + window_size;
 
     // Extract the window
@@ -279,7 +280,7 @@ void Client::recombine_insert(Client& inputClient) {
     // Determine the window size
     unsigned int window_size = random_int(1, 5);
     if (start+window_size >= inputClient.get()->length())
-        window_size = inputClient.get()->length() - start;
+        window_size = inputClient.get()->length() - start - 1;
     unsigned int end = start + window_size;
 
     // Extract the window

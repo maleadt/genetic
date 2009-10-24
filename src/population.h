@@ -62,7 +62,7 @@ class Population
 {
     public:
         // Construction and destruction
-        Population(Environment* inputEnvironment, DNA& inputDNA);
+        Population(Environment* inputEnvironment, const DNA& inputDNA);
         ~Population();
 
         // Output routines

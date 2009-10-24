@@ -45,7 +45,7 @@ class Environment
 {
 	public:
 		// Required functions
-		virtual double fitness(const DNA* inputDNA) const;
+		virtual double fitness(const DNA* inputDNA);
 		virtual int alphabet() const;
 		virtual void update(const DNA* inputDNA);
 		virtual bool condition();

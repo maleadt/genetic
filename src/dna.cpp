@@ -48,7 +48,11 @@ DNA::DNA() {
 
 // Copy constructor
 DNA::DNA(const DNA& inputDNA) {
-    DNA(inputDNA.dataGenes, inputDNA.dataSize);
+    dataSize = inputDNA.dataSize;
+
+    // Deep copy of genes
+    dataGenes = (unsigned char*) malloc(dataSize * sizeof(unsigned char));
+    std::memcpy(dataGenes, inputDNA.dataGenes, dataSize);
 }
 
 // Constructor with parameters
@@ -98,6 +102,7 @@ unsigned int DNA::length() const
 //   erases data from i_start (inclusive) to i_end (exclusive)
 void DNA::erase(unsigned int i_start, unsigned int i_end) {
     // Get pointers
+    assert(i_end <= dataSize);
     unsigned char* p_start = &dataGenes[i_start];
     unsigned char* p_end = &dataGenes[i_end];
 
@@ -116,6 +121,7 @@ void DNA::insert(unsigned int i_start, unsigned char* gene, unsigned int size) {
     dataGenes = (unsigned char*) std::realloc(dataGenes, dataSize+size);
 
     // Get pointers
+    assert(i_start < dataSize);
     unsigned char* p_start = &dataGenes[i_start];
     unsigned char* p_backup = &dataGenes[i_start+size];
 
@@ -130,6 +136,7 @@ void DNA::insert(unsigned int i_start, unsigned char* gene, unsigned int size) {
 // Replace data
 //   replaces data from i_start (inclusive)
 void DNA::replace(unsigned int i_start, unsigned char* gene, unsigned int size) {
+    assert(i_start+size <= dataSize);
     erase(i_start, i_start+size);
     if (i_start == dataSize)
         push_back(gene, size);
@@ -149,6 +156,7 @@ void DNA::push_back(unsigned char* gene, unsigned int size) {
 // Extract data
 //   extracts data from i_start (inclusive) to i_end (exclusive)
 void DNA::extract(unsigned int i_start, unsigned int i_end, unsigned char*& gene) const {
+    assert(i_end <= dataSize);
     gene = (unsigned char*) malloc((i_end-i_start) * sizeof(unsigned char));
     unsigned char* p_start = &dataGenes[i_start];
     memcpy(gene, p_start, i_end-i_start);
@@ -162,6 +170,7 @@ void DNA::extract(unsigned int i_start, unsigned int i_end, unsigned char*& gene
 // Erase a gene
 bool DNA::erase_gene(unsigned int index) {
     unsigned int amountgenes = genes();
+    assert(index < amountgenes);
     
     // Case 1: gene at start
     if (index == 0) {
@@ -198,6 +207,8 @@ bool DNA::erase_gene(unsigned int index) {
 // Insert a gene
 bool DNA::insert_gene(unsigned int index, unsigned char* gene, unsigned int size) {
     unsigned int amountgenes = genes();
+    assert(index <= amountgenes);
+    // TODO: remove functionality, or add to insert() as well
 
     // Case 1: gene at start
     if (index == 0) {
@@ -234,6 +245,9 @@ bool DNA::insert_gene(unsigned int index, unsigned char* gene, unsigned int size
 
 // Replace a gene
 bool DNA::replace_gene(unsigned int index, unsigned char* gene, unsigned int size) {
+    unsigned int amountgenes = genes();
+    assert(index < amountgenes);
+
     erase_gene(index);
     insert_gene(index, gene, size);
 
@@ -259,6 +273,9 @@ bool DNA::push_back_gene(unsigned char* gene, unsigned int size) {
 
 // Extract a gene
 bool DNA::extract_gene(unsigned int index, unsigned char*& gene, unsigned int& size) const {
+    unsigned int amountgenes = genes();
+    assert(index < amountgenes);
+    
     unsigned int i_start = gene_start(index);
     unsigned int i_end = gene_end(index);
     size = i_end-i_start;
