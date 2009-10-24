@@ -50,7 +50,7 @@ public:
     EnvImgWrite();
 
     // Required functions
-    void update(const DNA& inputDNA);
+    void update(const DNA* inputDNA);
     bool condition();
 
     // Additional functions
@@ -90,7 +90,7 @@ EnvImgWrite::EnvImgWrite() {
 //
 
 // Update call
-void EnvImgWrite::update(const DNA& inputDNA) {
+void EnvImgWrite::update(const DNA* inputDNA) {
     // Create surface
     cairo_surface_t* tempSurface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, dataInputWidth, dataInputHeight);
 

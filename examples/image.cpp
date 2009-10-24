@@ -65,29 +65,27 @@ EnvImage::~EnvImage()
 //
 
 // Fitness function
-double EnvImage::fitness(const DNA& inputDNA) const
-{
-	// Check the DNA's limit's
-	if (!valid_limits(inputDNA))
-		return -1;
+double EnvImage::fitness(const DNA* inputDNA) {
+    // Check the DNA's limit's
+    if (!valid_limits(inputDNA))
+            return -1;
 
-	// Create a DC for the generated image
+    // Create a DC for the generated image
     cairo_surface_t* tempSurface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, dataInputWidth, dataInputHeight);
 
-	// Draw the DNA onto the DC
-	draw(tempSurface, inputDNA);
+    // Draw the DNA onto the DC
+    draw(tempSurface, inputDNA);
 
-	// Compare them
-	double resemblance = compare(tempSurface);
+    // Compare them
+    double resemblance = compare(tempSurface);
 
-	// Finish
-	cairo_surface_destroy(tempSurface);
-	return resemblance;
+    // Finish
+    cairo_surface_destroy(tempSurface);
+    return resemblance;
 }
 
 // Alphabet (maximal amount of instructions)
-int EnvImage::alphabet() const
-{
+int EnvImage::alphabet() const {
 	return 254;
 }
 
@@ -130,25 +128,26 @@ bool EnvImage::loadImage(std::string inputFile)
 }
 
 // Validity function
-bool EnvImage::valid_limits(const DNA& inputDNA) const
-{
+bool EnvImage::valid_limits(const DNA* inputDNA) const {
 	// Check amount of polygons
-	if (inputDNA.genes() < 1 || inputDNA.genes() > LIMIT_POLYGONS)
+        unsigned int genes = inputDNA->genes();
+	if (genes < 1 || genes > LIMIT_POLYGONS)
 		return false;
 
 	// Check points per polygon
-	DNA::const_iterator it = inputDNA.begin();
-	while (it != inputDNA.end())
-	{
-		unsigned int size = (it++)->size();
+        for (unsigned int gene = 0; gene < genes; gene++) {
+            // Get gene
+            unsigned int size = 0; unsigned char* data = 0;
+            inputDNA->extract(gene, size, data);
+            free(data);
 
-		// 10 bytes at minimum
-		if ((size-4)/2 > LIMIT_POLYGON_POINTS || size < 10)
-			return false;
+            // 10 bytes at minimum
+            if ((size-4)/2 > LIMIT_POLYGON_POINTS || size < 10)
+                    return false;
 
-		// Should be even
-		if (size%2 != 0)
-			return false;
+            // Should be even
+            if (size%2 != 0)
+                    return false;
 	}
 
 	// All checked, seems valid
@@ -156,7 +155,7 @@ bool EnvImage::valid_limits(const DNA& inputDNA) const
 }
 
 // Render the DNA code onto a draw container
-void EnvImage::draw(cairo_surface_t* inputSurface, const DNA& inputDNA) const {
+void EnvImage::draw(cairo_surface_t* inputSurface, const DNA* inputDNA) const {
     // Create a Cairo context
     cairo_t *cr = cairo_create(inputSurface);
 
@@ -166,21 +165,25 @@ void EnvImage::draw(cairo_surface_t* inputSurface, const DNA& inputDNA) const {
     cairo_fill(cr);
 
     // Loop all genes
-    DNA::const_iterator it = inputDNA.begin();
-    while (it != inputDNA.end()) {
-        std::list<int>::const_iterator it2 = it->begin();
+    unsigned int genes = inputDNA->genes();
+    for (unsigned int gene = 0; gene < genes; gene++) {
+        // Get gene
+        unsigned int size; unsigned char* data;
+        inputDNA->extract_gene(gene, data, size);
+        unsigned int gene_loc = 0;
 
         // Get colour code
-        int r = *(it2++), g = *(it2++), b = *(it2++), a = *(it2++);
+        int r = *(data++), g = *(data++), b = *(data++), a = *(data++);
+        gene_loc += 4;
         cairo_set_source_rgba(cr, (r - 1) / 253.0, (g - 1) / 253.0, (b - 1) / 253.0, (a - 1) / 253.0);
 
         // Save all points in a container
         std::vector<vertex> points;
         int x, y;
-        while (it2 != it->end()) {
+        while (gene_loc < size) {
             // Points vary between 1 and 254, so let 1 be the lower bound and 254 the upper one
-            x = *(it2++) - 1;
-            y = *(it2++) - 1;
+            x = *(data++) - 1;
+            y = *(data++) - 1;
             int size = points.size();
             points.resize(size+1);
             points[size].x = dataInputWidth * x / 253.0;
@@ -189,9 +192,9 @@ void EnvImage::draw(cairo_surface_t* inputSurface, const DNA& inputDNA) const {
 
         // Sort the points to avoid complex polygons
         // http://www.computational-geometry.org/mailing-lists/compgeom-announce/2003-March/000731.html
-        const int size = points.size();
+        const int points_count = points.size();
         int start = 0;	// upper left point is starting point
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < points_count; i++) {
             if (points[i].y > points[start].y)
                 start = i;
             else if (points[i].y == points[start].y && points[i].x < points[start].x)
@@ -199,17 +202,19 @@ void EnvImage::draw(cairo_surface_t* inputSurface, const DNA& inputDNA) const {
         }
         cairo_move_to(cr, points[start].x, points[start].y);
         points[start].drawn = true;
-        for (int i = 0; i < size; i++) {    // calculate angle for each point against startpoint
+        for (int i = 0; i < points_count; i++) {    // calculate angle for each point against startpoint
             if (i == start)
                 continue;
             points[i].angle =  atan2(points[i].y - points[start].y, points[i].x - points[start].x);
         }
-        for (int i = 0; i < size; i++) {    // draw points based on increasing angle
+        for (int i = 0; i < points_count; i++) {    // draw points based on increasing angle
             double angle;
             int next = -1;
-            for (int j = 0; j < size; j++) {
-                if (points[j].drawn)
+            for (int j = 0; j < points_count; j++) {
+                if (points[j].drawn) {
+                    free(data);
                     continue;
+                }
                 if (next == -1) {
                     next = j;
                     angle = points[j].angle;
@@ -221,6 +226,7 @@ void EnvImage::draw(cairo_surface_t* inputSurface, const DNA& inputDNA) const {
                 }
             }
             if (next == -1) {
+                free(data);
                 continue;
             } else {
                 cairo_line_to(cr, points[next].x, points[next].y);
@@ -231,28 +237,32 @@ void EnvImage::draw(cairo_surface_t* inputSurface, const DNA& inputDNA) const {
         // Draw
         cairo_close_path(cr);
         cairo_fill(cr);
-        ++it;
+
+        // Clean
+        free(data);
     }
     cairo_destroy(cr);
 }
 
 // Explain a given DNA set
-void EnvImage::explain(const DNA& inputDNA) const {
+void EnvImage::explain(const DNA* inputDNA) const {
     std::cout << "* DNA explanation" << std::endl;
 
     // Main characteristics
     std::cout << "\t- Main characteristics:" << std::endl;
-    std::cout << "\t\tamount of polygons: " << inputDNA.genes() << std::endl;
+    std::cout << "\t\tamount of polygons: " << inputDNA->genes() << std::endl;
 
     // Process all polygons
     std::cout << "\t- List of polygons" << std::endl;
-    DNA::const_iterator it = inputDNA.begin();
-    while (it != inputDNA.end()) {
-        // Data access
-        std::list<int>::const_iterator it2 = it->begin();
+    unsigned int genes = inputDNA->genes();
+    for (unsigned int gene = 0; gene < genes; gene++) {
+        // Get gene
+        unsigned int size; unsigned char* data;
+        inputDNA->extract_gene(gene, data, size);
+        unsigned int gene_loc = 0;
 
         // Get polygon name
-        int points = (it->size()-4)/2;
+        int points = (size-4)/2;
         std::cout << "\t\t";
         switch (points) {
             case 3:
@@ -282,7 +292,8 @@ void EnvImage::explain(const DNA& inputDNA) const {
         }
 
         // Get colour code
-        int r = *(it2++), g = *(it2++), b = *(it2++), a = *(it2++);
+        int r = *(data++), g = *(data++), b = *(data++), a = *(data++);
+        gene_loc += 4;
         r = 255 * ( (r-1.0)/253.0);
         g = 255 * ( (g-1.0)/253.0);
         b = 255 * ( (b-1.0)/253.0);
@@ -292,7 +303,7 @@ void EnvImage::explain(const DNA& inputDNA) const {
         // TODO: do something with points?
 
         // Advance
-        ++it;
+        free(data);
     }
 }
 

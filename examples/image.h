@@ -102,14 +102,14 @@ class EnvImage : public Environment
 		~EnvImage();
 
 		// Required functons
-		double fitness(const DNA& inputDNA) const;
+		double fitness(const DNA* inputDNA);
 		int alphabet() const;
 
 		// Image functions
 		bool loadImage(std::string inputFile);
-		bool valid_limits(const DNA& inputDNA) const;
-		void draw(cairo_surface_t* inputSurface, const DNA& inputDNA) const;
-                void explain(const DNA& inputDNA) const;
+		bool valid_limits(const DNA* inputDNA) const;
+		void draw(cairo_surface_t* inputSurface, const DNA* inputDNA) const;
+                void explain(const DNA* inputDNA) const;
 
                 // Comparison setup
                 void setup(cairo_surface_t* inputSurface);

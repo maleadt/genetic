@@ -62,20 +62,20 @@ class EnvImgBenchmark : public EnvImage
         EnvImgBenchmark();
 
         // Required functions
-		void update(const DNA& inputDNA);
-		bool condition();
+        void update(const DNA* inputDNA);
+        bool condition();
 
-		// Additional functions
-		void reset();
-		void setVector(std::vector<double>* dataTime, std::vector<double>* dataFitness);
-		void setTime(int inputTime);
+        // Additional functions
+        void reset();
+        void setVector(std::vector<double>* dataTime, std::vector<double>* dataFitness);
+        void setTime(int inputTime);
 
     private:
         int runtime;
         std::vector<double>* dataTime;
         std::vector<double>* dataFitness;
-		int counter;
-		double start;
+        int counter;
+        double start;
 };
 
 
@@ -100,8 +100,7 @@ EnvImgBenchmark::EnvImgBenchmark()
 //
 
 // Update call
-void EnvImgBenchmark::update(const DNA& inputDNA)
-{
+void EnvImgBenchmark::update(const DNA* inputDNA) {
     // Ge the fitness and elapsed time
     double tempFitness = 100*fitness(inputDNA);
     #ifdef WITH_OPENMP
@@ -116,8 +115,7 @@ void EnvImgBenchmark::update(const DNA& inputDNA)
 }
 
 // Condition call
-bool EnvImgBenchmark::condition()
-{
+bool EnvImgBenchmark::condition() {
     #ifdef WITH_OPENMP
     double sec = omp_get_wtime()-start;
     #else
