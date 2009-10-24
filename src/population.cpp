@@ -41,19 +41,17 @@
 // Construction and destruction
 //
 
-// Constructor with given environment
-Population::Population(Environment* inputEnvironment)
+// Constructor with given DNA and environment
+Population::Population(Environment* inputEnvironment, DNA& inputDNA)
 {
     // Save all data
+    dataDNA = new DNA(inputDNA);
     dataEnvironment = inputEnvironment;
 }
 
-// Constructor with given DNA and environment
-Population::Population(Environment* inputEnvironment, DNA inputDNA)
-{
-    // Save all data
-    set(inputDNA);
-    dataEnvironment = inputEnvironment;
+// Destructor
+Population::~Population() {
+    delete dataDNA;
 }
 
 
@@ -61,14 +59,9 @@ Population::Population(Environment* inputEnvironment, DNA inputDNA)
 // Output routines
 //
 
-DNA Population::get() const
+const DNA* Population::get() const
 {
     return dataDNA;
-}
-
-void Population::set(DNA& inputDNA)
-{
-    dataDNA = inputDNA;
 }
 
 
@@ -86,7 +79,7 @@ void Population::evolve_single_straight()
     while (dataEnvironment->condition())
     {
         // Create a client, and mutate the DNA
-        Client tempClient(dataDNA);
+        Client tempClient(*dataDNA);
         tempClient.dataAlphabet = dataEnvironment->alphabet();
         tempClient.mutate();
 
@@ -96,7 +89,8 @@ void Population::evolve_single_straight()
         if (tempFitness > dataFitness)
         {
             dataFitness = tempFitness;
-            dataDNA = tempClient.get();
+            delete dataDNA;
+            dataDNA = new DNA(*tempClient.get());
             dataEnvironment->update(dataDNA);
         }
     }
@@ -108,8 +102,7 @@ void Population::evolve_population()
     // Allocate new population
     std::vector<CachedClient> population(POPULATION_BOX_SIZE);
     population[0].fitness = dataEnvironment->fitness(dataDNA);
-    population[0].client = dataDNA;
-    population[0].client.dataAlphabet = dataEnvironment->alphabet();
+    population[0].client = Client(*dataDNA, dataEnvironment->alphabet());
     fill(population, 1);
 
     // Initial mutation
@@ -158,8 +151,7 @@ void Population::evolve_population_straight()
     // Allocate new population
     std::vector<CachedClient> population(POPULATION_BOX_SIZE);
     population[0].fitness = dataEnvironment->fitness(dataDNA);
-    population[0].client = dataDNA;
-    population[0].client.dataAlphabet = dataEnvironment->alphabet();
+    population[0].client = Client(*dataDNA, dataEnvironment->alphabet());
     fill(population, 1);
 
     // Initial mutation
@@ -203,16 +195,14 @@ void Population::evolve_population_dual()
     // Allocate first population
     std::vector<CachedClient> population1(POPULATION_BOX_SIZE);
     population1[0].fitness = dataEnvironment->fitness(dataDNA);
-    population1[0].client = dataDNA;
-    population1[0].client.dataAlphabet = dataEnvironment->alphabet();
+    population1[0].client = Client(*dataDNA, dataEnvironment->alphabet());
     fill(population1, 1);
     mutate(population1, 1);
 
     // Allocate second population
     std::vector<CachedClient> population2(POPULATION_BOX_SIZE);
     population2[0].fitness = dataEnvironment->fitness(dataDNA);
-    population2[0].client = dataDNA;
-    population2[0].client.dataAlphabet = dataEnvironment->alphabet();
+    population2[0].client = Client(*dataDNA, dataEnvironment->alphabet());
     fill(population2, 1);
     mutate(population2, 1);
 

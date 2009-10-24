@@ -65,8 +65,8 @@
 const int IMAGE_DIGITS = 5;
 
 // Polygon limits
-const int LIMIT_POLYGONS = 50;
-const int LIMIT_POLYGON_POINTS = 5;
+const unsigned int LIMIT_POLYGONS = 50;
+const unsigned int LIMIT_POLYGON_POINTS = 5;
 
 // Division settings
 const int AVERAGE_DIV_X = 32;

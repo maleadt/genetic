@@ -63,7 +63,7 @@ int Environment::alphabet() const
 }
 
 // Update call
-void Environment::update(const DNA& inputDNA)
+void Environment::update(const DNA* inputDNA)
 {
     std::cout << "WARNING: NON-OVERRIDDEN UPDATE FUNCTION CALLED" << std::endl;
 }

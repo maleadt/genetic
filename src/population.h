@@ -62,12 +62,11 @@ class Population
 {
     public:
         // Construction and destruction
-        Population(Environment* inputEnvironment);
-        Population(Environment* inputEnvironment, DNA inputDNA);
+        Population(Environment* inputEnvironment, DNA& inputDNA);
+        ~Population();
 
         // Output routines
-        void set(DNA& inputDNA);
-        DNA get() const;
+        const DNA* get() const;
 
         // Evolutionary methods
         void evolve_single_straight();
@@ -83,7 +82,7 @@ class Population
 
     private:
         // Current DNA
-        DNA dataDNA;
+        const DNA* dataDNA;
         Environment* dataEnvironment;
 };
 

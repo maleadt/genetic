@@ -87,40 +87,33 @@ bool EnvDebug::condition()
 
 int main()
 {
-	// Generate a DNA string
-	std::deque<int> tempQueue;
-	tempQueue.push_back(255);
-	tempQueue.push_back(123);
-	tempQueue.push_back(64);
-	tempQueue.push_back(0);
-	tempQueue.push_back(0);
-	tempQueue.push_back(48);
-	tempQueue.push_back(91);
-	tempQueue.push_back(31);
-	tempQueue.push_back(0);
-	tempQueue.push_back(49);
-	tempQueue.push_back(255);
-	DNA tempDNA(tempQueue);
+    // Generate a DNA string
+    unsigned char dna1[] = {0x00,
+        0x01, 0x02, 0x03, 0x02, 0x01, 0x00,
+        0x00,
+        0x02, 0x03, 0x04, 0x03, 0x02, 0x00,
+        0x03, 0x04, 0x05, 0x04, 0x03};
+    DNA tempDNA(dna1, 19);
     tempDNA.debug();
 
-	// Create an environment
-	EnvDebug tempEnvironment;
+    // Create an environment
+    EnvDebug tempEnvironment;
 
-	// Create a population with initial DNA
-	Population tempPopulation(&tempEnvironment, tempDNA);
+    // Create a population with initial DNA
+    Population tempPopulation(&tempEnvironment, tempDNA);
 
-	// Simulate
-	try
-	{
-		tempPopulation.evolve_single_straight();
-		tempPopulation.get().debug();
-	}
-	catch (std::string error)
-	{
-		std::cout << "Caugt error: " << error << std::endl;
-	}
+    // Simulate
+    try
+    {
+            tempPopulation.evolve_single_straight();
+            tempPopulation.get()->debug();
+    }
+    catch (std::string error)
+    {
+            std::cout << "Caught error: " << error << std::endl;
+    }
 
-	return 0;
+    return 0;
 }
 
 
