@@ -100,8 +100,8 @@ void World::addObstacles(const unsigned int percentage)
 		while (!obstacle_valid)
 		{
 			// Generate new block coördinates
-			p_obst->dataX = random_range(0, sizeColumns-1);
-			p_obst->dataY = random_range(0, sizeRows-1);
+			p_obst->dataX = random_int(0, sizeColumns-1);
+			p_obst->dataY = random_int(0, sizeRows-1);
 
 			// Loop other obstacles to detect overlapping
 			obstacle_valid = true;

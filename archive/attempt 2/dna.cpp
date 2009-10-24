@@ -282,12 +282,12 @@ void DNA::rebuild()
 void DNA::mutate()
 {
 	// How many times we want to mutate
-	int randMutations = random_range(2, 8) / 2;
+	int randMutations = random_int(2, 8) / 2;
 
 	for (int i = 0; i < randMutations; i++)
 	{
 		// Get random factor
-		int tempRandom = random_range(1, 4);
+		int tempRandom = random_int(1, 4);
 
 		if (tempRandom == 1)
 		{
@@ -396,10 +396,10 @@ void DNA::mutateDirection()
 	if (DNA_VERBOSE) cout << "* DNA\t\tdirection mutating"<< endl;
 
 	// Pick a random element
-	int randElementIndex = random_range(0, dataString.length()-1);
+	int randElementIndex = random_int(0, dataString.length()-1);
 	while (!isDirection(dataString.substr(randElementIndex, 1)))
 	{
-		randElementIndex = random_range(0, dataString.length()-1);
+		randElementIndex = random_int(0, dataString.length()-1);
 	}
 	string randElement = dataString.substr(randElementIndex, 1);
 
@@ -425,10 +425,10 @@ void DNA::mutatePoint()
 {
 	if (DNA_VERBOSE) cout << "* DNA\t\tpoint mutating"<< endl;
 	// Pick a random element
-	int randElementIndex = random_range(0, dataString.length()-1);
+	int randElementIndex = random_int(0, dataString.length()-1);
 	while (dataString.substr(randElementIndex, 1) == "X")
 	{
-		randElementIndex = random_range(0, dataString.length()-1);
+		randElementIndex = random_int(0, dataString.length()-1);
 	}
 	string randElement = dataString.substr(randElementIndex, 1);
 
@@ -464,21 +464,21 @@ void DNA::mutateChromosome()
 	if (DNA_VERBOSE) cout << "* DNA\t\tchromosome mutating"<< endl;
 
 	// Pick random mutation
-	int randMutation = random_range(1, 5);
+	int randMutation = random_int(1, 5);
 	if (amountGenes == 1)
-		randMutation = random_range(1, 2);	// With 1 gene, we can only do duplication or fusion
+		randMutation = random_int(1, 2);	// With 1 gene, we can only do duplication or fusion
 
 	// Duplication: duplicate a random gene
 	if (randMutation == 1)
 	{
 		// Pick a random gene
-		int randGene = random_range(0, amountGenes-1);
+		int randGene = random_int(0, amountGenes-1);
 
 		// Fetch it
 		Gene tempGene = getGene(randGene);
 
 		// Random location for insertion
-		int randLoc = random_range(0, amountGenes-1);
+		int randLoc = random_int(0, amountGenes-1);
 
 		// Duplicate it
 		insertGene(randLoc, tempGene);
@@ -490,7 +490,7 @@ void DNA::mutateChromosome()
 	else if (true || randMutation == 2)
 	{
 		// Pick a random gene
-		int randGene = random_range(0, amountGenes-1);
+		int randGene = random_int(0, amountGenes-1);
 
 		// Fetch it
 		Gene tempGene = getGene(randGene);
@@ -555,11 +555,11 @@ void DNA::mutateChromosome()
 	else if (randMutation == 3)
 	{
 		// Find two victims
-		int randGene1 = random_range(0, amountGenes-1);
-		int randGene2 = random_range(0, amountGenes-1);
+		int randGene1 = random_int(0, amountGenes-1);
+		int randGene2 = random_int(0, amountGenes-1);
 		while (randGene1 == randGene2)
 		{
-			randGene2 = random_range(0, amountGenes-1);;
+			randGene2 = random_int(0, amountGenes-1);;
 		}
 
 		// Fetch them both
@@ -577,7 +577,7 @@ void DNA::mutateChromosome()
 	else if (randMutation == 4)
 	{
 		// Find a victim
-		int randGene = random_range(0, amountGenes-1);
+		int randGene = random_int(0, amountGenes-1);
 		removeGene(randGene);
 	}
 
@@ -585,11 +585,11 @@ void DNA::mutateChromosome()
 	else if (randMutation == 5)
 	{
 		// Find two victims
-		int randGene1 = random_range(0, amountGenes-1);
-		int randGene2 = random_range(0, amountGenes-1);
+		int randGene1 = random_int(0, amountGenes-1);
+		int randGene2 = random_int(0, amountGenes-1);
 		while (randGene1 == randGene2)
 		{
-			randGene2 = random_range(0, amountGenes-1);;
+			randGene2 = random_int(0, amountGenes-1);;
 		}
 
 		// Fetch them both
@@ -622,7 +622,7 @@ void DNA::mutateChromosome()
 		}
 
 		// Pick a operator
-		int randOperator = random_range(1, 2);
+		int randOperator = random_int(1, 2);
 		if (randOperator == 1)
 		{
 			tempOperator = tempGene1.getOperatorCodon();
@@ -647,10 +647,10 @@ void DNA::mutateGen()
 	if (DNA_VERBOSE) cout << "* DNA\t\tgen mutating"<< endl;
 
 	// Pick random mutation
-	int randMutation = random_range(1, 2);
+	int randMutation = random_int(1, 2);
 
 	// Pick random gene
-	int randGene = random_range(0, amountGenes-1);
+	int randGene = random_int(0, amountGenes-1);
 
 	// Inversion: switch two codons
 	if (randMutation == 1)
@@ -664,11 +664,11 @@ void DNA::mutateGen()
 		if (tempGene.getAmountActionCodons() > 1)
 		{
 			// Pick two different codons
-			int randCodon1 = random_range(0, tempGene.getAmountActionCodons()-1);
-			int randCodon2 = random_range(0, tempGene.getAmountActionCodons()-1);
+			int randCodon1 = random_int(0, tempGene.getAmountActionCodons()-1);
+			int randCodon2 = random_int(0, tempGene.getAmountActionCodons()-1);
 			while (randCodon1 == randCodon2)
 			{
-				randCodon2 = random_range(0, tempGene.getAmountActionCodons()-1);
+				randCodon2 = random_int(0, tempGene.getAmountActionCodons()-1);
 			}
 
 			// Switch them
@@ -686,7 +686,7 @@ void DNA::mutateGen()
 	if (randMutation == 2)
 	{
 		// Pick condition, action, or both
-		int randMethod = random_range(1, 3);
+		int randMethod = random_int(1, 3);
 
 		// Fetch the gene
 		Gene tempGene = getGene(randGene);
@@ -695,10 +695,10 @@ void DNA::mutateGen()
 		if ((randMethod == 1) || (randMethod == 2))
 		{
 			// Pick a codon
-			int randCodon = random_range(0, tempGene.getAmountConditionCodons()-1);
+			int randCodon = random_int(0, tempGene.getAmountConditionCodons()-1);
 
 			// Pick a random location
-			int randLocation = random_range(0, tempGene.getAmountConditionCodons()-1);
+			int randLocation = random_int(0, tempGene.getAmountConditionCodons()-1);
 
 			// Insert the duplicated codon
 			tempGene.insertConditionCodon(randLocation, tempGene.getConditionCodon(randCodon));
@@ -709,10 +709,10 @@ void DNA::mutateGen()
 		if ((randMethod == 3) || (randMethod == 2))
 		{
 			// Pick a codon
-			int randCodon = random_range(0, tempGene.getAmountActionCodons()-1);
+			int randCodon = random_int(0, tempGene.getAmountActionCodons()-1);
 
 			// Pick a random location
-			int randLocation = random_range(0, tempGene.getAmountActionCodons()-1);
+			int randLocation = random_int(0, tempGene.getAmountActionCodons()-1);
 
 			// Insert the duplicated codon
 			tempGene.insertActionCodon(randLocation, tempGene.getActionCodon(randCodon));

@@ -255,7 +255,7 @@ string evolveStraight(string inputDNA, int inputRuns)
 		tempDNA.mutate();
 
 		// Mutate twice sometimes
-		if (random_range(1,10) < 3)
+		if (random_int(1,10) < 3)
 		{
 			tempDNA.mutate();
 		}

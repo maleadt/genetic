@@ -40,7 +40,7 @@ bool RAND_SET = false;
  */
 
 // Will contain lowest and highest
-int random_range(int lowest_number, int highest_number)
+int random_int(int lowest_number, int highest_number)
 {
 	if (GENERIC_VERBOSE) cout << "* Generic\tcalculating random integer between " << lowest_number << " and " << highest_number << endl;
 	// Set seed
@@ -65,7 +65,7 @@ int random_range(int lowest_number, int highest_number)
 string random_char(string inputString)
 {
 	int length = inputString.length();
-	int randomIndex = random_range(0, length-1);
+	int randomIndex = random_int(0, length-1);
 	return inputString.substr(randomIndex, 1);
 }
 

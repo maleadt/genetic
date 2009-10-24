@@ -344,7 +344,7 @@ void Gen::mutate(unsigned int mutLevel)
 	else
 	{
 		std::list<Command*>::iterator it = dataCommands.begin();
-		for (int i = 0; i < random_range(0, dataCommands.size()-1); i++)
+		for (int i = 0; i < random_int(0, dataCommands.size()-1); i++)
 			++it;
 		(*it)->mutate(mutLevel-1);
 	}
@@ -359,13 +359,13 @@ void Gen::mutateSelf()
 		return;
 
 	// Get some random stuff we'll need
-	int randomMutation = random_range(1, 5);
-	int randomCommand = random_range(0, dataCommands.size()-1);
+	int randomMutation = random_int(1, 5);
+	int randomCommand = random_int(0, dataCommands.size()-1);
 	int randomCommand2 = randomCommand;
 	if (dataCommands.size() > 1)
 	{
 		while (randomCommand == randomCommand2)
-			randomCommand2 = random_range(0, dataCommands.size()-1);
+			randomCommand2 = random_int(0, dataCommands.size()-1);
 	}
 	std::list<Command*>::iterator iteratorCommand = dataCommands.begin();
 	for (int i = 0; i < randomCommand; i++)
@@ -404,7 +404,7 @@ void Gen::mutateSelf()
 		// Amplification
 		case 4:
 			log(2, "gen: amplification");
-			for (int i = 0; i < random_range(1, dataCommands.size()); i++)
+			for (int i = 0; i < random_int(1, dataCommands.size()); i++)
 				dataCommands.insert(iteratorCommand, new Command(*(*iteratorCommand)));;
 			break;
 

@@ -72,8 +72,8 @@ void Creature::spawnRandom()
 	bool available = false;
 	while (!available)
 	{
-		tempX = random_range(0, pointerWorld->sizeColumns - 1);
-		tempY = random_range(0, pointerWorld->sizeRows - 1);
+		tempX = random_int(0, pointerWorld->sizeColumns - 1);
+		tempY = random_int(0, pointerWorld->sizeRows - 1);
 
 		available = pointerWorld->checkSpot(tempX, tempY) == WORLD_FREE;
 	}
@@ -206,7 +206,7 @@ void Creature::mutate()
 	log(1, "creature: mutating");
 
 	// How many times do we want to mutate
-	int amount = random_range(1, 5);
+	int amount = random_int(1, 5);
 
 	// Backup DNA
 	BackupDNA();
@@ -218,7 +218,7 @@ void Creature::mutate()
 		for (int i = 0; i <= amount; i++)
 		{
 		// Level to mutate
-			unsigned int mutLevel = random_range(0, 2);
+			unsigned int mutLevel = random_int(0, 2);
 
 			// Mutate
 			dnaCode->mutate(mutLevel);

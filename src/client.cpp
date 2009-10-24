@@ -83,13 +83,13 @@ DNA& Client::get() const
 void Client::mutate()
 {
 	// Amount of mutations
-	int tempAmount = random_range(MUTATE_AMOUNT_LOWER, MUTATE_AMOUNT_UPPER);
+	int tempAmount = random_int(MUTATE_AMOUNT_LOWER, MUTATE_AMOUNT_UPPER);
 
 	// Process all mutations
 	for (int i = 0; i < tempAmount; i++)
 	{
 		// Pick level of mutation
-		int level = random_range(1, 3);
+		int level = random_int(1, 4);
 
 		// Call correct mutation routine
 		switch (level)
@@ -124,7 +124,7 @@ void Client::recombine(Client& inputClient)
 
 
     // Pick a crossover-method
-    int method = random_range(1, 3);
+    int method = random_int(1, 4);
 
     // Recombine!
     switch (method)
@@ -137,8 +137,8 @@ void Client::recombine(Client& inputClient)
             if (size1 <= 3 && size2 <= 3)
             {
                 // Calculate part to exchange out of DNA 1
-                unsigned int p1 = random_range(0, size1-1);
-                unsigned int p2 = random_range(1, size1);
+                unsigned int p1 = random_int(0, size1);
+                unsigned int p2 = random_int(1, size1+1);
                 if (p1 > p2)
                 {
                     int temp = p1;
@@ -146,11 +146,11 @@ void Client::recombine(Client& inputClient)
                     p2 = temp;
                 }
                 while (p2 == p1)
-                    p2 = random_range(p1+1, size1);
+                    p2 = random_int(p1+1, size1+1);
 
                 // Calculate part to exchange out of DNA 2
-                unsigned int p3 = random_range(0, size2-1);
-                unsigned int p4 = random_range(1, size2);
+                unsigned int p3 = random_int(0, size2);
+                unsigned int p4 = random_int(1, size2+1);
                 if (p3 > p4)
                 {
                     int temp = p3;
@@ -158,7 +158,7 @@ void Client::recombine(Client& inputClient)
                     p4 = temp;
                 }
                 while (p4 == p3)
-                    p4 = random_range(p3+1, size2);
+                    p4 = random_int(p3+1, size2+1);
 
                 // First part
                 for (unsigned int i = 0; i < p1; i++)
@@ -202,11 +202,11 @@ void Client::recombine(Client& inputClient)
             if (size1 <= 2 && size2 <= 3)
             {
                 // Calculate insertion spot of DNA 1
-                unsigned int p1 = random_range(1, size1-1);
+                unsigned int p1 = random_int(1, size1);
 
                 // Calculate part to get out of DNA 2
-                unsigned int p3 = random_range(0, size2-1);
-                unsigned int p4 = random_range(1, size2);
+                unsigned int p3 = random_int(0, size2);
+                unsigned int p4 = random_int(1, size2+1);
                 if (p3 > p4)
                 {
                     int temp = p3;
@@ -214,7 +214,7 @@ void Client::recombine(Client& inputClient)
                     p4 = temp;
                 }
                 while (p4 == p3)
-                    p4 = random_range(p3+1, size2);
+                    p4 = random_int(p3+1, size2+1);
 
                 // First part
                 for (unsigned int i = 0; i < p1; i++)
@@ -256,8 +256,8 @@ void Client::recombine(Client& inputClient)
             if (size1 <= 3 && size2 <= 3)
             {
                 // Calculate split points
-                unsigned int p1 = random_range(1, size1-1);
-                unsigned int p2 = random_range(1, size2-1);
+                unsigned int p1 = random_int(1, size1);
+                unsigned int p2 = random_int(1, size2);
 
                 // First part
                 for (unsigned int i = 0; i < p1; i++)
@@ -323,10 +323,10 @@ void Client::mutate_dna()
 
 	 // Pick random gene(s)
 	 int size = dataDNA.genes();
-	 int random1 = random_range(0, size-1);
-	 int random2 = random_range(0, size-1);
+	 int random1 = random_int(0, size);
+	 int random2 = random_int(0, size);
 	 while (size > 1 && random1 == random2)
-	 	random2 = random_range(0, size-1);
+	 	random2 = random_int(0, size);
 
 	// Calculate iterators to those genes
 	DNA::iterator it1 = dataDNA.begin(), it2 = dataDNA.begin();
@@ -336,7 +336,7 @@ void Client::mutate_dna()
 		it2++;
 
 	// Pick mutation
-	int mutation = random_range(1, 2);
+	int mutation = random_int(1, 3);
 
 	switch (mutation)
 	{
@@ -344,12 +344,12 @@ void Client::mutate_dna()
 		case 1:
 		{
 			// Generate random gene
-			int size = random_range((int)it1->size()/2, (int)it1->size()*4);
+			int size = random_int((int)it1->size()/2, (int)it1->size()*4+1);
 			if (size == 0)
-				size = random_range(5, 10);
+				size = random_int(5, 11);
 			std::list<int> tempList;
 			for (int i = 0; i < size; i++)
-				tempList.push_back(random_range(0, dataAlphabet));
+				tempList.push_back(random_int(0, dataAlphabet+1));
 			dataDNA.insert(it1, tempList);
 			break;
 		}
@@ -368,7 +368,7 @@ void Client::mutate_gen()
 		return;
 
 	// Pick random gene
-	int random = random_range(0, size-1);
+	int random = random_int(0, size);
 	DNA::iterator it = dataDNA.begin();
 	for (int i = 0; i < random; i++)
 		it++;
@@ -378,7 +378,7 @@ void Client::mutate_gen()
 		return;
 
 	// Pick mutation
-	int mutation = random_range(1, 2);
+	int mutation = random_int(1, 3);
 
 	// Pick a mutation
 	switch (mutation)
@@ -387,7 +387,7 @@ void Client::mutate_gen()
 		case 1:
 		{
 			// Generate and insert
-			it->push_back(random_range(1, dataAlphabet));
+			it->push_back(random_int(1, dataAlphabet+1));
 			break;
 		}
 
@@ -405,7 +405,7 @@ void Client::mutate_codon()
         return;
 
 	// Pick random gene
-	int random = random_range(0, size-1);
+	int random = random_int(0, size);
 	DNA::iterator it = dataDNA.begin();
 	for (int i = 0; i < random; i++)
 		it++;
@@ -415,12 +415,12 @@ void Client::mutate_codon()
 		return;
 
 	// Pick random codon
-	random = random_range(0, it->size()-1);
+	random = random_int(0, it->size());
 	std::list<int>::iterator it2 = it->begin();
 	for (int i = 0; i < random; i++)
 		it2++;
 
 	// Point mutate
-	*it2 = random_range(1, dataAlphabet);
+	*it2 = random_int(1, dataAlphabet+1);
 }
 

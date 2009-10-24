@@ -83,8 +83,8 @@ void Command::mutateSelf()
 		return;
 
 	// Random stuff we'll need
-	int randMutation = random_range(1, 5);
-	int randomParameter = random_range(0, parameters.size()-1);
+	int randMutation = random_int(1, 5);
+	int randomParameter = random_int(0, parameters.size()-1);
 
 	// Iterators to that random stuff
 	std::vector<char>::iterator iteratorParameter = parameters.begin();
@@ -113,7 +113,7 @@ void Command::mutateSelf()
 			{
 				int randomParameter2 = randomParameter;
 				while (randomParameter2 == randomParameter)
-					randomParameter2 = random_range(0, parameters.size()-1);
+					randomParameter2 = random_int(0, parameters.size()-1);
 
 				char temp = parameters[randomParameter];
 				parameters[randomParameter] = parameters[randomParameter2];
@@ -124,7 +124,7 @@ void Command::mutateSelf()
 		// Amplification
 		case 4:
 			log(2, "command: amplification");
-			for (int i = 0; i < random_range(1, parameters.size()); i++)
+			for (int i = 0; i < random_int(1, parameters.size()); i++)
 				iteratorParameter = parameters.insert(iteratorParameter, (*iteratorParameter));
 				// Vector insertion invalidates all iterators
 			break;
@@ -132,10 +132,10 @@ void Command::mutateSelf()
 		// Point-mutation
 		case 5:
 			log(2, "command: point-mutation");
-			int randType = random_range(0, 1);
+			int randType = random_int(0, 1);
 			if (randType == 0)
 			{
-				int randEl = random_range(0, dnaConditions.size()-1);
+				int randEl = random_int(0, dnaConditions.size()-1);
 				std::map<std::string, char>::iterator it = dnaConditions.begin();
 				for (int i = 0; i < randEl; i++)
 					++it;
@@ -143,8 +143,8 @@ void Command::mutateSelf()
 			}
 			else if (randType == 1)
 			{
-				int randParam = random_range(0, parameters.size()-1);
-				int randEl = random_range(0, dnaConditions.size()-1);
+				int randParam = random_int(0, parameters.size()-1);
+				int randEl = random_int(0, dnaConditions.size()-1);
 				std::map<std::string, char>::iterator it = dnaParameters.begin();
 				for (int i = 0; i < randEl; i++)
 					++it;

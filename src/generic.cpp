@@ -40,9 +40,8 @@ bool GENERIC_SRAND = false;
 // ROUTINES //
 //////////////
 
-// Generate a number from lower up to (and with) upper
-//TODO: modify to exclusive upper
-int random_range(int lowest_number, int highest_number)
+// Generate a number from lower up to (exclusive) upper
+int random_int(int lowest_number, int highest_number)
 {
 	// Set seed
 	if (!GENERIC_SRAND)
@@ -59,7 +58,7 @@ int random_range(int lowest_number, int highest_number)
 	}
 
 	// Calculate the range
-	int range = highest_number - lowest_number + 1;
+	int range = highest_number - lowest_number;
 
 	// Return a number (using lower-order bits)
 	//return lowest_number + rand()%range;

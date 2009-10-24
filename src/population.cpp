@@ -258,7 +258,7 @@ void Population::evolve_population_dual()
         std::random_shuffle(it, population->end());
 
         // Population cross-contamination!
-        if (random_range(1, 26) == 13)
+        if (random_int(1, 27) == 13)
             std::swap( (*population)[0], (*population_other)[0] );
 
         // Mutate new ones

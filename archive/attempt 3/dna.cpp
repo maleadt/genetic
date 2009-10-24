@@ -199,7 +199,7 @@ void DNA::mutate(unsigned int mutLevel)
 	}
 	else
 	{
-		unsigned int randChild = random_range(0, dataGenes.size()-1);
+		unsigned int randChild = random_int(0, dataGenes.size()-1);
 		std::list<Gen*>::iterator it = dataGenes.begin();
 
 		for (unsigned int i = 0; i < randChild; i++)
@@ -220,13 +220,13 @@ void DNA::mutateSelf()
 		return;
 
 	// Get some random stuff we'll need
-	int randomMutation = random_range(1, 5);
-	int randomGen = random_range(0, dataGenes.size()-1);
+	int randomMutation = random_int(1, 5);
+	int randomGen = random_int(0, dataGenes.size()-1);
 	int randomGen2 = randomGen;
 	if (dataGenes.size() > 1)
 	{
 		while (randomGen == randomGen2)
-			randomGen2 = random_range(0, dataGenes.size()-1);
+			randomGen2 = random_int(0, dataGenes.size()-1);
 	}
 	std::list<Gen*>::iterator iteratorGen = dataGenes.begin();
 	for (int i = 0; i < randomGen; i++)
@@ -267,7 +267,7 @@ void DNA::mutateSelf()
 		// Amplification
 		case 4:
 			log(2, "dna: amplification");
-			for (int i = 0; i < random_range(1, dataGenes.size()); i++)
+			for (int i = 0; i < random_int(1, dataGenes.size()); i++)
 				dataGenes.insert(iteratorGen, new Gen(*(*iteratorGen)));;
 			break;
 

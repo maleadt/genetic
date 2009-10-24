@@ -143,8 +143,8 @@ string Simulation::simulateStraight()
             int tempEndRow, tempEndColumn;
             if (dataRandPosEnd == true)
             {
-                tempEndRow = random_range(0, dataWorldRows-1);
-                tempEndColumn = random_range(0, dataWorldColumns-1);
+                tempEndRow = random_int(0, dataWorldRows-1);
+                tempEndColumn = random_int(0, dataWorldColumns-1);
             }
             else
             {
@@ -159,11 +159,11 @@ string Simulation::simulateStraight()
             {
                 while (tempStartRow == tempEndRow)
                 {
-                    tempStartRow = random_range(0, dataWorldRows-1);
+                    tempStartRow = random_int(0, dataWorldRows-1);
                 }
                 while (tempStartColumn == tempEndColumn)
                 {
-                    tempStartColumn = random_range(0, dataWorldColumns-1);
+                    tempStartColumn = random_int(0, dataWorldColumns-1);
                 }
             }
             else

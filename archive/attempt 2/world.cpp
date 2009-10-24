@@ -125,14 +125,14 @@ void World::setBlocks(unsigned int inputBlocks)
 	for (int i = 0; i < tempBlocks; i++)
 	{
 		// Generate random spot
-		int tempRow = random_range(0, dataRows-1);
-		int tempColumn = random_range(0, dataColumns-1);
+		int tempRow = random_int(0, dataRows-1);
+		int tempColumn = random_int(0, dataColumns-1);
 
 		// Only overwrite empty spots with blocks
 		while (dataWorld[tempRow][tempColumn] != "0")
 		{
-			tempRow = random_range(0, dataRows-1);
-			tempColumn = random_range(0, dataColumns-1);
+			tempRow = random_int(0, dataRows-1);
+			tempColumn = random_int(0, dataColumns-1);
 		}
 
 		// Write the spot
@@ -151,15 +151,15 @@ void World::addCreature(Creature& inputCreature)
 	}
 
 	// Generate random spot
-	int tempRow = random_range(0, dataRows-1);
-	int tempColumn = random_range(0, dataColumns-1);
+	int tempRow = random_int(0, dataRows-1);
+	int tempColumn = random_int(0, dataColumns-1);
 
 	// Only place our creature on an empty spot
 	if (WORLD_VERBOSE) cout << "* World\t\tlooking up a location for the creature"<< endl;
 	while (dataWorld[tempRow][tempColumn] != "0")
 	{
-		tempRow = random_range(0, dataRows-1);
-		tempColumn = random_range(0, dataColumns-1);
+		tempRow = random_int(0, dataRows-1);
+		tempColumn = random_int(0, dataColumns-1);
 	}
 
 	// TEMP: force the creature in the upper left corner

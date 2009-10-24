@@ -58,7 +58,7 @@ swap(X &a, X &b)
 */
 
 // Generate a number from lower up to (and with) upper
-int random_range(int lowest_number, int highest_number);
+int random_int(int lowest_number, int highest_number);
 
 // Convert several types to a string
 template <typename X>

@@ -93,16 +93,16 @@ void mutate_list(T& inputObject)
 	 int size = inputObject.size();
 	 if (size > 1)
 	 {
-	 	mutation = random_range(1, 5);
+	 	mutation = random_int(1, 5);
 	 } else {
-	 	mutation = random_range(1, 2);
+	 	mutation = random_int(1, 2);
 	 }
 
 	 // Pick random gene(s)
-	 int random1 = random_range(0, size-1);
-	 int random2 = random_range(0, size-1);
+	 int random1 = random_int(0, size-1);
+	 int random2 = random_int(0, size-1);
 	 while (size > 1 && random1 == random2)
-	 	random2 = random_range(0, size-1);
+	 	random2 = random_int(0, size-1);
 
 	// Calculate iterators to those genes
 	typename T::iterator it1 = inputObject.begin(), it2 = inputObject.begin();
@@ -125,7 +125,7 @@ void mutate_list(T& inputObject)
 		// Amplification (at current spot)
 		case 2:
 		{
-			int randAmp = random_range(1, 5);
+			int randAmp = random_int(1, 5);
 			for (int i = 0; i < randAmp; i++)
 				inputObject.insert(it1, *(it1));
 			break;

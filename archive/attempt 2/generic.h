@@ -42,7 +42,7 @@ using namespace std;
  */
 
 // Will contain lowest and highest
-int random_range(int lowest_number, int highest_number);
+int random_int(int lowest_number, int highest_number);
 string random_char(string inputString);
 
 
