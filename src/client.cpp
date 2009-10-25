@@ -43,6 +43,7 @@
 
 // Default constructor
 Client::Client() {
+    dataDNA = 0;
 }
 
 // Create client with given DNA
@@ -58,7 +59,8 @@ Client::Client(const DNA& inputDNA, int inputAlphabet) {
 
 // Destructor
 Client::~Client() {
-    delete dataDNA;
+    if (dataDNA != 0)
+        delete dataDNA;
 }
 
 

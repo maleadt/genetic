@@ -196,20 +196,11 @@ int main(int argc, char** argv) {
     //
 
     // Initial DNA (triangle)
-    std::deque<int> tempQueue;
-    tempQueue.push_back(255); // Start of DNA
-    tempQueue.push_back(50); // Semi transparent grey brush (RGB = 50 50 50, with 50% opacity)
-    tempQueue.push_back(50);
-    tempQueue.push_back(50);
-    tempQueue.push_back(128);
-    tempQueue.push_back(1); // Point one: (1, 254)
-    tempQueue.push_back(254);
-    tempQueue.push_back(128); // Point two: (128, 1)
-    tempQueue.push_back(1);
-    tempQueue.push_back(254); // Point three: (254, 254)
-    tempQueue.push_back(254);
-    tempQueue.push_back(255); // End of DNA
-    DNA tempDNA(tempQueue);
+    unsigned char dnastring[] = {0x50, 0x50, 0x50, 0x128, // Semi transparent grey brush (RGB = 50 50 50, with 50% opacity)
+                                 0x1, 0x254,              // Point one: (1, 254)
+                                 0x128, 0x1,              // Point two: (128, 1)
+                                 0x254, 0x254};           // Point three: (254, 254)
+    DNA tempDNA(dnastring, 10);
 
     // Create object
     Population dataPopulation(&dataEnvironment, tempDNA);
@@ -221,7 +212,7 @@ int main(int argc, char** argv) {
     dataPopulation.evolve_population();
 
     // Fetch and print the resulting DNA
-    DNA outputDNA = dataPopulation.get();
+    const DNA* outputDNA = dataPopulation.get();
     dataEnvironment.explain(outputDNA);
 
     return 0;

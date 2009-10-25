@@ -75,6 +75,7 @@ class Population
         void evolve_population_dual();
 
         // Population helper methods
+        void init(std::vector<CachedClient>& population, const DNA* dna, int amount);
         void clean(std::vector<CachedClient>& population, int start);
         void fill(std::vector<CachedClient>& population, int start);
         void mutate(std::vector<CachedClient>& population, int start);
@@ -89,7 +90,7 @@ class Population
 // A struct containing a client, as well as a field for its fitness
 struct CachedClient
 {
-    Client client;
+    Client* client;
     double fitness;
     friend bool operator<(const CachedClient& left, const CachedClient& right)
     {

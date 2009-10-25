@@ -49,6 +49,8 @@ class Environment
 		virtual int alphabet() const;
 		virtual void update(const DNA* inputDNA);
 		virtual bool condition();
+
+                // TODO: explain
 };
 
 

@@ -99,9 +99,11 @@ void Population::evolve_population()
 {
     // Allocate new population
     std::vector<CachedClient> population(POPULATION_BOX_SIZE);
-    population[0].fitness = dataEnvironment->fitness(dataDNA);
-    population[0].client = Client(*dataDNA, dataEnvironment->alphabet());
+    init(population, dataDNA, 1);
     fill(population, 1);
+
+    std::cout << "VECTOR 1" << std::endl;
+    population[1].client->get()->debug_raw();
 
     // Initial mutation
     mutate(population, 1);
@@ -125,7 +127,7 @@ void Population::evolve_population()
         if (population[0].fitness > fitness_critical)
         {
             fitness_critical = population[0].fitness;
-            dataDNA = population[0].client.get();
+            dataDNA = population[0].client->get();
             dataEnvironment->update(dataDNA);    // TODO: pass fitness
         }
 
@@ -141,6 +143,12 @@ void Population::evolve_population()
         // Mutate new ones
         recombine(population, threshold+1);
     }
+
+    // Clean
+    for (int i = 0; i < POPULATION_BOX_SIZE; i++) {
+        if (population[i].client != 0)
+            delete population[i].client;
+    }
 }
 
 // Evolve a population straightly
@@ -148,8 +156,7 @@ void Population::evolve_population_straight()
 {
     // Allocate new population
     std::vector<CachedClient> population(POPULATION_BOX_SIZE);
-    population[0].fitness = dataEnvironment->fitness(dataDNA);
-    population[0].client = Client(*dataDNA, dataEnvironment->alphabet());
+    init(population, dataDNA, 1);
     fill(population, 1);
 
     // Initial mutation
@@ -174,7 +181,7 @@ void Population::evolve_population_straight()
         if (population[0].fitness > fitness_critical)
         {
             fitness_critical = population[0].fitness;
-            dataDNA = population[0].client.get();
+            dataDNA = population[0].client->get();
             dataEnvironment->update(dataDNA);    // TODO: pass fitness
         }
 
@@ -185,6 +192,12 @@ void Population::evolve_population_straight()
         // Mutate new ones
         mutate(population, threshold+1);
     }
+
+    // Clean
+    for (int i = 0; i < POPULATION_BOX_SIZE; i++) {
+        if (population[i].client != 0)
+            delete population[i].client;
+    }
 }
 
 // Evolve two populations simulteanously
@@ -192,15 +205,13 @@ void Population::evolve_population_dual()
 {
     // Allocate first population
     std::vector<CachedClient> population1(POPULATION_BOX_SIZE);
-    population1[0].fitness = dataEnvironment->fitness(dataDNA);
-    population1[0].client = Client(*dataDNA, dataEnvironment->alphabet());
+    init(population1, dataDNA, 1);
     fill(population1, 1);
     mutate(population1, 1);
 
     // Allocate second population
     std::vector<CachedClient> population2(POPULATION_BOX_SIZE);
-    population2[0].fitness = dataEnvironment->fitness(dataDNA);
-    population2[0].client = Client(*dataDNA, dataEnvironment->alphabet());
+    init(population2, dataDNA, 1);
     fill(population2, 1);
     mutate(population2, 1);
 
@@ -232,7 +243,7 @@ void Population::evolve_population_dual()
         if ((*population)[0].fitness > fitness_critical)
         {
             fitness_critical = (*population)[0].fitness;
-            dataDNA = (*population)[0].client.get();
+            dataDNA = (*population)[0].client->get();
             dataEnvironment->update(dataDNA);    // TODO: pass fitness
         }
 
@@ -252,37 +263,51 @@ void Population::evolve_population_dual()
         // Mutate new ones
         recombine((*population), threshold+1);
     }
+
+    // Clean
+    for (int i = 0; i < POPULATION_BOX_SIZE; i++) {
+        if (population1[i].client != 0)
+            delete population1[i].client;
+        if (population2[i].client != 0)
+            delete population2[i].client;
+    }
 }
 
 //
 // Population helper functions
 //
 
+// Initialize a population
+// TODO: amount == fill functionality
+void Population::init(std::vector<CachedClient>& population, const DNA* dna, int amount) {
+    for (int i = 0; i < amount; i++) {
+        population[i].fitness = dataEnvironment->fitness(dna);
+        population[i].client = new Client(*dna, dataEnvironment->alphabet());
+    }
+
+    for (int i = amount; i < POPULATION_BOX_SIZE; i++) {
+        population[i].fitness = 0;
+        population[i].client = 0;
+    }
+}
+
 // Clean the DNA of a population
 void Population::clean(std::vector<CachedClient>& population, int start)
 {
     for (int i = 0; i < start; i++)
-        population[i].client.clean();
+        population[i].client->clean();
 }
 
 // Fill a population with the starting DNA
 void Population::fill(std::vector<CachedClient>& population, int start)
 {
-    // Copy the DNA of the first clients to the rest of the population
+    // Copy the first clients
     int j = 0;
     for (unsigned int i = start; i < population.size(); i++)
     {
-        population[i].client = population[j++].client;
-        if (j == start)
-            j = 0;
-    }
-
-    // Copy the fitness of the first clients
-    j = 0;
-    for (unsigned int i = start; i < population.size(); i++)
-    {
-        population[i].fitness = population[j++].fitness;
-        if (j == start)
+        population[i].client = new Client(*population[j].client);
+        population[i].fitness = population[j].fitness;
+        if (++j == start)
             j = 0;
     }
 }
@@ -292,11 +317,11 @@ void Population::mutate(std::vector<CachedClient>& population, int start)
 {
     // Mutate clients
     for (unsigned int i = start; i < population.size(); i++)
-        population[i].client.mutate();
+        population[i].client->mutate();
 
     // Calculate new fitness
     for (unsigned int i = start; i < population.size(); i++)
-        population[i].fitness = dataEnvironment->fitness(population[i].client.get());
+        population[i].fitness = dataEnvironment->fitness(population[i].client->get());
 
     // Sort the population
     std::sort(population.begin(), population.end());
@@ -309,14 +334,14 @@ void Population::recombine(std::vector<CachedClient>& population, int start)
     int j = 0;
     for (unsigned int i = start; i < population.size(); i++)
     {
-        population[i].client.recombine(population[j].client);
+        population[i].client->recombine(*population[j].client);
         if (j == start)
             j = 0;
     }
 
     // Calculate new fitness
     for (unsigned int i = start; i < population.size(); i++)
-        population[i].fitness = dataEnvironment->fitness(population[i].client.get());
+        population[i].fitness = dataEnvironment->fitness(population[i].client->get());
 
     // Sort the population
     std::sort(population.begin(), population.end());
