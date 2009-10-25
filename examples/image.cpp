@@ -135,13 +135,17 @@ bool EnvImage::valid_limits(const DNA* inputDNA) const {
 		return false;
 
 	// Check points per polygon
+        inputDNA->debug_raw();
+        std::cout << "Got " << genes << " genes." << std::endl;
         for (unsigned int gene = 0; gene < genes; gene++) {
             // Get gene
+            std::cout << "Fetching gene " << gene << std::endl;
             unsigned int size = 0; unsigned char* data = 0;
-            inputDNA->extract(gene, size, data);
+            inputDNA->extract_gene(gene, data, size);
             free(data);
 
             // 10 bytes at minimum
+            std::cout << "Size is " << size << std::endl;
             if ((size-4)/2 > LIMIT_POLYGON_POINTS || size < 10)
                     return false;
 
@@ -170,10 +174,12 @@ void EnvImage::draw(cairo_surface_t* inputSurface, const DNA* inputDNA) const {
         // Get gene
         unsigned int size; unsigned char* data;
         inputDNA->extract_gene(gene, data, size);
+        unsigned char* gene_ptr = data;
         unsigned int gene_loc = 0;
+        std::cout << "Extracted gene " << gene << " with size " << size << std::endl;
 
         // Get colour code
-        int r = *(data++), g = *(data++), b = *(data++), a = *(data++);
+        int r = *(gene_ptr++), g = *(gene_ptr++), b = *(gene_ptr++), a = *(gene_ptr++);
         gene_loc += 4;
         cairo_set_source_rgba(cr, (r - 1) / 253.0, (g - 1) / 253.0, (b - 1) / 253.0, (a - 1) / 253.0);
 
@@ -182,12 +188,13 @@ void EnvImage::draw(cairo_surface_t* inputSurface, const DNA* inputDNA) const {
         int x, y;
         while (gene_loc < size) {
             // Points vary between 1 and 254, so let 1 be the lower bound and 254 the upper one
-            x = *(data++) - 1;
-            y = *(data++) - 1;
+            x = *(gene_ptr++) - 1;
+            y = *(gene_ptr++) - 1;
             int size = points.size();
             points.resize(size+1);
             points[size].x = dataInputWidth * x / 253.0;
             points[size].y = dataInputHeight * y / 253.0;
+            gene_loc += 2;
         }
 
         // Sort the points to avoid complex polygons
@@ -212,7 +219,6 @@ void EnvImage::draw(cairo_surface_t* inputSurface, const DNA* inputDNA) const {
             int next = -1;
             for (int j = 0; j < points_count; j++) {
                 if (points[j].drawn) {
-                    free(data);
                     continue;
                 }
                 if (next == -1) {
@@ -226,7 +232,6 @@ void EnvImage::draw(cairo_surface_t* inputSurface, const DNA* inputDNA) const {
                 }
             }
             if (next == -1) {
-                free(data);
                 continue;
             } else {
                 cairo_line_to(cr, points[next].x, points[next].y);
@@ -259,6 +264,7 @@ void EnvImage::explain(const DNA* inputDNA) const {
         // Get gene
         unsigned int size; unsigned char* data;
         inputDNA->extract_gene(gene, data, size);
+        unsigned char* gene_ptr = data;
         unsigned int gene_loc = 0;
 
         // Get polygon name
@@ -292,7 +298,7 @@ void EnvImage::explain(const DNA* inputDNA) const {
         }
 
         // Get colour code
-        int r = *(data++), g = *(data++), b = *(data++), a = *(data++);
+        int r = *(gene_ptr++), g = *(gene_ptr++), b = *(gene_ptr++), a = *(gene_ptr++);
         gene_loc += 4;
         r = 255 * ( (r-1.0)/253.0);
         g = 255 * ( (g-1.0)/253.0);

@@ -45,8 +45,10 @@ int random_int(int lowest_number, int highest_number)
 {
 	// Set seed
 	if (!GENERIC_SRAND) {
-		srand((unsigned)time(0));
-		//srand(0);
+                unsigned int seed = (unsigned)time(0);
+
+                std::cout << "DEBUG: using seed " << (unsigned)time(0) << std::endl;                
+		srand(seed);
 		GENERIC_SRAND = true;
 	}
 

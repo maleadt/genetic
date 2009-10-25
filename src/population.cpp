@@ -102,9 +102,6 @@ void Population::evolve_population()
     init(population, dataDNA, 1);
     fill(population, 1);
 
-    std::cout << "VECTOR 1" << std::endl;
-    population[1].client->get()->debug_raw();
-
     // Initial mutation
     mutate(population, 1);
 
@@ -280,9 +277,10 @@ void Population::evolve_population_dual()
 // Initialize a population
 // TODO: amount == fill functionality
 void Population::init(std::vector<CachedClient>& population, const DNA* dna, int amount) {
+    int fitness = dataEnvironment->fitness(dna);
     for (int i = 0; i < amount; i++) {
-        population[i].fitness = dataEnvironment->fitness(dna);
         population[i].client = new Client(*dna, dataEnvironment->alphabet());
+        population[i].fitness = fitness;
     }
 
     for (int i = amount; i < POPULATION_BOX_SIZE; i++) {
@@ -305,6 +303,8 @@ void Population::fill(std::vector<CachedClient>& population, int start)
     int j = 0;
     for (unsigned int i = start; i < population.size(); i++)
     {
+        if (population[i].client != 0)
+            delete population[i].client;
         population[i].client = new Client(*population[j].client);
         population[i].fitness = population[j].fitness;
         if (++j == start)

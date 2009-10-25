@@ -201,6 +201,13 @@ int main(int argc, char** argv) {
                                  0x128, 0x1,              // Point two: (128, 1)
                                  0x254, 0x254};           // Point three: (254, 254)
     DNA tempDNA(dnastring, 10);
+    dataEnvironment.explain(&tempDNA);
+    if (dataEnvironment.valid_limits(&tempDNA)) {
+        std::cout << "DNA is valid" << std::endl;
+    } else {
+        std::cout << "ERROR: initial DNA not valid" << std::endl;
+        exit(1);
+    }
 
     // Create object
     Population dataPopulation(&dataEnvironment, tempDNA);
@@ -209,7 +216,11 @@ int main(int argc, char** argv) {
     std::cout << "NOTE: population created" << std::endl;
 
     // Evolve
+    try {
     dataPopulation.evolve_population();
+    } catch (std::string e) {
+        std::cout << "ERROR: " << e << std::endl;
+    }
 
     // Fetch and print the resulting DNA
     const DNA* outputDNA = dataPopulation.get();
