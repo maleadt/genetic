@@ -36,10 +36,7 @@
 #include "client.h"
 #include "environment.h"
 #include "dna.h"
-#include <list>
-#include <queue>
 #include <vector>
-#include <algorithm>
 
 
 //
@@ -74,6 +71,7 @@ class Population
         void evolve_population_straight();
         void evolve_population_dual();
 
+    private:
         // Population helper methods
         void init(std::vector<CachedClient>& population, const DNA* dna, int amount);
         void clean(std::vector<CachedClient>& population, int start);
@@ -81,7 +79,6 @@ class Population
         void mutate(std::vector<CachedClient>& population, int start);
         void recombine(std::vector<CachedClient>& population, int start);
 
-    private:
         // Current DNA
         const DNA* dataDNA;
         Environment* dataEnvironment;

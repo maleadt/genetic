@@ -45,12 +45,12 @@ class Environment
 {
 	public:
 		// Required functions
-		virtual double fitness(const DNA* inputDNA);
-		virtual int alphabet() const;
-		virtual void update(const DNA* inputDNA);
-		virtual bool condition();
+		virtual double fitness(const DNA* inputDNA) = 0;
+		virtual int alphabet() const = 0;
+		virtual void update(const DNA* inputDNA) = 0;
+		virtual bool condition() = 0;
 
-                // TODO: explain
+                // TODO: explain function
 };
 
 

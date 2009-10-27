@@ -41,20 +41,10 @@
 // Construction and destruction
 //
 
-// Default constructor
-Client::Client() {
-    dataDNA = 0;
-}
-
 // Copy constructor
 Client::Client(const Client& inputClient) {
     dataDNA = new DNA(*inputClient.get());
     dataAlphabet = inputClient.dataAlphabet;
-}
-
-// Create client with given DNA
-Client::Client(const DNA& inputDNA) {
-	dataDNA = new DNA(inputDNA);
 }
 
 // Create client with given DNA and alphabet

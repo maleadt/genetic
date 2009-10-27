@@ -33,8 +33,6 @@
 #define __CLIENT
 
 // Headers
-#include <iostream>
-#include <algorithm>
 #include "generic.h"
 #include "dna.h"
 
@@ -63,9 +61,7 @@ class Client
 {
 	public:
 		// Construction and destruction
-		Client();
 		Client(const Client& inputClient);
-		Client(const DNA& inputDNA);
 		Client(const DNA& inputDNA, int inputAlphabet);
                 ~Client();
 

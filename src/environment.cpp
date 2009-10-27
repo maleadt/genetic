@@ -37,40 +37,4 @@
 // CLASS ROUTINES //
 ////////////////////
 
-//
-// Required routines
-//
-
-/*
-WARNING:
-  Only ONE fitness functions should be overloaded,
-  the other one should not and return a value of
-  zero.
-*/
-
-// Fitness functions
-double Environment::fitness(const DNA* inputDNA)
-{
-    std::cout << "WARNING: NON-OVERRIDDEN FITNESS FUNCTION CALLED" << std::endl;
-	return 0;
-}
-
-// Return the alphabet value
-int Environment::alphabet() const
-{
-    std::cout << "WARNING: NON-OVERRIDDEN ALPHABET FUNCTION CALLED" << std::endl;
-	return 254;
-}
-
-// Update call
-void Environment::update(const DNA* inputDNA)
-{
-    std::cout << "WARNING: NON-OVERRIDDEN UPDATE FUNCTION CALLED" << std::endl;
-}
-
-// Condition call
-bool Environment::condition()
-{
-    std::cout << "WARNING: NON-OVERRIDDEN CONDITION FUNCTION CALLED" << std::endl;
-    return true;
-}
+/* None at the moment */

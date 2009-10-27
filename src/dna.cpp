@@ -41,11 +41,6 @@
 // Construction and destruction
 //
 
-// Default constructor
-DNA::DNA() {
-    dataSize = 0;
-}
-
 // Copy constructor
 DNA::DNA(const DNA& inputDNA) {
     dataSize = inputDNA.dataSize;

@@ -53,7 +53,6 @@ class DNA
 {
 	public:
 		// Construction and destruction
-		DNA();
 		DNA(const DNA& inputData);
                 DNA(const unsigned char* inputData, int inputSize);
                 ~DNA();

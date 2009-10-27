@@ -77,8 +77,7 @@ void Population::evolve_single_straight()
     while (dataEnvironment->condition())
     {
         // Create a client, and mutate the DNA
-        Client tempClient(*dataDNA);
-        tempClient.dataAlphabet = dataEnvironment->alphabet();
+        Client tempClient(*dataDNA, dataEnvironment->alphabet());
         tempClient.mutate();
 
         // Compare the new DNA
