@@ -207,8 +207,7 @@ bool DNA::erase_gene(unsigned int index) {
 // Insert a gene
 bool DNA::insert_gene(unsigned int index, unsigned char* gene, unsigned int size) {
     unsigned int amountgenes = genes();
-    assert(index <= amountgenes);
-    // TODO: remove functionality, or add to insert() as well
+    assert(index < amountgenes);
 
     // Case 1: gene at start
     if (index == 0) {
@@ -226,7 +225,7 @@ bool DNA::insert_gene(unsigned int index, unsigned char* gene, unsigned int size
     }
 
     // Case 2: gene at midst
-    else if (index < amountgenes) {
+    else {
         unsigned char* gene_mod = (unsigned char*) malloc((size+1) * sizeof(unsigned char));
         memcpy(gene_mod, gene, size);
         gene_mod[size] = 0;
@@ -236,10 +235,6 @@ bool DNA::insert_gene(unsigned int index, unsigned char* gene, unsigned int size
         free(gene_mod);
     }
 
-    // Case 3: gene at end
-    else {
-        push_back_gene(gene, size);
-    }
     return true;
 }
 

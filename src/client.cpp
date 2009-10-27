@@ -46,6 +46,12 @@ Client::Client() {
     dataDNA = 0;
 }
 
+// Copy constructor
+Client::Client(const Client& inputClient) {
+    dataDNA = new DNA(*inputClient.get());
+    dataAlphabet = inputClient.dataAlphabet;
+}
+
 // Create client with given DNA
 Client::Client(const DNA& inputDNA) {
 	dataDNA = new DNA(inputDNA);
@@ -347,7 +353,7 @@ void Client::recombine_crossover_double(Client& inputClient) {
     if (crossover_end == dataDNA->length())
         dataDNA->push_back(window, window_size);
     else
-        dataDNA->insert(crossover_end, window, window_size);
+        dataDNA->insert(crossover_start, window, window_size);
 
     // Clean
     free(window);

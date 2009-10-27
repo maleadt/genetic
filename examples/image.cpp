@@ -66,9 +66,10 @@ EnvImage::~EnvImage()
 
 // Fitness function
 double EnvImage::fitness(const DNA* inputDNA) {
-    // Check the DNA's limit's
-    if (!valid_limits(inputDNA))
-            return -1;
+    // Check amount of polygons
+    unsigned int genes = inputDNA->genes();
+    if (genes < 1 || genes > LIMIT_POLYGONS)
+            return 0;   // TODO: define 0 or -1 as invalid
 
     // Create a DC for the generated image
     cairo_surface_t* tempSurface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, dataInputWidth, dataInputHeight);
@@ -95,7 +96,7 @@ int EnvImage::alphabet() const {
 //
 
 // Set input image
-bool EnvImage::loadImage(std::string inputFile)
+bool EnvImage::load(std::string inputFile)
 {
     // Update variables
 	dataInputFile = inputFile;
@@ -127,37 +128,6 @@ bool EnvImage::loadImage(std::string inputFile)
 	return true;
 }
 
-// Validity function
-bool EnvImage::valid_limits(const DNA* inputDNA) const {
-	// Check amount of polygons
-        unsigned int genes = inputDNA->genes();
-	if (genes < 1 || genes > LIMIT_POLYGONS)
-		return false;
-
-	// Check points per polygon
-        inputDNA->debug_raw();
-        std::cout << "Got " << genes << " genes." << std::endl;
-        for (unsigned int gene = 0; gene < genes; gene++) {
-            // Get gene
-            std::cout << "Fetching gene " << gene << std::endl;
-            unsigned int size = 0; unsigned char* data = 0;
-            inputDNA->extract_gene(gene, data, size);
-            free(data);
-
-            // 10 bytes at minimum
-            std::cout << "Size is " << size << std::endl;
-            if ((size-4)/2 > LIMIT_POLYGON_POINTS || size < 10)
-                    return false;
-
-            // Should be even
-            if (size%2 != 0)
-                    return false;
-	}
-
-	// All checked, seems valid
-	return true;
-}
-
 // Render the DNA code onto a draw container
 void EnvImage::draw(cairo_surface_t* inputSurface, const DNA* inputDNA) const {
     // Create a Cairo context
@@ -176,72 +146,75 @@ void EnvImage::draw(cairo_surface_t* inputSurface, const DNA* inputDNA) const {
         inputDNA->extract_gene(gene, data, size);
         unsigned char* gene_ptr = data;
         unsigned int gene_loc = 0;
-        std::cout << "Extracted gene " << gene << " with size " << size << std::endl;
 
-        // Get colour code
-        int r = *(gene_ptr++), g = *(gene_ptr++), b = *(gene_ptr++), a = *(gene_ptr++);
-        gene_loc += 4;
-        cairo_set_source_rgba(cr, (r - 1) / 253.0, (g - 1) / 253.0, (b - 1) / 253.0, (a - 1) / 253.0);
+        // Draw if we have a colour code and at least three points
+        // Also, discard genes with too many points
+        if (size >= 10 && (size-4)/2 < LIMIT_POLYGON_POINTS) {
+            // Get colour code
+            int r = *(gene_ptr++), g = *(gene_ptr++), b = *(gene_ptr++), a = *(gene_ptr++);
+            gene_loc += 4;
+            cairo_set_source_rgba(cr, (r - 1) / 253.0, (g - 1) / 253.0, (b - 1) / 253.0, (a - 1) / 253.0);
 
-        // Save all points in a container
-        std::vector<vertex> points;
-        int x, y;
-        while (gene_loc < size) {
-            // Points vary between 1 and 254, so let 1 be the lower bound and 254 the upper one
-            x = *(gene_ptr++) - 1;
-            y = *(gene_ptr++) - 1;
-            int size = points.size();
-            points.resize(size+1);
-            points[size].x = dataInputWidth * x / 253.0;
-            points[size].y = dataInputHeight * y / 253.0;
-            gene_loc += 2;
-        }
+            // Save all points in a container
+            std::vector<vertex> points;
+            int x, y;
+            while (gene_loc+1 < size) {
+                // Points vary between 1 and 254, so let 1 be the lower bound and 254 the upper one
+                x = *(gene_ptr++) - 1;
+                y = *(gene_ptr++) - 1;
+                int size = points.size();
+                points.resize(size+1);
+                points[size].x = dataInputWidth * x / 253.0;
+                points[size].y = dataInputHeight * y / 253.0;
+                gene_loc += 2;
+            }
 
-        // Sort the points to avoid complex polygons
-        // http://www.computational-geometry.org/mailing-lists/compgeom-announce/2003-March/000731.html
-        const int points_count = points.size();
-        int start = 0;	// upper left point is starting point
-        for (int i = 0; i < points_count; i++) {
-            if (points[i].y > points[start].y)
-                start = i;
-            else if (points[i].y == points[start].y && points[i].x < points[start].x)
-                start = i;
-        }
-        cairo_move_to(cr, points[start].x, points[start].y);
-        points[start].drawn = true;
-        for (int i = 0; i < points_count; i++) {    // calculate angle for each point against startpoint
-            if (i == start)
-                continue;
-            points[i].angle =  atan2(points[i].y - points[start].y, points[i].x - points[start].x);
-        }
-        for (int i = 0; i < points_count; i++) {    // draw points based on increasing angle
-            double angle;
-            int next = -1;
-            for (int j = 0; j < points_count; j++) {
-                if (points[j].drawn) {
+            // Sort the points to avoid complex polygons
+            // http://www.computational-geometry.org/mailing-lists/compgeom-announce/2003-March/000731.html
+            const int points_count = points.size();
+            int start = 0;	// upper left point is starting point
+            for (int i = 0; i < points_count; i++) {
+                if (points[i].y > points[start].y)
+                    start = i;
+                else if (points[i].y == points[start].y && points[i].x < points[start].x)
+                    start = i;
+            }
+            cairo_move_to(cr, points[start].x, points[start].y);
+            points[start].drawn = true;
+            for (int i = 0; i < points_count; i++) {    // calculate angle for each point against startpoint
+                if (i == start)
                     continue;
-                }
-                if (next == -1) {
-                    next = j;
-                    angle = points[j].angle;
-                } else {
-                    if (points[j].angle < angle) {
-                        angle = points[j].angle;
+                points[i].angle =  atan2(points[i].y - points[start].y, points[i].x - points[start].x);
+            }
+            for (int i = 0; i < points_count; i++) {    // draw points based on increasing angle
+                double angle;
+                int next = -1;
+                for (int j = 0; j < points_count; j++) {
+                    if (points[j].drawn) {
+                        continue;
+                    }
+                    if (next == -1) {
                         next = j;
+                        angle = points[j].angle;
+                    } else {
+                        if (points[j].angle < angle) {
+                            angle = points[j].angle;
+                            next = j;
+                        }
                     }
                 }
+                if (next == -1) {
+                    continue;
+                } else {
+                    cairo_line_to(cr, points[next].x, points[next].y);
+                    points[next].drawn = true;
+                }
             }
-            if (next == -1) {
-                continue;
-            } else {
-                cairo_line_to(cr, points[next].x, points[next].y);
-                points[next].drawn = true;
-            }
-        }
 
-        // Draw
-        cairo_close_path(cr);
-        cairo_fill(cr);
+            // Draw
+            cairo_close_path(cr);
+            cairo_fill(cr);
+        }
 
         // Clean
         free(data);
@@ -321,8 +294,7 @@ void EnvImage::explain(const DNA* inputDNA) const {
 
 // Setup the comparison data
 void EnvImage::setup(cairo_surface_t* inputSurface) {
-    switch(COMPARISON_METHOD)
-    {
+    switch(COMPARISON_METHOD) {
         case 0:
             setup_nmse(inputSurface);
             break;

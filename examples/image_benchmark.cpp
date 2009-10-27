@@ -218,7 +218,7 @@ int main(int argc, char** argv)
 	dataEnvironment.setTime(inputTime);
 
 	// Load base image
-	if (!dataEnvironment.loadImage(inputFileInput))
+	if (!dataEnvironment.load(inputFileInput))
 	{
 	    std::cout << "! Could not load image" << std::endl;
 	    return 1;

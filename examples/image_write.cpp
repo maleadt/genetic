@@ -148,6 +148,8 @@ void EnvImgWrite::runtime(int inputTime) {
     dataTime = inputTime;
 }
 
+
+
 //////////
 // MAIN //
 //////////
@@ -182,7 +184,7 @@ int main(int argc, char** argv) {
         dataEnvironment.runtime(atoi(argv[2]));
 
     // Load base image
-    if (!dataEnvironment.loadImage(inputFile)) {
+    if (!dataEnvironment.load(inputFile)) {
         std::cout << "ERROR: could not load image" << std::endl;
         return 1;
     }
@@ -199,15 +201,16 @@ int main(int argc, char** argv) {
     unsigned char dnastring[] = {0x50, 0x50, 0x50, 0x128, // Semi transparent grey brush (RGB = 50 50 50, with 50% opacity)
                                  0x1, 0x254,              // Point one: (1, 254)
                                  0x128, 0x1,              // Point two: (128, 1)
-                                 0x254, 0x254};           // Point three: (254, 254)
-    DNA tempDNA(dnastring, 10);
+                                 0x254, 0x254,            // Point three: (254, 254)
+                                 0x00,                    // And a seperator for the next gene
+                                 0x255, 0x1, 0x1, 0x128,
+                                 0x25, 0x225,
+                                 0x225, 0x225,
+                                 0x225, 0x25,
+                                 0x25, 0x25};
+
+    DNA tempDNA(dnastring, 23);
     dataEnvironment.explain(&tempDNA);
-    if (dataEnvironment.valid_limits(&tempDNA)) {
-        std::cout << "DNA is valid" << std::endl;
-    } else {
-        std::cout << "ERROR: initial DNA not valid" << std::endl;
-        exit(1);
-    }
 
     // Create object
     Population dataPopulation(&dataEnvironment, tempDNA);

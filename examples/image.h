@@ -106,8 +106,7 @@ class EnvImage : public Environment
 		int alphabet() const;
 
 		// Image functions
-		bool loadImage(std::string inputFile);
-		bool valid_limits(const DNA* inputDNA) const;
+		bool load(std::string inputFile);
 		void draw(cairo_surface_t* inputSurface, const DNA* inputDNA) const;
                 void explain(const DNA* inputDNA) const;
 

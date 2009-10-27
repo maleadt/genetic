@@ -64,6 +64,7 @@ class Client
 	public:
 		// Construction and destruction
 		Client();
+		Client(const Client& inputClient);
 		Client(const DNA& inputDNA);
 		Client(const DNA& inputDNA, int inputAlphabet);
                 ~Client();

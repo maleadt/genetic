@@ -97,6 +97,15 @@ struct CachedClient
         return (left.fitness > right.fitness);
     }
 };
+struct CachedClient_more {
+    bool operator ()(CachedClient const& a, CachedClient const& b) const {
+        if (a.fitness < b.fitness) return false;
+        if (a.fitness > b.fitness) return true;
+
+        return true;
+    }
+};
+
 
 
 // Include guard
