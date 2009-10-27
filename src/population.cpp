@@ -124,7 +124,7 @@ void Population::evolve_population()
         if (population[0].fitness > fitness_critical)
         {
             fitness_critical = population[0].fitness;
-            dataDNA = population[0].client->get();
+            dataDNA = new DNA(*population[0].client->get());
             dataEnvironment->update(dataDNA);    // TODO: pass fitness
         }
 
@@ -178,7 +178,7 @@ void Population::evolve_population_straight()
         if (population[0].fitness > fitness_critical)
         {
             fitness_critical = population[0].fitness;
-            dataDNA = population[0].client->get();
+            dataDNA = new DNA(*population[0].client->get());
             dataEnvironment->update(dataDNA);    // TODO: pass fitness
         }
 
@@ -240,7 +240,7 @@ void Population::evolve_population_dual()
         if ((*population)[0].fitness > fitness_critical)
         {
             fitness_critical = (*population)[0].fitness;
-            dataDNA = (*population)[0].client->get();
+            dataDNA = new DNA(*(*population)[0].client->get());
             dataEnvironment->update(dataDNA);    // TODO: pass fitness
         }
 

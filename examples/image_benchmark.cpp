@@ -231,9 +231,6 @@ int main(int argc, char** argv)
                                      0x254, 0x254};           // Point three: (254, 254)
         DNA tempDNA(dnastring, 10);
 
-	// Create object
-	Population dataPopulation(&dataEnvironment, tempDNA);
-
 	// Message
 	std::cout << "* Environment configured" << std::endl;
 
@@ -251,7 +248,7 @@ int main(int argc, char** argv)
 	try
     {
         dataEnvironment.reset();
-        dataPopulation = Population(&dataEnvironment, tempDNA);
+        Population dataPopulation = Population(&dataEnvironment, tempDNA);
         dataEnvironment.setVector(&dataSingleStraightTime, &dataSingleStraightFitness);
         dataPopulation.evolve_single_straight();
     }
@@ -268,7 +265,7 @@ int main(int argc, char** argv)
 	try
     {
         dataEnvironment.reset();
-        dataPopulation = Population(&dataEnvironment, tempDNA);
+        Population dataPopulation = Population(&dataEnvironment, tempDNA);
         dataEnvironment.setVector(&dataPopulationTime, &dataPopulationFitness);
         dataPopulation.evolve_population();
     }
@@ -285,7 +282,7 @@ int main(int argc, char** argv)
 	try
     {
         dataEnvironment.reset();
-        dataPopulation = Population(&dataEnvironment, tempDNA);
+        Population  dataPopulation = Population(&dataEnvironment, tempDNA);
         dataEnvironment.setVector(&dataPopulationStraightTime, &dataPopulationStraightFitness);
         dataPopulation.evolve_population_straight();
     }
@@ -302,7 +299,7 @@ int main(int argc, char** argv)
 	try
     {
         dataEnvironment.reset();
-        dataPopulation = Population(&dataEnvironment, tempDNA);
+        Population  dataPopulation = Population(&dataEnvironment, tempDNA);
         dataEnvironment.setVector(&dataPopulationDualTime, &dataPopulationDualFitness);
         dataPopulation.evolve_population_dual();
     }

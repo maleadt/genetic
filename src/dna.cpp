@@ -243,10 +243,12 @@ bool DNA::replace_gene(unsigned int index, unsigned char* gene, unsigned int siz
     unsigned int amountgenes = genes();
     assert(index < amountgenes);
 
-    erase_gene(index);
-    insert_gene(index, gene, size);
-
-    return true;
+    if (!erase_gene(index))
+        return false;
+    if (index < amountgenes-1)
+        return insert_gene(index, gene, size);
+    else
+        return push_back_gene(gene, size);
 }
 
 // Add a gene
