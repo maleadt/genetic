@@ -29,8 +29,8 @@ ELSE (HAVE_CAIRO)
 	MESSAGE("!! Cannot link against Cairo")
 ENDIF (HAVE_CAIRO)
 
-# GNUplot
-ADD_SUBDIRECTORY(gnuplot)
+# GNUplot library
+INCLUDE_DIRECTORIES(${EVOLVE_SOURCE_DIR}/lib/gnuplot)
 
 # Compile library
 ADD_LIBRARY(image image.h image.cpp)

@@ -37,7 +37,7 @@
 #include <sstream>
 #include <ctime>
 #include <cairo/cairo.h>
-#include "gnuplot/gnuplot.h"
+#include "../lib/gnuplot/gnuplot.h"
 
 
 //
