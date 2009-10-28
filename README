@@ -1,4 +1,5 @@
-1) Introduction
+Introduction
+------------
 
 This application provides a modular framework for genetic evolutionary algorithms.
 In order to use this framework, two parts are required:
@@ -13,7 +14,8 @@ In order to use this framework, two parts are required:
 	    to the client, which handles accordingly
 
 
-2) Application contents
+Application contents
+--------------------
 
 This application consists out of three sets of files:
 	- client
@@ -24,7 +26,7 @@ This application consists out of three sets of files:
 	    routines which can be used in both the client and environment
 
 
-3) DNA format
+1) DNA format
 
 The client accepts DNA in two different forms:
 	- string
@@ -45,7 +47,7 @@ When using the queue representation, there are some special possibilities:
 	0: sperates genes
 
 
-4) Description of the environment
+2) Description of the environment
 
 The client will call the environment on several occasions, so it needs to have implemented
 a certain amount of functions.
@@ -55,4 +57,51 @@ a certain amount of functions.
 	    the DNA set to be dropped
 	- int alphabet()
 	    this function returns the highest possible value of a gene byte (maximum = 254)
+
+
+History
+-------
+
+Over time, this application has been written and re-written several times.
+Mostly because of the lack of preparation, but also because the subject isn't
+documented much and thus difficulties tend to get discovered on-the-run.
+
+1) Initial Perl version
+
+This first implementation, written in Perl, works quite well but only supports
+a single hard-coded environment (creature running through a obstacle-filled
+world), and a single-straight evolutionary path. Still, it is cleanly written
+and demonstrates the principles of evolutionary code.
+
+Download: "/trunk/archive/attempt 1/" @ r81
+
+2) C++ rewrite
+
+Essentially this is the raw C++ rewrite of the initial Perl version. Although it
+only adds one important features (simple population-based evolution), its
+mutation algorithms are more advanced and it generally works a lot faster. The
+environment though is still hard-coded.
+However, the project seems to contains some memory-leaks, which I did not find.
+
+Download: "/trunk/archive/attempt 2/" @ r81
+
+3) STL rewrite
+
+Due to the memory leaks in the previous version, I attempted another rewrite,
+eliminating use of pointers and replacing them with STL containers. During the
+write however, I decided it was flawed by design, and decided to abandon this
+version and include modularity in the design. Still, this version worked well,
+apart from a memory leak and a yet undiscovered segmentation fault.
+
+Download: "/trunk/archive/attempt 3/" @ r81
+
+4) Modularity
+
+This rewrite introduced modularity, using a user-implementable Environment.
+
+Download: "/trunk" @ r62
+
+5) DNA redesign
+
+Download: "/trunk" @ HEAD
 
