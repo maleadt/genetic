@@ -55,3 +55,16 @@ TARGET_LINK_LIBRARIES(image_benchmark environment)
 TARGET_LINK_LIBRARIES(image_benchmark ${Cairo_LIBRARIES})
 TARGET_LINK_LIBRARIES(image_benchmark gnuplot)
 
+
+#
+# Tetris
+#
+
+# Add and include tetris library
+ADD_SUBDIRECTORY("tetris")
+INCLUDE_DIRECTORIES("tetris")
+
+# Build executable
+#ADD_EXECUTABLE(tetris tetris.h tetris.cpp)
+#TARGET_LINK_LIBRARIES(tetris tetrislib)
+
