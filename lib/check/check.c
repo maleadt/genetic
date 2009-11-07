@@ -26,10 +26,10 @@
 #include <stdarg.h>
 
 #include "check.h"
-#include "check_error.h"
-#include "check_list.h"
-#include "check_impl.h"
-#include "check_msg.h"
+#include "error.h"
+#include "list.h"
+#include "impl.h"
+#include "msg.h"
 
 #ifndef DEFAULT_TIMEOUT
 #define DEFAULT_TIMEOUT 4
