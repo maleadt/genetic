@@ -1,6 +1,6 @@
 /*
- * tetris.cpp
- * Evolve - Tetris environment
+ * tetris_interactive.cpp
+ * Evolve - Tetris environment (interactive client)
  *
  * Copyright (c) 2009 Tim Besard <tim.besard@gmail.com>
  * Copyright (c) 2009 Javier López López <javilop.com>

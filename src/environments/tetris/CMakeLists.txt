@@ -26,14 +26,14 @@ TARGET_LINK_LIBRARIES(tetris_game tetris_board)
 
 
 #
-# Build sample executable
+# Interactive client
 #
 
 # Executable
-ADD_EXECUTABLE(tetris_sample main.cpp)
-TARGET_LINK_LIBRARIES(tetris_sample tetris_input)
-TARGET_LINK_LIBRARIES(tetris_sample tetris_output)
-TARGET_LINK_LIBRARIES(tetris_sample tetris_pieces)
-TARGET_LINK_LIBRARIES(tetris_sample tetris_board)
-TARGET_LINK_LIBRARIES(tetris_sample tetris_game)
+ADD_EXECUTABLE(tetris_interactive tetris_interactive.cpp)
+TARGET_LINK_LIBRARIES(tetris_interactive tetris_input)
+TARGET_LINK_LIBRARIES(tetris_interactive tetris_output)
+TARGET_LINK_LIBRARIES(tetris_interactive tetris_pieces)
+TARGET_LINK_LIBRARIES(tetris_interactive tetris_board)
+TARGET_LINK_LIBRARIES(tetris_interactive tetris_game)
 

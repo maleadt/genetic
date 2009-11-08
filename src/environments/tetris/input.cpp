@@ -1,5 +1,5 @@
 /*
- * tetris_render.cpp
+ * input.cpp
  * Evolve - Tetris environment (input interface)
  *
  * Copyright (c) 2009 Tim Besard <tim.besard@gmail.com>

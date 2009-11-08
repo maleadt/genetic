@@ -1,5 +1,5 @@
 /*
- * tetris_pieces.cpp
+ * pieces.cpp
  * Evolve - Tetris environment (pieces with their rotational and displacement
  *          details)
  *

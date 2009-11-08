@@ -1,5 +1,5 @@
 /*
- * tetris_render.h
+ * output.h
  * Evolve - Tetris environment (output interface)
  *
  * Copyright (c) 2009 Tim Besard <tim.besard@gmail.com>

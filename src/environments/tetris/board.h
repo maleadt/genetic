@@ -1,5 +1,5 @@
 /*
- * tetris_board.h
+ * board.h
  * Evolve - Tetris environment (board definition)
  *
  * Copyright (c) 2009 Tim Besard <tim.besard@gmail.com>

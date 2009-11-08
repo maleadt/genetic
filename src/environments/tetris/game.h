@@ -1,5 +1,5 @@
 /*
- * tetris_game.h
+ * game.h
  * Evolve - Tetris environment (general game class)
  *
  * Copyright (c) 2009 Tim Besard <tim.besard@gmail.com>
