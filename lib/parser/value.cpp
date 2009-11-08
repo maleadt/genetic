@@ -108,6 +108,8 @@ bool Value::operator==(const Value& v) const {
         case INT:
             return mInt == v.getInt();
             break;
+        default:
+            return false;
     }
 }
 

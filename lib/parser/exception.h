@@ -61,9 +61,19 @@ public:
         mType = iType;
         mMessage = iMessage;
     }
+    Exception(EXCEPTIONTYPE iType, const std::string& iMessage, const std::string &iDetails) {
+        mType = iType;
+        mMessage = iMessage;
+        mDetails = iDetails;
+    }
     Exception(const std::string& iMessage) {
         mType = GENERIC;
         mMessage = iMessage;
+    }
+    Exception(const std::string& iMessage, const std::string &iDetails) {
+        mType = GENERIC;
+        mMessage = iMessage;
+        mDetails = iDetails;
     }
     virtual std::string type() const throw() {
         switch(mType) {
@@ -84,14 +94,20 @@ public:
     const std::string& what() const throw() {
         return mMessage;
     }
+    const std::string& details() const throw() {
+        return mDetails;
+    }
 
     friend std::ostream& operator<<(std::ostream& out, const Exception& e) {
         out << "! Caught " << e.type() << ": " + e.what();
+        if (e.details().length() > 0)
+            out << std::endl << "       " << e.details();
         return out;
     }
 private:
     EXCEPTIONTYPE mType;
     std::string mMessage;
+    std::string mDetails;
 };
 
 

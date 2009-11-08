@@ -41,18 +41,51 @@
 // ROUTINES //
 //////////////
 
-void test1() {
-    std::cout << "This is test1" << std::endl;
+//
+// Mathematical
+//
+
+Value plus(std::vector<Value> p) {
+    return p[0].getInt() + p[1].getInt();
+}
+
+Value min(std::vector<Value> p) {
+    return p[0].getInt() - p[1].getInt();
+}
+
+Value mult(std::vector<Value> p) {
+    return p[0].getInt() * p[1].getInt();
+}
+
+Value div(std::vector<Value> p) {
+    return p[0].getInt() / p[1].getInt();
 }
 
 
-//////////////
-// WRAPPERS //
-//////////////
+//
+// Conditional
+//
 
-Value test1_wrapper(std::vector<Value> param) {
-    test1();
-    return Value();
+Value equals(std::vector<Value> p) {
+    return p[0].getInt() == p[1].getInt();
+}
+
+Value lesser(std::vector<Value> p) {
+    return p[0].getInt() < p[1].getInt();
+}
+
+Value greater(std::vector<Value> p) {
+    return p[0].getInt() > p[1].getInt();
+}
+
+
+//
+// Other
+//
+
+Value print(std::vector<Value> p) {
+    std::cout << "Print: " << p[0].getInt();
+    return VOID;
 }
 
 
@@ -62,11 +95,26 @@ Value test1_wrapper(std::vector<Value> param) {
 
 int main() {
     try {
-        Grammar tGrammar;
-        tGrammar.setFunction(1, new Function(&test1_wrapper));
+        //
+        // Grammar setup
+        //
 
-        const Function* tFunction = tGrammar.getFunction(1);
-        tFunction->call();
+        // Create grammar
+        Grammar tGrammar;
+
+        // Mathematical functions
+        tGrammar.setFunction(1, new Function(&plus, {INT, INT}, INT));
+        tGrammar.setFunction(2, new Function(&min, {INT, INT}, INT));
+        tGrammar.setFunction(3, new Function(&mult, {INT, INT}, INT));
+        tGrammar.setFunction(4, new Function(&div, {INT, INT}, INT));
+
+        // Conditional functions
+        tGrammar.setFunction(5, new Function(&equals, {INT, INT}, BOOL));
+        tGrammar.setFunction(6, new Function(&lesser, {INT, INT}, BOOL));
+        tGrammar.setFunction(7, new Function(&greater, {INT, INT}, BOOL));
+
+        // Other
+        tGrammar.setFunction(8, new Function(&print, {INT}));
     }
     catch (Exception e) {
         std::cout << e << std::endl;

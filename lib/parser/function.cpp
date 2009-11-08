@@ -56,16 +56,16 @@ Function::Function(Value (*iPointer)(std::vector<Value>), const Type& iReturn) {
 }
 
 // Parameterisized constructor -- only parameters
-Function::Function(Value (*iPointer)(std::vector<Value>), const std::vector<Type>& iArguments) {
+Function::Function(Value (*iPointer)(std::vector<Value>), std::initializer_list<Type> iParameters) {
     mPointer = iPointer;
-    mParameterTypes = iArguments;
+    mParameterTypes = iParameters;
 }
 
 // Parameterisized constructor -- return value and parameters
-Function::Function(Value (*iPointer)(std::vector<Value>), const Type& iReturn, const std::vector<Type>& iArguments) {
+Function::Function(Value (*iPointer)(std::vector<Value>), std::initializer_list<Type> iParameters, const Type& iReturn) {
     mPointer = iPointer;
     mReturnType = iReturn;
-    mParameterTypes = iArguments;
+    mParameterTypes = iParameters;
 }
 
 
@@ -75,40 +75,50 @@ Function::Function(Value (*iPointer)(std::vector<Value>), const Type& iReturn, c
 
 // Call without parameters
 Value Function::call() const {
-    // Check parameters
-    if (mParameterTypes.size() != 0)
-        throw Exception(FUNCTION, "function needs parameters");
-
-    // Call function
-    std::vector<Value> tEmpty;
-    Value tReturn = (*mPointer)(tEmpty);
-
-    // Check return value
-    if (tReturn.getType() != mReturnType) {
-        std::stringstream error;
-        error << "function returned " << tReturn << ", while I expected something of type " << mReturnType;
-        throw Exception(FUNCTION, error.str());
-    }
-    return tReturn;
+    return call(std::vector<Value>());
 }
 
 // Call with parameters
+Value Function::call(const std::initializer_list<Value>& iParameters) const {
+    return call(std::vector<Value>(iParameters));
+}
 Value Function::call(const std::vector<Value>& iParameters) const {
+    // Check input parameters
+    bool tParameterFailure = false;
     if (mParameterTypes.size() != iParameters.size())
-        throw Exception(FUNCTION, "incorrect amount of parameters");
-    for (int i = 0; i < iParameters.size(); i++) {
-        if (iParameters[i].getType() != mParameterTypes[i]) {
-            std::stringstream error;
-            error << "parameter " << i << " is of type " << iParameters[i].getType() << ", while I expected " << mParameterTypes[i];
-            throw Exception(FUNCTION, error.str());
+        tParameterFailure = true;
+    else {
+        for (unsigned int i = 0; i < iParameters.size() && !tParameterFailure; i++) {
+            if (iParameters[i].getType() != mParameterTypes[i])
+                tParameterFailure = true;
         }
+    }
+    if (tParameterFailure) {
+        std::stringstream details;
+        details << "got called with [";
+        for (unsigned int j = 0; j < iParameters.size(); j++) {
+            details << iParameters[j].getType();
+            if (j < iParameters.size()-1)
+                details << ", ";
+        }
+        details << "] while function signature is [";
+        for (unsigned int j = 0; j < mParameterTypes.size(); j++) {
+            details << mParameterTypes[j];
+            if (j < mParameterTypes.size()-1)
+                details << ", ";
+        }
+        details << "]";
+        throw Exception(FUNCTION, "input parameters did not respect function signature", details.str());
     }
 
     // Call function
     Value tReturn = (*mPointer)(iParameters);
 
     // Check return value
-    if (tReturn.getType() != mReturnType)
-        throw Exception(FUNCTION, "function returned invalid value");
+    if (tReturn.getType() != mReturnType) {
+        std::stringstream details;
+        details << "function returned " << tReturn.getType() << " while function definition was " << mReturnType;
+        throw Exception(FUNCTION, "function returned invalid value", details.str());
+    }
     return tReturn;
 }
