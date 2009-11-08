@@ -171,6 +171,9 @@ Value Parser::evaluate(unsigned char* iBlock, unsigned int iSize, unsigned int& 
             tParameters.push_back(tParameter);
         }
 
+        // TODO: function extract_block. no DO. delete do!
+        // TODO 2: Conditional type. MEt function als argument. IPV recursief uitvoeren, recursief tree opstellen, dan tree uitvoeren
+
         // Save the pointer
         tLoc = tEnd;
 

@@ -47,30 +47,30 @@
 //
 
 // Boundaries
-const unsigned char RESERVED_START = 0x00;
-const unsigned char RESERVED_END = 0x24;
+const unsigned char RESERVED_START = 00;
+const unsigned char RESERVED_END = 24;
 
 // Syntax
-const unsigned char SYNT_START = 0x01;
-const unsigned char ARG_OPEN = 0x01;
-const unsigned char ARG_SEP = 0x02;
-const unsigned char ARG_CLOSE = 0x03;
-const unsigned char DO = 0x04;
-const unsigned char SYNT_END = 0x05;
+const unsigned char SYNT_START = 01;
+const unsigned char ARG_OPEN = 01;
+const unsigned char ARG_SEP = 02;
+const unsigned char ARG_CLOSE = 03;
+const unsigned char DO = 04;
+const unsigned char SYNT_END = 05;
 
 // Conditionals
-const unsigned char COND_START = 0x10;
-const unsigned char COND_IF = 0x10;
-const unsigned char COND_UNLESS = 0x11;
-const unsigned char COND_WHILE = 0x12;
-const unsigned char COND_END = 0x14;
+const unsigned char COND_START = 10;
+const unsigned char COND_IF = 10;
+const unsigned char COND_UNLESS = 11;
+const unsigned char COND_WHILE = 12;
+const unsigned char COND_END = 14;
 
 // Data types
-const unsigned char DATA_START = 0x20;
-const unsigned char DATA_VOID = 0x21;
-const unsigned char DATA_BOOL = 0x22;
-const unsigned char DATA_INT = 0x23;
-const unsigned char DATA_END = 0x24;
+const unsigned char DATA_START = 20;
+const unsigned char DATA_VOID = 21;
+const unsigned char DATA_BOOL = 22;
+const unsigned char DATA_INT = 23;
+const unsigned char DATA_END = 24;
 
 
 
@@ -84,8 +84,8 @@ public:
     Grammar();
     ~Grammar();
 
-    // Grammar configuration
-    virtual void setup()=0;
+    // Configuration
+    virtual void setup();
 
     // Functions
     unsigned char createFunction(Value (*)(std::vector<Value>), const std::initializer_list<Type>&, const Type&);
@@ -101,6 +101,7 @@ public:
     bool isData(unsigned char) const;
 
 private:
+    bool mSetup;
     std::map<unsigned char, const Function*> mFunctions;
     std::list<const Function*> mCreatedFunctions;
 };

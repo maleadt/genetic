@@ -112,6 +112,9 @@ public:
 ////////////////////
 
 void SimpleGrammar::setup() {
+    // Parent setup
+    Grammar::setup();
+
     // Mathematical functions
     MATH_PLUS = createFunction(&plus, {INT, INT}, INT);
     MATH_MIN = createFunction(&min, {INT, INT}, INT);

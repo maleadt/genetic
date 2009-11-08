@@ -43,7 +43,7 @@
 
 // Default constructor
 Grammar::Grammar() {
-    
+    mSetup = false;
 }
 
 // Destructor
@@ -58,17 +58,30 @@ Grammar::~Grammar() {
 
 
 //
+// Configuration
+//
+
+// Setup the grammar
+void Grammar::setup() {
+    if (mSetup)
+        throw Exception(GENERIC, "grammar can only be set up once");
+    mSetup = true;
+}
+
+
+//
 // Functions
 //
 
 // Create a function
 unsigned char Grammar::createFunction(Value (*iPointer)(std::vector<Value>), const std::initializer_list<Type>& iParameterTypes, const Type& iReturnType) {
-    unsigned char tByte = RESERVED_START;
+    unsigned char tByte = RESERVED_END;
     while (isFunction(tByte) && tByte < 254) {
         tByte++;
     }
     if (tByte >= 254)   // FIXME: 255? Hoe past laatste waarde detecteren?
         throw Exception(FUNCTION, "function definition possibilities exhausted");
+    createFunction(tByte, iPointer, iParameterTypes, iReturnType);
     return tByte;
 }
 
@@ -95,6 +108,10 @@ void Grammar::setFunction(unsigned char iByte, const Function* iFunction) {
 
 // Get a function
 const Function* Grammar::getFunction(unsigned char iByte) const {
+    // Grammar needs to be set up
+    if (!mSetup)
+        throw Exception(GENERIC, "grammar isn't configured yet");
+
     // The function must be defined
     std::map<unsigned char, const Function*>::const_iterator it = mFunctions.find(iByte);
     if (it == mFunctions.end()) {
@@ -106,6 +123,10 @@ const Function* Grammar::getFunction(unsigned char iByte) const {
 
 // Delete a function
 void Grammar::deleteFunction(unsigned char iByte) {
+    // Grammar needs to be set up
+    if (!mSetup)
+        throw Exception(GENERIC, "grammar isn't configured yet");
+
     // The function must be defined
     const Function* tFunction = getFunction(iByte);
     mFunctions.erase(iByte);
