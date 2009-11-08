@@ -38,7 +38,7 @@
 #include <valarray>
 #include <utility>
 #include "grammar.h"
-#include "../../src/dna.h"
+#include "../dna.h"
 
 
 //////////////////////

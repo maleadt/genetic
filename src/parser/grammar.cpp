@@ -62,6 +62,17 @@ Grammar::~Grammar() {
 //
 
 // Create a function
+unsigned char Grammar::createFunction(Value (*iPointer)(std::vector<Value>), const std::initializer_list<Type>& iParameterTypes, const Type& iReturnType) {
+    unsigned char tByte = RESERVED_START;
+    while (isFunction(tByte) && tByte < 254) {
+        tByte++;
+    }
+    if (tByte >= 254)   // FIXME: 255? Hoe past laatste waarde detecteren?
+        throw Exception(FUNCTION, "function definition possibilities exhausted");
+    return tByte;
+}
+
+// Create a function
 void Grammar::createFunction(unsigned char iByte, Value (*iPointer)(std::vector<Value>), const std::initializer_list<Type>& iParameterTypes, const Type& iReturnType) {
     const Function* tFunction = new Function(iPointer, iParameterTypes, iReturnType);
     setFunction(iByte, tFunction);

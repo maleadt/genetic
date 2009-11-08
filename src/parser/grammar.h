@@ -84,7 +84,11 @@ public:
     Grammar();
     ~Grammar();
 
+    // Grammar configuration
+    virtual void setup()=0;
+
     // Functions
+    unsigned char createFunction(Value (*)(std::vector<Value>), const std::initializer_list<Type>&, const Type&);
     void createFunction(unsigned char, Value (*)(std::vector<Value>), const std::initializer_list<Type>&, const Type&);
     void setFunction(unsigned char, const Function*);
     const Function* getFunction(unsigned char) const;

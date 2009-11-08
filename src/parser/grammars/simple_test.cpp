@@ -29,73 +29,12 @@
 //
 
 // Headers
-#include "../../src/dna.h"
-#include "parser.h"
-#include "grammar.h"
-#include "value.h"
-#include "function.h"
-#include <vector>
+#include "simple.h"
+#include "../parser.h"
+#include "../../dna.h"
 
 
-//////////////
-// ROUTINES //
-//////////////
 
-//
-// Mathematical
-//
-
-const int MATH_PLUS = RESERVED_END;
-Value plus(std::vector<Value> p) {
-    return p[0].getInt() + p[1].getInt();
-}
-
-const int MATH_MIN = RESERVED_END+1;
-Value min(std::vector<Value> p) {
-    return p[0].getInt() - p[1].getInt();
-}
-
-const int MATH_MULT = RESERVED_END+2;
-Value mult(std::vector<Value> p) {
-    return p[0].getInt() * p[1].getInt();
-}
-
-const int MATH_DIV = RESERVED_END+3;
-Value div(std::vector<Value> p) {
-    return p[0].getInt() / p[1].getInt();
-}
-
-
-//
-// Tests
-//
-
-const int TEST_EQUALS = RESERVED_END+10;
-Value equals(std::vector<Value> p) {
-    return p[0].getInt() == p[1].getInt();
-}
-
-const int TEST_LESSER = RESERVED_END+11;
-Value lesser(std::vector<Value> p) {
-    return p[0].getInt() < p[1].getInt();
-}
-
-const int TEST_GREATER = RESERVED_END+12;
-Value greater(std::vector<Value> p) {
-    return p[0].getInt() > p[1].getInt();
-}
-
-
-//
-// Other
-//
-
-const int OTHER_PRINT = RESERVED_END+20;
-Value print(std::vector<Value> p) {
-    std::cout << "Print: " << p[0].getInt() << std::endl;
-    // FIXME: THIS IS WRONG return VOID;
-    return Value();
-}
 
 
 //////////
@@ -109,22 +48,8 @@ int main() {
         //
 
         // Create grammar
-        Grammar tGrammar;
-
-        // Mathematical functions
-        tGrammar.createFunction(MATH_PLUS, &plus, {INT, INT}, INT);
-        tGrammar.createFunction(MATH_MIN, &min, {INT, INT}, INT);
-        tGrammar.createFunction(MATH_MULT, &mult, {INT, INT}, INT);
-        tGrammar.createFunction(MATH_DIV, &div, {INT, INT}, INT);
-
-        // Test functions
-        tGrammar.createFunction(TEST_EQUALS, &equals, {INT, INT}, BOOL);
-        tGrammar.createFunction(TEST_LESSER, &lesser, {INT, INT}, BOOL);
-        tGrammar.createFunction(TEST_GREATER, &greater, {INT, INT}, BOOL);
-
-        // Other
-        tGrammar.createFunction(OTHER_PRINT, &print, {INT}, VOID);
-
+        SimpleGrammar tGrammar;
+        tGrammar.setup();
 
 
         //
