@@ -1,4 +1,4 @@
 # Add individual subdirectories
 ADD_SUBDIRECTORY(check)
 ADD_SUBDIRECTORY(gnuplot)
-#ADD_SUBDIRECTORY(parser)
+ADD_SUBDIRECTORY(parser)

@@ -1,19 +1,11 @@
-# Require minimum CMake version
-cmake_minimum_required(VERSION 2.6)
-
-# Include main evolution directory
-INCLUDE_DIRECTORIES(${EVOLVE_SOURCE_DIR}/src)
-
-# Enable warnings
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-SET(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+#
+# Configuration
+#
 
 # Enable C++0x
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 SET(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 
-# Type of build ("debug", "release" or "profile")
-set(CMAKE_BUILD_TYPE debug)
 
 #
 # Build libraries
@@ -45,4 +37,5 @@ TARGET_LINK_LIBRARIES(parser parser_grammar)
 
 # Build executable
 ADD_EXECUTABLE(simple simple.cpp)
-TARGET_LINK_LIBRARIES(simple parser parser_function)
+TARGET_LINK_LIBRARIES(simple parser parser_function dna)
+

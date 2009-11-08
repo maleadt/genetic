@@ -42,6 +42,39 @@
 #include "exception.h"
 
 
+//
+// Reserved instructions
+//
+
+// Boundaries
+const unsigned char RESERVED_START = 0x00;
+const unsigned char RESERVED_END = 0x24;
+
+// Syntax
+const unsigned char SYNT_START = 0x01;
+const unsigned char ARG_OPEN = 0x01;
+const unsigned char ARG_SEP = 0x02;
+const unsigned char ARG_CLOSE = 0x03;
+const unsigned char BLOCK_OPEN = 0x04;
+const unsigned char BLOCK_SEP = 0x00;   // Gene seperator, shouldn't be used in parsing
+const unsigned char BLOCK_CLOSE = 0x05;
+const unsigned char SYNT_END = 0x06;
+
+// Conditionals
+const unsigned char COND_START = 0x10;
+const unsigned char COND_IF = 0x10;
+const unsigned char COND_UNLESS = 0x12;
+const unsigned char COND_WHILE = 0x13;
+const unsigned char COND_END = 0x14;
+
+// Data types
+const unsigned char DATA_START = 0x20;
+const unsigned char DATA_VOID = 0x21;
+const unsigned char DATA_BOOL = 0x22;
+const unsigned char DATA_INT = 0x23;
+const unsigned char DATA_END = 0x24;
+
+
 
 //////////////////////
 // CLASS DEFINITION //
@@ -58,6 +91,12 @@ public:
     void setFunction(unsigned char, const Function*);
     const Function* getFunction(unsigned char) const;
     void deleteFunction(unsigned char);
+
+    // Test funcions
+    bool isReserved(unsigned char) const;
+    bool isFunction(unsigned char) const;
+    bool isConditional(unsigned char) const;
+    bool isData(unsigned char) const;
 
 private:
     std::map<unsigned char, const Function*> mFunctions;

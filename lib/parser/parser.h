@@ -34,9 +34,11 @@
 
 // Headers
 #include <iostream>
+#include <stack>
+#include <valarray>
+#include <utility>
 #include "grammar.h"
 #include "../../src/dna.h"
-
 
 
 //////////////////////
@@ -46,14 +48,24 @@
 class Parser {
 public:
     // Construction and destruction
-    Parser(const Grammar&);
+    Parser(const Grammar*);
 
-    // Functionality
-    //validate(DNA);
-    //execute(DNA);
+    // Parsing
+    void execute(const DNA&);
+    void execute_instruction(unsigned char*, unsigned int);
 
 private:
-    const Grammar mGrammar;
+    // Auxiliary
+    std::vector<std::pair<unsigned int, unsigned int> > extract_arguments(unsigned char*, unsigned int, unsigned int, unsigned int&);
+    Value evaluate(unsigned char*, unsigned int, unsigned int&, unsigned int);
+    
+    // Byte conversion
+    bool toBool(unsigned char);
+    int toInt(unsigned char);
+
+    // Data members
+    const Grammar* mGrammar;
+    std::map<unsigned int, Value> mScope;
 };
 
 

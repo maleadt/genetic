@@ -71,8 +71,10 @@ void Grammar::createFunction(unsigned char iByte, Value (*iPointer)(std::vector<
 // Set a function
 void Grammar::setFunction(unsigned char iByte, const Function* iFunction) {
     // We won't overwrite an existing function
-    if (mFunctions.find(iByte) != mFunctions.end()) {
-        throw Exception(FUNCTION, "cannot overwrite existing function");
+    if (isReserved(iByte))
+        throw Exception(FUNCTION, "attempt to overwrite protected byte identifier");
+    if (isFunction(iByte)) {
+        throw Exception(FUNCTION, "attempt to overwrite predefined byte identifier");
     }
 
     // Save the function
@@ -85,7 +87,7 @@ const Function* Grammar::getFunction(unsigned char iByte) const {
     // The function must be defined
     std::map<unsigned char, const Function*>::const_iterator it = mFunctions.find(iByte);
     if (it == mFunctions.end()) {
-        throw Exception(FUNCTION, "unknown function");
+        throw Exception(FUNCTION, "unknown byte identifier");
     }
 
     return it->second;
@@ -94,12 +96,8 @@ const Function* Grammar::getFunction(unsigned char iByte) const {
 // Delete a function
 void Grammar::deleteFunction(unsigned char iByte) {
     // The function must be defined
-    std::map<unsigned char, const Function*>::iterator it = mFunctions.find(iByte);
-    if (it == mFunctions.end()) {
-        throw Exception(FUNCTION, "unknown function");
-    }
-    const Function* tFunction = it->second;
-    mFunctions.erase(it);
+    const Function* tFunction = getFunction(iByte);
+    mFunctions.erase(iByte);
 
     // Check if we created the function
     std::list<const Function*>::iterator it2 = mCreatedFunctions.begin();
@@ -111,4 +109,30 @@ void Grammar::deleteFunction(unsigned char iByte) {
         }
         it2++;
     }
+}
+
+
+//
+// Test funcions
+//
+
+// Test if a byte idnetifier falls in the reserved region
+bool Grammar::isReserved(unsigned char iByte) const {
+    return (iByte >= RESERVED_START && iByte < RESERVED_END);
+}
+
+// Test if a byte idnetifier is linked with a function
+bool Grammar::isFunction(unsigned char iByte) const {
+    std::map<unsigned char, const Function*>::const_iterator it = mFunctions.find(iByte);
+    return it != mFunctions.end();
+}
+
+// Test if a byte identifier corresponds with a conditional
+bool Grammar::isConditional(unsigned char iByte) const {
+    return (iByte >= COND_START && iByte < COND_END);
+}
+
+// Test if a byte identifier corresponds with data
+bool Grammar::isData(unsigned char iByte) const {
+    return (iByte >= DATA_START && iByte < DATA_END);
 }
