@@ -3,7 +3,7 @@
  * Evolve - Tetris environment (output interface)
  *
  * Copyright (c) 2009 Tim Besard <tim.besard@gmail.com>
- * Copyright (c) 2009 Javier López López <javilop.com>
+ * Copyright (c) 2009 Javier LÃ³pez LÃ³pez <javilop.com>
  * All rights reserved.
  *
  * This program is licensed under the Creative Commons - Attribution 3.0
