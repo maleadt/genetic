@@ -11,6 +11,9 @@ SET(WITH_OPENMP false)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 SET(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
+# Enable C++0x
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+
 # Handle testing (tests are specified in "tests" subfolder")
 ENABLE_TESTING()
 
@@ -45,6 +48,5 @@ ENDIF (WITH_OPENMP)
 # Add individual subdirectories
 ADD_SUBDIRECTORY(lib)
 ADD_SUBDIRECTORY(src)
-ADD_SUBDIRECTORY(examples)
 ADD_SUBDIRECTORY(tests)
 ADD_SUBDIRECTORY(benchmarks)

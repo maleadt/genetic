@@ -29,10 +29,10 @@
 #endif
 
 #include "check.h"
-#include "check_error.h"
-#include "check_list.h"
-#include "check_impl.h"
-#include "check_pack.h"
+#include "error.h"
+#include "list.h"
+#include "impl.h"
+#include "pack.h"
 
 #ifdef HAVE_PTHREAD
 pthread_mutex_t lock_mutex = PTHREAD_MUTEX_INITIALIZER;

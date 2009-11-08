@@ -37,7 +37,7 @@
 #include <sstream>
 #include <ctime>
 #include <cairo/cairo.h>
-#include "../lib/gnuplot/gnuplot.h"
+#include "../../../lib/gnuplot/gnuplot.h"
 
 
 //
@@ -225,10 +225,10 @@ int main(int argc, char** argv)
 	}
 
 	// Initial DNA (triangle)
-        unsigned char dnastring[] = {0x50, 0x50, 0x50, 0x128, // Semi transparent grey brush (RGB = 50 50 50, with 50% opacity)
-                                     0x1, 0x254,              // Point one: (1, 254)
-                                     0x128, 0x1,              // Point two: (128, 1)
-                                     0x254, 0x254};           // Point three: (254, 254)
+        unsigned char dnastring[] = {50, 50, 50, 128,     // Semi transparent grey brush (RGB = 50 50 50, with 50% opacity)
+                                     1, 254,              // Point one: (1, 254)
+                                     128, 1,              // Point two: (128, 1)
+                                     254, 254};           // Point three: (254, 254)
         DNA tempDNA(dnastring, 10);
 
 	// Message

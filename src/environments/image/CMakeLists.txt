@@ -1,23 +1,3 @@
-# Include main evolution directory
-INCLUDE_DIRECTORIES(${EVOLVE_SOURCE_DIR}/src)
-
-#
-# Debug
-#
-
-# Build executable
-ADD_EXECUTABLE(debug debug.cpp)
-
-# Link executable
-TARGET_LINK_LIBRARIES(debug dna)
-TARGET_LINK_LIBRARIES(debug population)
-TARGET_LINK_LIBRARIES(debug environment)
-
-
-#
-# Image
-#
-
 # Cairo
 INCLUDE(CheckCCompilerFlag)
 CHECK_C_COMPILER_FLAG(-lcairo HAVE_CAIRO)
@@ -54,17 +34,4 @@ TARGET_LINK_LIBRARIES(image_benchmark population)
 TARGET_LINK_LIBRARIES(image_benchmark environment)
 TARGET_LINK_LIBRARIES(image_benchmark ${Cairo_LIBRARIES})
 TARGET_LINK_LIBRARIES(image_benchmark gnuplot)
-
-
-#
-# Tetris
-#
-
-# Add and include tetris library
-ADD_SUBDIRECTORY("tetris")
-INCLUDE_DIRECTORIES("tetris")
-
-# Build executable
-#ADD_EXECUTABLE(tetris tetris.h tetris.cpp)
-#TARGET_LINK_LIBRARIES(tetris tetrislib)
 

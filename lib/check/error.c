@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include "check_error.h"
+#include "error.h"
 
 
 /* FIXME: including a colon at the end is a bad way to indicate an error */

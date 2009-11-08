@@ -29,8 +29,8 @@
 //
 
 // Headers
-#include "../src/population.h"
-#include "../src/environment.h"
+#include "../population.h"
+#include "../environment.h"
 #include <queue>
 
 

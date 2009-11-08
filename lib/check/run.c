@@ -30,11 +30,11 @@
 #endif
 
 #include "check.h"
-#include "check_error.h"
-#include "check_list.h"
-#include "check_impl.h"
-#include "check_msg.h"
-#include "check_log.h"
+#include "error.h"
+#include "list.h"
+#include "impl.h"
+#include "msg.h"
+#include "log.h"
 
 enum rinfo {
   CK_R_SIG,

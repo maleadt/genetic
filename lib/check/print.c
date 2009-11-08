@@ -25,10 +25,10 @@
 #include <stdlib.h>
 
 #include "check.h"
-#include "check_list.h"
-#include "check_impl.h"
-#include "check_str.h"
-#include "check_print.h"
+#include "list.h"
+#include "impl.h"
+#include "str.h"
+#include "print.h"
 
 static void srunner_fprint_summary (FILE *file, SRunner *sr,
 				    enum print_output print_mode);

@@ -24,10 +24,10 @@
 #include <stdarg.h>
 
 #include "check.h"
-#include "check_list.h"
-#include "check_error.h"
-#include "check_impl.h"
-#include "check_str.h"
+#include "list.h"
+#include "error.h"
+#include "impl.h"
+#include "str.h"
 
 static const char *tr_type_str (TestResult *tr);
 static int percent_passed (TestStats *t);

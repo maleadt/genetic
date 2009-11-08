@@ -198,16 +198,16 @@ int main(int argc, char** argv) {
     //
 
     // Initial DNA (triangle)
-    unsigned char dnastring[] = {0x50, 0x50, 0x50, 0x128, // Semi transparent grey brush (RGB = 50 50 50, with 50% opacity)
-                                 0x1, 0x254,              // Point one: (1, 254)
-                                 0x128, 0x1,              // Point two: (128, 1)
-                                 0x254, 0x254,            // Point three: (254, 254)
-                                 0x00,                    // And a seperator for the next gene
-                                 0x255, 0x1, 0x1, 0x128,
-                                 0x25, 0x225,
-                                 0x225, 0x225,
-                                 0x225, 0x25,
-                                 0x25, 0x25};
+    unsigned char dnastring[] = {50, 50, 50, 128,     // Semi transparent grey brush (RGB = 50 50 50, with 50% opacity)
+                                 1, 254,              // Point one: (1, 254)
+                                 128, 1,              // Point two: (128, 1)
+                                 254, 254,            // Point three: (254, 254)
+                                 0,                   // And a seperator for the next gene
+                                 255, 1, 1, 128,
+                                 25, 225,
+                                 225, 225,
+                                 225, 25,
+                                 25, 25};
 
     DNA tempDNA(dnastring, 23);
     dataEnvironment.explain(&tempDNA);

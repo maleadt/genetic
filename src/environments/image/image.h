@@ -44,9 +44,9 @@
 #define __IMAGE
 
 // Headers
-#include "../src/population.h"
-#include "../src/environment.h"
-#include "../src/dna.h"
+#include "../../population.h"
+#include "../../environment.h"
+#include "../../dna.h"
 #include <vector>
 #include <cmath>
 #include <string>

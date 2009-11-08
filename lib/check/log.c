@@ -27,12 +27,12 @@
 #include <subunit/child.h>
 #endif
 
-#include "check_error.h"
-#include "check_list.h"
-#include "check_impl.h"
-#include "check_log.h"
-#include "check_print.h"
-#include "check_str.h"
+#include "error.h"
+#include "list.h"
+#include "impl.h"
+#include "log.h"
+#include "print.h"
+#include "str.h"
 
 
 static void srunner_send_evt (SRunner *sr, void *obj, enum cl_event evt);

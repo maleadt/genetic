@@ -25,12 +25,12 @@
 #include <fcntl.h>
 #include <stdio.h>
 
-#include "check_error.h"
+#include "error.h"
 #include "check.h"
-#include "check_list.h"
-#include "check_impl.h"
-#include "check_msg.h"
-#include "check_pack.h"
+#include "list.h"
+#include "impl.h"
+#include "msg.h"
+#include "pack.h"
 
 
 /* 'Pipe' is implemented as a temporary file to overcome message
