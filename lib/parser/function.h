@@ -49,14 +49,10 @@
 class Function {
 public:
     // Construction and destruction
-    Function(Value (*)(std::vector<Value>));
-    Function(Value (*)(std::vector<Value>), const Type&);
-    Function(Value (*)(std::vector<Value>), std::initializer_list<Type>);
     Function(Value (*)(std::vector<Value>), std::initializer_list<Type>, const Type&);
 
     // Function execution
-    Value call() const;
-    Value call(const std::initializer_list<Value>&) const;
+    Value call(std::initializer_list<Value>) const;
     Value call(const std::vector<Value>&) const;
 
 private:

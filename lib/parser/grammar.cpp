@@ -46,12 +46,29 @@ Grammar::Grammar() {
     
 }
 
+// Destructor
+Grammar::~Grammar() {
+    std::list<const Function*>::iterator it = mCreatedFunctions.begin();
+    while (it != mCreatedFunctions.end()) {
+        delete *it;
+        it++;
+    }
+    mCreatedFunctions.clear();
+}
+
 
 //
-// Setters
-//
-
 // Functions
+//
+
+// Create a function
+void Grammar::createFunction(unsigned char iByte, Value (*iPointer)(std::vector<Value>), const std::initializer_list<Type>& iParameterTypes, const Type& iReturnType) {
+    const Function* tFunction = new Function(iPointer, iParameterTypes, iReturnType);
+    setFunction(iByte, tFunction);
+    mCreatedFunctions.push_back(tFunction);
+}
+
+// Set a function
 void Grammar::setFunction(unsigned char iByte, const Function* iFunction) {
     // We won't overwrite an existing function
     if (mFunctions.find(iByte) != mFunctions.end()) {
@@ -63,17 +80,35 @@ void Grammar::setFunction(unsigned char iByte, const Function* iFunction) {
 }
 
 
-//
-// Getters
-//
-
-// Functions
-const Function* Grammar::getFunction(unsigned char iByte) {
+// Get a function
+const Function* Grammar::getFunction(unsigned char iByte) const {
     // The function must be defined
-    std::map<unsigned char, const Function*>::iterator it = mFunctions.find(iByte);
+    std::map<unsigned char, const Function*>::const_iterator it = mFunctions.find(iByte);
     if (it == mFunctions.end()) {
         throw Exception(FUNCTION, "unknown function");
     }
 
     return it->second;
+}
+
+// Delete a function
+void Grammar::deleteFunction(unsigned char iByte) {
+    // The function must be defined
+    std::map<unsigned char, const Function*>::iterator it = mFunctions.find(iByte);
+    if (it == mFunctions.end()) {
+        throw Exception(FUNCTION, "unknown function");
+    }
+    const Function* tFunction = it->second;
+    mFunctions.erase(it);
+
+    // Check if we created the function
+    std::list<const Function*>::iterator it2 = mCreatedFunctions.begin();
+    while (it2 != mCreatedFunctions.end()) {
+        if (tFunction == *it2) {
+            delete tFunction;
+            mCreatedFunctions.erase(it2);
+            break;
+        }
+        it2++;
+    }
 }

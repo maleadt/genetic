@@ -32,7 +32,7 @@ TARGET_LINK_LIBRARIES(parser_function parser_value parser_type)
 
 # Grammar
 ADD_LIBRARY(parser_grammar grammar.h grammar.cpp)
-TARGET_LINK_LIBRARIES(parser_grammar parser_type parser_value)
+TARGET_LINK_LIBRARIES(parser_grammar parser_type parser_value parser_function)
 
 # Parser
 ADD_LIBRARY(parser parser.h parser.cpp)

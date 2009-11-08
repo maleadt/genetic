@@ -43,24 +43,6 @@
 // Construction and destruction
 //
 
-// Parameterisized constructor
-Function::Function(Value (*iPointer)(std::vector<Value>)) {
-    mPointer = iPointer;
-    mReturnType = Type(VOID);
-}
-
-// Parameterisized constructor -- only return value
-Function::Function(Value (*iPointer)(std::vector<Value>), const Type& iReturn) {
-    mPointer = iPointer;
-    mReturnType = iReturn;
-}
-
-// Parameterisized constructor -- only parameters
-Function::Function(Value (*iPointer)(std::vector<Value>), std::initializer_list<Type> iParameters) {
-    mPointer = iPointer;
-    mParameterTypes = iParameters;
-}
-
 // Parameterisized constructor -- return value and parameters
 Function::Function(Value (*iPointer)(std::vector<Value>), std::initializer_list<Type> iParameters, const Type& iReturn) {
     mPointer = iPointer;
@@ -73,13 +55,8 @@ Function::Function(Value (*iPointer)(std::vector<Value>), std::initializer_list<
 // Function execution
 //
 
-// Call without parameters
-Value Function::call() const {
-    return call(std::vector<Value>());
-}
-
 // Call with parameters
-Value Function::call(const std::initializer_list<Value>& iParameters) const {
+Value Function::call(std::initializer_list<Value> iParameters) const {
     return call(std::vector<Value>(iParameters));
 }
 Value Function::call(const std::vector<Value>& iParameters) const {

@@ -103,18 +103,18 @@ int main() {
         Grammar tGrammar;
 
         // Mathematical functions
-        tGrammar.setFunction(1, new Function(&plus, {INT, INT}, INT));
-        tGrammar.setFunction(2, new Function(&min, {INT, INT}, INT));
-        tGrammar.setFunction(3, new Function(&mult, {INT, INT}, INT));
-        tGrammar.setFunction(4, new Function(&div, {INT, INT}, INT));
+        tGrammar.createFunction(1, &plus, {INT, INT}, INT);
+        tGrammar.createFunction(2, &min, {INT, INT}, INT);
+        tGrammar.createFunction(3, &mult, {INT, INT}, INT);
+        tGrammar.createFunction(4, &div, {INT, INT}, INT);
 
         // Conditional functions
-        tGrammar.setFunction(5, new Function(&equals, {INT, INT}, BOOL));
-        tGrammar.setFunction(6, new Function(&lesser, {INT, INT}, BOOL));
-        tGrammar.setFunction(7, new Function(&greater, {INT, INT}, BOOL));
+        tGrammar.createFunction(5, &equals, {INT, INT}, BOOL);
+        tGrammar.createFunction(6, &lesser, {INT, INT}, BOOL);
+        tGrammar.createFunction(7, &greater, {INT, INT}, BOOL);
 
         // Other
-        tGrammar.setFunction(8, new Function(&print, {INT}));
+        tGrammar.createFunction(8, &print, {INT}, VOID);
     }
     catch (Exception e) {
         std::cout << e << std::endl;

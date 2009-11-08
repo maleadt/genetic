@@ -34,6 +34,8 @@
 
 // Headers
 #include <map>
+#include <list>
+#include <initializer_list>
 #include "type.h"
 #include "value.h"
 #include "function.h"
@@ -49,15 +51,17 @@ class Grammar {
 public:
     // Construction and destruction
     Grammar();
+    ~Grammar();
 
-    // Setters
+    // Functions
+    void createFunction(unsigned char, Value (*)(std::vector<Value>), const std::initializer_list<Type>&, const Type&);
     void setFunction(unsigned char, const Function*);
-
-    // Getters
-    const Function* getFunction(unsigned char);
+    const Function* getFunction(unsigned char) const;
+    void deleteFunction(unsigned char);
 
 private:
     std::map<unsigned char, const Function*> mFunctions;
+    std::list<const Function*> mCreatedFunctions;
 };
 
 
