@@ -1,3 +1,16 @@
+#
+# Configuration
+#
+
+# Enable C++0x
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+SET(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+
+
+#
+# Build libraries
+#
+
 # Generic functions
 ADD_LIBRARY(generic generic.h generic.cpp)
 

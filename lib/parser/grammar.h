@@ -55,16 +55,14 @@ const unsigned char SYNT_START = 0x01;
 const unsigned char ARG_OPEN = 0x01;
 const unsigned char ARG_SEP = 0x02;
 const unsigned char ARG_CLOSE = 0x03;
-const unsigned char BLOCK_OPEN = 0x04;
-const unsigned char BLOCK_SEP = 0x00;   // Gene seperator, shouldn't be used in parsing
-const unsigned char BLOCK_CLOSE = 0x05;
-const unsigned char SYNT_END = 0x06;
+const unsigned char DO = 0x04;
+const unsigned char SYNT_END = 0x05;
 
 // Conditionals
 const unsigned char COND_START = 0x10;
 const unsigned char COND_IF = 0x10;
-const unsigned char COND_UNLESS = 0x12;
-const unsigned char COND_WHILE = 0x13;
+const unsigned char COND_UNLESS = 0x11;
+const unsigned char COND_WHILE = 0x12;
 const unsigned char COND_END = 0x14;
 
 // Data types

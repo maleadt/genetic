@@ -131,13 +131,39 @@ int main() {
         // Code creation
         //
 
-        unsigned char tBytecode[] = {
-        OTHER_PRINT,
-            ARG_OPEN,
-                DATA_INT, 5,
-            ARG_CLOSE
-        };
-        DNA tDNA(tBytecode, 5);
+        DNA tDNA({
+            OTHER_PRINT,
+                ARG_OPEN,
+                    MATH_PLUS,
+                        ARG_OPEN,
+                            DATA_INT, 1,
+                        ARG_SEP,
+                            DATA_INT, 2,
+                        ARG_CLOSE,
+                ARG_CLOSE,
+            0,
+            COND_IF,
+                ARG_OPEN,
+                    TEST_GREATER,
+                        ARG_OPEN,
+                            DATA_INT, 2,
+                        ARG_SEP,
+                            DATA_INT, 1,
+                        ARG_CLOSE,
+                ARG_CLOSE,
+            DO,
+                ARG_OPEN,
+                    OTHER_PRINT,
+                        ARG_OPEN,
+                            DATA_INT, 2,
+                        ARG_CLOSE,
+                ARG_SEP,
+                    OTHER_PRINT,
+                        ARG_OPEN,
+                            DATA_INT, 1,
+                        ARG_CLOSE,
+                ARG_CLOSE
+        });
         
         
         //

@@ -123,17 +123,20 @@ void Parser::execute_instruction(unsigned char* iBlock, unsigned int iSize) {
                 throw Exception(GENERIC, "conditional clause not implemented yet");
             }
         }
+
+        // Save pointer
+        tLoc = tEnd;
     }
 
     // Evaluate instruction
     if (tConditionalExecution) {
-        if (mGrammar->isFunction(iBlock[tLoc])) {
+        if (mGrammar->isFunction(iBlock[tLoc]) || iBlock[tLoc] == DO) { // FIXME
             evaluate(iBlock, iSize, tLoc, iSize);
         } else {
             throw Exception(SYNTAX, "instruction can only contain one (optional) conditional and one function");
         }
 
-        // We should be at the end now
+        // We should be at the end no
         if (tLoc != iSize)
             throw Exception(SYNTAX, "garbage after instruction end");
     }
@@ -165,16 +168,29 @@ Value Parser::evaluate(unsigned char* iBlock, unsigned int iSize, unsigned int& 
         std::vector<Value> tParameters;
         for (unsigned int i = 0; i < tParameterBytecode.size(); i++) {
             Value tParameter = evaluate(iBlock, iSize, tParameterBytecode[i].first, tParameterBytecode[i].second);
-            if (tParameter.getType() == VOID)
-                throw Exception(SYNTAX, "argument produced void value");
             tParameters.push_back(tParameter);
         }
 
-        // Move the pointer
+        // Save the pointer
         tLoc = tEnd;
 
         // Call the function
         return tFunction->call(tParameters);
+    }
+    else if (iBlock[tLoc] == DO) {
+        // Extract the arguments
+        unsigned int tStart = ++tLoc;
+        unsigned int tEnd;
+        std::vector<std::pair<unsigned int, unsigned int> > tParameterBytecode = extract_arguments(iBlock, iSize, tStart, tEnd);
+
+        // Evaluate all arguments
+        for (unsigned int i = 0; i < tParameterBytecode.size(); i++)
+            Value tParameter = evaluate(iBlock, iSize, tParameterBytecode[i].first, tParameterBytecode[i].second);
+
+        // Save the pointer
+        tLoc = tEnd;
+
+        return Value();
     }
     else if (mGrammar->isData(iBlock[tLoc])) {
         unsigned char tDataType = iBlock[tLoc++];
@@ -240,16 +256,23 @@ std::vector<std::pair<unsigned int, unsigned int> > Parser::extract_arguments(un
             tBracketBalance--;
         }
 
+        // Data
+        else if (mGrammar->isData(iBlock[tLoc])) {
+            tLoc++;
+        }
+
+        // Move pointer
+        tLoc++;
+
         // End of argument parsing
         if (tBracketBalance == 0)
             break;
-        tLoc++;
     }
 
     // Check if the brackets did match
     if (tBracketBalance != 0)
         throw Exception(SYNTAX, "could not find closing arguments bracket");
-    iEnd = ++tLoc;
+    iEnd = tLoc;
 
     return tArguments;
 }

@@ -50,6 +50,15 @@ DNA::DNA(const DNA& inputDNA) {
     std::memcpy(dataGenes, inputDNA.dataGenes, dataSize);
 }
 
+// Constructor with initializer list
+DNA::DNA(const std::initializer_list<unsigned char> inputList) {
+    dataSize = inputList.size();
+
+    // Initialize genes
+    dataGenes = (unsigned char*) malloc(dataSize * sizeof(unsigned char));
+    std::memcpy(dataGenes, inputList.begin(), dataSize);
+}
+
 // Constructor with parameters
 DNA::DNA(const unsigned char* inputGenes, int inputSize) {
     dataSize = inputSize;

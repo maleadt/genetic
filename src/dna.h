@@ -38,6 +38,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <assert.h>
+#include <initializer_list>
 
 
 //
@@ -54,6 +55,7 @@ class DNA
 	public:
 		// Construction and destruction
 		DNA(const DNA& inputData);
+		DNA(const std::initializer_list<unsigned char>);
                 DNA(const unsigned char* inputData, int inputSize);
                 ~DNA();
 
