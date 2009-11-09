@@ -37,6 +37,7 @@
 #include <stack>
 #include <valarray>
 #include <utility>
+#include <initializer_list>
 #include "grammar.h"
 #include "../dna.h"
 
@@ -56,8 +57,10 @@ public:
 
 private:
     // Auxiliary
+    std::vector<std::pair<unsigned int, unsigned int> > extract_syntax(std::initializer_list<unsigned char>, unsigned char*, unsigned int, unsigned int, unsigned int&);
     std::vector<std::pair<unsigned int, unsigned int> > extract_arguments(unsigned char*, unsigned int, unsigned int, unsigned int&);
-    Value evaluate(unsigned char*, unsigned int, unsigned int&, unsigned int);
+    std::vector<std::pair<unsigned int, unsigned int> > extract_instructions(unsigned char*, unsigned int, unsigned int, unsigned int&);
+    Value evaluate(unsigned char*, unsigned int, unsigned int&);
     
     // Byte conversion
     bool toBool(unsigned char);

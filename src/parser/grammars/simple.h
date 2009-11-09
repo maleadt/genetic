@@ -63,6 +63,11 @@ Value div(std::vector<Value> p) {
     return p[0].getInt() / p[1].getInt();
 }
 
+unsigned char MATH_MOD;
+Value mod(std::vector<Value> p) {
+    return p[0].getInt() % p[1].getInt();
+}
+
 
 //
 // Tests
@@ -73,13 +78,28 @@ Value equals(std::vector<Value> p) {
     return p[0].getInt() == p[1].getInt();
 }
 
+unsigned char TEST_INEQUALS;
+Value inequals(std::vector<Value> p) {
+    return p[0].getInt() != p[1].getInt();
+}
+
 unsigned char TEST_LESSER;
 Value lesser(std::vector<Value> p) {
+    return p[0].getInt() <= p[1].getInt();
+}
+
+unsigned char TEST_STRICTLESSER;
+Value strictlesser(std::vector<Value> p) {
     return p[0].getInt() < p[1].getInt();
 }
 
 unsigned char TEST_GREATER;
 Value greater(std::vector<Value> p) {
+    return p[0].getInt() >= p[1].getInt();
+}
+
+unsigned char TEST_STRICTGREATER;
+Value strictgreater(std::vector<Value> p) {
     return p[0].getInt() > p[1].getInt();
 }
 
@@ -123,8 +143,11 @@ void SimpleGrammar::setup() {
 
     // Test functions
     TEST_EQUALS = createFunction(&equals, {INT, INT}, BOOL);
+    TEST_INEQUALS = createFunction(&inequals, {INT, INT}, BOOL);
     TEST_LESSER = createFunction(&lesser, {INT, INT}, BOOL);
+    TEST_STRICTLESSER = createFunction(&strictlesser, {INT, INT}, BOOL);
     TEST_GREATER = createFunction(&greater, {INT, INT}, BOOL);
+    TEST_STRICTGREATER = createFunction(&strictgreater, {INT, INT}, BOOL);
 
     // Other
     OTHER_PRINT = createFunction(&print, {INT}, VOID);

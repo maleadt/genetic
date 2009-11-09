@@ -76,18 +76,17 @@ int main() {
                             DATA_INT, 1,
                         ARG_CLOSE,
                 ARG_CLOSE,
-            DO,
-                ARG_OPEN,
+                INSTR_OPEN,
                     OTHER_PRINT,
                         ARG_OPEN,
                             DATA_INT, 2,
                         ARG_CLOSE,
-                ARG_SEP,
+                INSTR_SEP,
                     OTHER_PRINT,
                         ARG_OPEN,
                             DATA_INT, 1,
                         ARG_CLOSE,
-                ARG_CLOSE
+                INSTR_CLOSE
         });
         
         

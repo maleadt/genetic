@@ -55,8 +55,10 @@ const unsigned char SYNT_START = 01;
 const unsigned char ARG_OPEN = 01;
 const unsigned char ARG_SEP = 02;
 const unsigned char ARG_CLOSE = 03;
-const unsigned char DO = 04;
-const unsigned char SYNT_END = 05;
+const unsigned char INSTR_OPEN = 04;
+const unsigned char INSTR_SEP = 05;
+const unsigned char INSTR_CLOSE = 06;
+const unsigned char SYNT_END = 07;
 
 // Conditionals
 const unsigned char COND_START = 10;
