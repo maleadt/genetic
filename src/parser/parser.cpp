@@ -42,7 +42,7 @@
 //
 
 // Parameterized constructor
-Parser::Parser(const Grammar* iGrammar) {
+Parser::Parser(Grammar* iGrammar) {
     mGrammar = iGrammar;
 }
 
@@ -54,9 +54,6 @@ Parser::Parser(const Grammar* iGrammar) {
 
 // Execute DNA
 void Parser::execute(const DNA& iDNA) {
-    // Initialize variable scope
-    mScope.clear();
-
     // Execute all instructions
     for (unsigned int i = 0; i < iDNA.genes(); i++) {
         // Extract the gene
@@ -76,6 +73,9 @@ void Parser::evaluate_block(unsigned char* iBlock, unsigned int iSize) {
     // Extract all instructions
     unsigned int tLoc = 0;
     std::vector<unsigned int> tInstructionBytecode = extract_instructions(iBlock, iSize, tLoc);
+    
+    // Give the grammar a chance to do some stuff (variable handling, ...)
+    mGrammar->block();
 
     // Evaluate all instructions
     for (unsigned int i = 0; i < tInstructionBytecode.size(); i++) {
@@ -156,6 +156,8 @@ void Parser::evaluate_conditional(unsigned char* iBlock, unsigned int iSize, uns
                         unsigned int tLocInst = tInstructionBytecode[i];
                         evaluate_instruction(iBlock, iSize, tLocInst);
                     }
+                } else {
+                    break;
                 }
             }
             break;

@@ -49,7 +49,7 @@
 class Parser {
 public:
     // Construction and destruction
-    Parser(const Grammar*);
+    Parser(Grammar*);
 
     // Parsing
     void execute(const DNA&);
@@ -72,8 +72,7 @@ private:
     int toInt(unsigned char);
 
     // Data members
-    const Grammar* mGrammar;
-    std::map<unsigned int, Value> mScope;
+    Grammar* mGrammar;
 };
 
 

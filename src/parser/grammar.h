@@ -88,6 +88,7 @@ public:
 
     // Configuration
     virtual void setup();
+    virtual void block();
 
     // Functions
     unsigned char createFunction(Value (*)(std::vector<Value>), const std::initializer_list<Type>&, const Type&);

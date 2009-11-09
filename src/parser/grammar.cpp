@@ -68,6 +68,11 @@ void Grammar::setup() {
     mSetup = true;
 }
 
+// A new block is going to be parsed
+void Grammar::block() {
+    
+}
+
 
 //
 // Functions

@@ -34,10 +34,37 @@
 
 // Headers
 #include "../grammar.h"
+#include <map>
 
 //////////////
 // ROUTINES //
 //////////////
+
+//
+// Variable handling
+//
+
+// Static scope
+std::map<unsigned int, Value> mScope;
+
+unsigned char GET;
+Value get(std::vector<Value> p) {
+    // The variable must be defined
+    std::map<unsigned int, Value>::const_iterator it = mScope.find(p[0].getInt());
+    if (it == mScope.end()) {
+        throw Exception(FUNCTION, "unknown variable");
+    }
+
+    return it->second;
+}
+
+unsigned char SET;
+Value set(std::vector<Value> p) {
+    // Define the variable
+    mScope[p[0].getInt()] = p[1];
+
+    return Value();
+}
 
 //
 // Mathematical
@@ -124,6 +151,7 @@ class SimpleGrammar : public Grammar {
 public:
     // Grammar setup
     void setup();
+    void block();
     
 };
 
@@ -134,6 +162,10 @@ public:
 void SimpleGrammar::setup() {
     // Parent setup
     Grammar::setup();
+
+    // Variable handling
+    GET = createFunction(&get, {INT}, INT);
+    SET = createFunction(&set, {INT, INT}, VOID);
 
     // Mathematical functions
     MATH_PLUS = createFunction(&plus, {INT, INT}, INT);
@@ -151,6 +183,14 @@ void SimpleGrammar::setup() {
 
     // Other
     OTHER_PRINT = createFunction(&print, {INT}, VOID);
+}
+
+void SimpleGrammar::block() {
+    // Parent block handling
+    Grammar::block();
+
+    // Reset the scope
+    mScope.clear();
 }
 
 

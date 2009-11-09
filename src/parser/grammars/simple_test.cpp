@@ -55,42 +55,58 @@ int main() {
         //
         // Code creation
         //
-
+// TODO: lege block
         DNA tDNA({
             INSTR_OPEN,
-                OTHER_PRINT,
+                // Set variable 1 to 0
+                SET,
                     ARG_OPEN,
-                        MATH_PLUS,
+                        DATA_INT, 1,
+                    ARG_SEP,
+                        DATA_INT, 1,
+                    ARG_CLOSE,
+            INSTR_SEP,
+
+                // While variable 1 < 10
+                COND_WHILE,
+                    ARG_OPEN,
+                        TEST_LESSER,
                             ARG_OPEN,
-                                DATA_INT, 1,
+                                GET,
+                                    ARG_OPEN,
+                                        DATA_INT, 1,
+                                    ARG_CLOSE,
                             ARG_SEP,
-                                DATA_INT, 2,
+                                DATA_INT, 10,
                             ARG_CLOSE,
                     ARG_CLOSE,
-            INSTR_CLOSE,
-            0,
-            INSTR_OPEN,
-            COND_IF,
-                ARG_OPEN,
-                    TEST_GREATER,
-                        ARG_OPEN,
-                            DATA_INT, 2,
-                        ARG_SEP,
-                            DATA_INT, 1,
-                        ARG_CLOSE,
-                ARG_CLOSE,
                 INSTR_OPEN,
+                    // Print value
                     OTHER_PRINT,
                         ARG_OPEN,
-                            DATA_INT, 2,
+                            GET,
+                                ARG_OPEN,
+                                    DATA_INT, 1,
+                                ARG_CLOSE,
                         ARG_CLOSE,
                 INSTR_SEP,
-                    OTHER_PRINT,
+                    // Increase with 1
+                    SET,
                         ARG_OPEN,
                             DATA_INT, 1,
+                        ARG_SEP,
+                            MATH_PLUS,
+                                ARG_OPEN,
+                                    GET,
+                                        ARG_OPEN,
+                                            DATA_INT, 1,
+                                        ARG_CLOSE,
+                                ARG_SEP,
+                                    DATA_INT, 1,
+                                ARG_CLOSE,
                         ARG_CLOSE,
                 INSTR_CLOSE,
-            INSTR_CLOSE,
+            INSTR_CLOSE
         });
         
         
