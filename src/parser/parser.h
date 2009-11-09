@@ -53,14 +53,19 @@ public:
 
     // Parsing
     void execute(const DNA&);
-    void execute_instruction(unsigned char*, unsigned int);
 
 private:
+    // Evaluation of subparts
+    void evaluate_block(unsigned char*, unsigned int);
+    Value evaluate_instruction(unsigned char*, unsigned int, unsigned int&);
+    void evaluate_conditional(unsigned char*, unsigned int, unsigned int&);
+    Value evaluate_function(unsigned char*, unsigned int, unsigned int&);
+    Value evaluate_data(unsigned char*, unsigned int, unsigned int&);
+    
     // Auxiliary
-    std::vector<std::pair<unsigned int, unsigned int> > extract_syntax(std::initializer_list<unsigned char>, unsigned char*, unsigned int, unsigned int, unsigned int&);
-    std::vector<std::pair<unsigned int, unsigned int> > extract_arguments(unsigned char*, unsigned int, unsigned int, unsigned int&);
-    std::vector<std::pair<unsigned int, unsigned int> > extract_instructions(unsigned char*, unsigned int, unsigned int, unsigned int&);
-    Value evaluate(unsigned char*, unsigned int, unsigned int&);
+    std::vector<unsigned int> extract_syntax(std::initializer_list<unsigned char>, unsigned char*, unsigned int, unsigned int&);
+    std::vector<unsigned int> extract_arguments(unsigned char*, unsigned int, unsigned int&);
+    std::vector<unsigned int> extract_instructions(unsigned char*, unsigned int, unsigned int&);
     
     // Byte conversion
     bool toBool(unsigned char);

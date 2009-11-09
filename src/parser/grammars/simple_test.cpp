@@ -57,16 +57,19 @@ int main() {
         //
 
         DNA tDNA({
-            OTHER_PRINT,
-                ARG_OPEN,
-                    MATH_PLUS,
-                        ARG_OPEN,
-                            DATA_INT, 1,
-                        ARG_SEP,
-                            DATA_INT, 2,
-                        ARG_CLOSE,
-                ARG_CLOSE,
+            INSTR_OPEN,
+                OTHER_PRINT,
+                    ARG_OPEN,
+                        MATH_PLUS,
+                            ARG_OPEN,
+                                DATA_INT, 1,
+                            ARG_SEP,
+                                DATA_INT, 2,
+                            ARG_CLOSE,
+                    ARG_CLOSE,
+            INSTR_CLOSE,
             0,
+            INSTR_OPEN,
             COND_IF,
                 ARG_OPEN,
                     TEST_GREATER,
@@ -86,7 +89,8 @@ int main() {
                         ARG_OPEN,
                             DATA_INT, 1,
                         ARG_CLOSE,
-                INSTR_CLOSE
+                INSTR_CLOSE,
+            INSTR_CLOSE,
         });
         
         

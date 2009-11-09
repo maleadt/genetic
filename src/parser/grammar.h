@@ -65,7 +65,7 @@ const unsigned char COND_START = 10;
 const unsigned char COND_IF = 10;
 const unsigned char COND_UNLESS = 11;
 const unsigned char COND_WHILE = 12;
-const unsigned char COND_END = 14;
+const unsigned char COND_END = 13;
 
 // Data types
 const unsigned char DATA_START = 20;
