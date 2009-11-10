@@ -36,6 +36,7 @@
 #include "type.h"
 #include "value.h"
 #include "exception.h"
+#include "grammar.h"
 #include <vector>
 #include <iostream>
 #include <initializer_list>
@@ -46,17 +47,18 @@
 // CLASS DEFINITION //
 //////////////////////
 
+class Grammar;
+
 class Function {
 public:
     // Construction and destruction
-    Function(Value (*)(std::vector<Value>), std::initializer_list<Type>, const Type&);
+    Function(std::vector<Type>, const Type&);
 
-    // Function execution
-    Value call(std::initializer_list<Value>) const;
-    Value call(const std::vector<Value>&) const;
+    // Data verification
+    void checkParameters(const std::vector<Value>&) const;
+    void checkReturn(const Value&) const;
 
 private:
-    Value (*mPointer)(std::vector<Value>);
     Type mReturnType;
     std::vector<Type> mParameterTypes;
 };

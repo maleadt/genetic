@@ -172,7 +172,7 @@ void Parser::evaluate_conditional(unsigned char* iBlock, unsigned int iSize, uns
 
 Value Parser::evaluate_function(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
     // Fetch the function
-    const Function* tFunction = mGrammar->getFunction(iBlock[tLoc]);
+    unsigned char tFunction = iBlock[tLoc];
 
     // Extract the arguments
     tLoc++;
@@ -188,7 +188,7 @@ Value Parser::evaluate_function(unsigned char* iBlock, unsigned int iSize, unsig
     }
 
     // Call the function
-    return tFunction->call(tParameters);
+    return mGrammar->callFunction(tFunction, tParameters);
 }
 
 Value Parser::evaluate_data(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {

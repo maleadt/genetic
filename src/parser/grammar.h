@@ -35,7 +35,7 @@
 // Headers
 #include <map>
 #include <list>
-#include <initializer_list>
+#include <vector>
 #include "type.h"
 #include "value.h"
 #include "function.h"
@@ -80,6 +80,9 @@ const unsigned char DATA_END = 24;
 // CLASS DEFINITION //
 //////////////////////
 
+// Forward function declaration
+class Function;
+
 class Grammar {
 public:
     // Construction and destruction
@@ -90,12 +93,14 @@ public:
     virtual void setup();
     virtual void block();
 
-    // Functions
-    unsigned char createFunction(Value (*)(std::vector<Value>), const std::initializer_list<Type>&, const Type&);
-    void createFunction(unsigned char, Value (*)(std::vector<Value>), const std::initializer_list<Type>&, const Type&);
+    // Function handling
+    unsigned char createFunction(const std::vector<Type>&, const Type&);
+    void createFunction(unsigned char, const std::vector<Type>&, const Type&);
     void setFunction(unsigned char, const Function*);
     const Function* getFunction(unsigned char) const;
     void deleteFunction(unsigned char);
+    Value callFunction(unsigned char, const std::vector<Value>&);
+    virtual Value executeFunction(unsigned char, const std::vector<Value>&) = 0;
 
     // Test funcions
     bool isReserved(unsigned char) const;

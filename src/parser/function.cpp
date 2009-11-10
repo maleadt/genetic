@@ -44,22 +44,18 @@
 //
 
 // Parameterisized constructor -- return value and parameters
-Function::Function(Value (*iPointer)(std::vector<Value>), std::initializer_list<Type> iParameters, const Type& iReturn) {
-    mPointer = iPointer;
+Function::Function(std::vector<Type> iParameters, const Type& iReturn) {
     mReturnType = iReturn;
     mParameterTypes = iParameters;
 }
 
 
 //
-// Function execution
+// Data verification
 //
 
-// Call with parameters
-Value Function::call(std::initializer_list<Value> iParameters) const {
-    return call(std::vector<Value>(iParameters));
-}
-Value Function::call(const std::vector<Value>& iParameters) const {
+// Check the parameters
+void Function::checkParameters(const std::vector<Value>& iParameters) const {
     // Check input parameters
     bool tParameterFailure = false;
     if (mParameterTypes.size() != iParameters.size())
@@ -87,15 +83,14 @@ Value Function::call(const std::vector<Value>& iParameters) const {
         details << "]";
         throw Exception(FUNCTION, "input parameters did not respect function signature", details.str());
     }
+}
 
-    // Call function
-    Value tReturn = (*mPointer)(iParameters);
-
+// Check the return value
+void Function::checkReturn(const Value& iReturn) const {
     // Check return value
-    if (tReturn.getType() != mReturnType) {
+    if (iReturn.getType() != mReturnType) {
         std::stringstream details;
-        details << "function returned " << tReturn.getType() << " while function definition was " << mReturnType;
+        details << "function returned " << iReturn.getType() << " while function definition was " << mReturnType;
         throw Exception(FUNCTION, "function returned invalid value", details.str());
     }
-    return tReturn;
 }

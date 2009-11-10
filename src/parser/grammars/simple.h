@@ -36,111 +36,6 @@
 #include "../grammar.h"
 #include <map>
 
-//////////////
-// ROUTINES //
-//////////////
-
-//
-// Variable handling
-//
-
-// Static scope
-std::map<unsigned int, Value> mScope;
-
-unsigned char GET;
-Value get(std::vector<Value> p) {
-    // The variable must be defined
-    std::map<unsigned int, Value>::const_iterator it = mScope.find(p[0].getInt());
-    if (it == mScope.end()) {
-        throw Exception(FUNCTION, "unknown variable");
-    }
-
-    return it->second;
-}
-
-unsigned char SET;
-Value set(std::vector<Value> p) {
-    // Define the variable
-    mScope[p[0].getInt()] = p[1];
-
-    return Value();
-}
-
-//
-// Mathematical
-//
-
-unsigned char MATH_PLUS;
-Value plus(std::vector<Value> p) {
-    return p[0].getInt() + p[1].getInt();
-}
-
-unsigned char MATH_MIN;
-Value min(std::vector<Value> p) {
-    return p[0].getInt() - p[1].getInt();
-}
-
-unsigned char MATH_MULT;
-Value mult(std::vector<Value> p) {
-    return p[0].getInt() * p[1].getInt();
-}
-
-unsigned char MATH_DIV;
-Value div(std::vector<Value> p) {
-    return p[0].getInt() / p[1].getInt();
-}
-
-unsigned char MATH_MOD;
-Value mod(std::vector<Value> p) {
-    return p[0].getInt() % p[1].getInt();
-}
-
-
-//
-// Tests
-//
-
-unsigned char TEST_EQUALS;
-Value equals(std::vector<Value> p) {
-    return p[0].getInt() == p[1].getInt();
-}
-
-unsigned char TEST_INEQUALS;
-Value inequals(std::vector<Value> p) {
-    return p[0].getInt() != p[1].getInt();
-}
-
-unsigned char TEST_LESSER;
-Value lesser(std::vector<Value> p) {
-    return p[0].getInt() <= p[1].getInt();
-}
-
-unsigned char TEST_STRICTLESSER;
-Value strictlesser(std::vector<Value> p) {
-    return p[0].getInt() < p[1].getInt();
-}
-
-unsigned char TEST_GREATER;
-Value greater(std::vector<Value> p) {
-    return p[0].getInt() >= p[1].getInt();
-}
-
-unsigned char TEST_STRICTGREATER;
-Value strictgreater(std::vector<Value> p) {
-    return p[0].getInt() > p[1].getInt();
-}
-
-
-//
-// Other
-//
-
-unsigned char OTHER_PRINT;
-Value print(std::vector<Value> p) {
-    std::cout << "Print: " << p[0].getInt() << std::endl;
-    return Value();
-}
-
 
 
 //////////////////////
@@ -152,38 +47,165 @@ public:
     // Grammar setup
     void setup();
     void block();
-    
+
+    // Function handling
+    unsigned char registerFunction(Value (SimpleGrammar::*)(std::vector<Value>), std::initializer_list<Type>, Type);
+    Value executeFunction(unsigned char, const std::vector<Value>&);
+
+    // Variable handling
+    Value get(std::vector<Value> p);
+    Value set(std::vector<Value> p);
+
+    // Mathematical
+    Value plus(std::vector<Value> p);
+    Value min(std::vector<Value> p);
+    Value mult(std::vector<Value> p);
+    Value div(std::vector<Value> p);
+    Value mod(std::vector<Value> p);
+
+    // Tests
+    Value equals(std::vector<Value> p);
+    Value inequals(std::vector<Value> p);
+    Value greater(std::vector<Value> p);
+    Value strictgreater(std::vector<Value> p);
+    Value lesser(std::vector<Value> p);
+    Value strictlesser(std::vector<Value> p);
+
+    // Other
+    Value print(std::vector<Value> p);
+private:
+    std::map<unsigned char, Value (SimpleGrammar::*)(std::vector<Value>)> mPointers;
 };
+
 
 ////////////////////
 // CLASS ROUTINES //
 ////////////////////
 
-void SimpleGrammar::setup() {
-    // Parent setup
-    Grammar::setup();
+//
+// Variable handling
+//
 
-    // Variable handling
-    GET = createFunction(&get, {INT}, INT);
-    SET = createFunction(&set, {INT, INT}, VOID);
+// Static scope
+std::map<unsigned int, Value> mScope;
 
-    // Mathematical functions
-    MATH_PLUS = createFunction(&plus, {INT, INT}, INT);
-    MATH_MIN = createFunction(&min, {INT, INT}, INT);
-    MATH_MULT = createFunction(&mult, {INT, INT}, INT);
-    MATH_DIV = createFunction(&div, {INT, INT}, INT);
+unsigned char GET;
+Value SimpleGrammar::get(std::vector<Value> p) {
+    // The variable must be defined
+    std::map<unsigned int, Value>::const_iterator it = mScope.find(p[0].getInt());
+    if (it == mScope.end()) {
+        throw Exception(FUNCTION, "unknown variable");
+    }
 
-    // Test functions
-    TEST_EQUALS = createFunction(&equals, {INT, INT}, BOOL);
-    TEST_INEQUALS = createFunction(&inequals, {INT, INT}, BOOL);
-    TEST_LESSER = createFunction(&lesser, {INT, INT}, BOOL);
-    TEST_STRICTLESSER = createFunction(&strictlesser, {INT, INT}, BOOL);
-    TEST_GREATER = createFunction(&greater, {INT, INT}, BOOL);
-    TEST_STRICTGREATER = createFunction(&strictgreater, {INT, INT}, BOOL);
-
-    // Other
-    OTHER_PRINT = createFunction(&print, {INT}, VOID);
+    return it->second;
 }
+
+unsigned char SET;
+Value SimpleGrammar::set(std::vector<Value> p) {
+    // Define the variable
+    mScope[p[0].getInt()] = p[1];
+
+    return Value();
+}
+
+
+//
+// Function handling
+//
+
+// Save the function locally
+unsigned char SimpleGrammar::registerFunction(Value (SimpleGrammar::*iPointer)(std::vector<Value>), std::initializer_list<Type> iParameters, Type iReturn) {
+    unsigned char tByte;
+    tByte = createFunction(std::vector<Type>(iParameters), iReturn);
+    mPointers[tByte] = iPointer;
+    return tByte;
+}
+
+// Execute a function
+Value SimpleGrammar::executeFunction(unsigned char iByte, const std::vector<Value>& iParameters) {
+    return ((this)->*(mPointers[iByte]))(iParameters);
+}
+
+//
+// Mathematical
+//
+
+unsigned char MATH_PLUS;
+Value SimpleGrammar::plus(std::vector<Value> p) {
+    return p[0].getInt() + p[1].getInt();
+}
+
+unsigned char MATH_MIN;
+Value SimpleGrammar::min(std::vector<Value> p) {
+    return p[0].getInt() - p[1].getInt();
+}
+
+unsigned char MATH_MULT;
+Value SimpleGrammar::mult(std::vector<Value> p) {
+    return p[0].getInt() * p[1].getInt();
+}
+
+unsigned char MATH_DIV;
+Value SimpleGrammar::div(std::vector<Value> p) {
+    return p[0].getInt() / p[1].getInt();
+}
+
+unsigned char MATH_MOD;
+Value SimpleGrammar::mod(std::vector<Value> p) {
+    return p[0].getInt() % p[1].getInt();
+}
+
+
+//
+// Tests
+//
+
+unsigned char TEST_EQUALS;
+Value SimpleGrammar::equals(std::vector<Value> p) {
+    return p[0].getInt() == p[1].getInt();
+}
+
+unsigned char TEST_INEQUALS;
+Value SimpleGrammar::inequals(std::vector<Value> p) {
+    return p[0].getInt() != p[1].getInt();
+}
+
+unsigned char TEST_LESSER;
+Value SimpleGrammar::lesser(std::vector<Value> p) {
+    return p[0].getInt() <= p[1].getInt();
+}
+
+unsigned char TEST_STRICTLESSER;
+Value SimpleGrammar::strictlesser(std::vector<Value> p) {
+    return p[0].getInt() < p[1].getInt();
+}
+
+unsigned char TEST_GREATER;
+Value SimpleGrammar::greater(std::vector<Value> p) {
+    return p[0].getInt() >= p[1].getInt();
+}
+
+unsigned char TEST_STRICTGREATER;
+Value SimpleGrammar::strictgreater(std::vector<Value> p) {
+    return p[0].getInt() > p[1].getInt();
+}
+
+
+//
+// Other
+//
+
+unsigned char OTHER_PRINT;
+Value SimpleGrammar::print(std::vector<Value> p) {
+    std::cout << "Print: " << p[0].getInt() << std::endl;
+    return Value();
+}
+
+
+//
+// Configuration
+//
+
 
 void SimpleGrammar::block() {
     // Parent block handling
@@ -191,6 +213,32 @@ void SimpleGrammar::block() {
 
     // Reset the scope
     mScope.clear();
+}
+
+void SimpleGrammar::setup() {
+    // Parent setup
+    Grammar::setup();
+
+    // Variable handling
+    GET = registerFunction(&SimpleGrammar::get, {INT}, INT);
+    SET = registerFunction(&SimpleGrammar::set, {INT, INT}, VOID);
+
+    // Mathematical functions
+    MATH_PLUS = registerFunction(&SimpleGrammar::plus, {INT, INT}, INT);
+    MATH_MIN = registerFunction(&SimpleGrammar::min, {INT, INT}, INT);
+    MATH_MULT = registerFunction(&SimpleGrammar::mult, {INT, INT}, INT);
+    MATH_DIV = registerFunction(&SimpleGrammar::div, {INT, INT}, INT);
+
+    // Test functions
+    TEST_EQUALS = registerFunction(&SimpleGrammar::equals, {INT, INT}, BOOL);
+    TEST_INEQUALS = registerFunction(&SimpleGrammar::inequals, {INT, INT}, BOOL);
+    TEST_LESSER = registerFunction(&SimpleGrammar::lesser, {INT, INT}, BOOL);
+    TEST_STRICTLESSER = registerFunction(&SimpleGrammar::strictlesser, {INT, INT}, BOOL);
+    TEST_GREATER = registerFunction(&SimpleGrammar::greater, {INT, INT}, BOOL);
+    TEST_STRICTGREATER = registerFunction(&SimpleGrammar::strictgreater, {INT, INT}, BOOL);
+
+    // Other
+    OTHER_PRINT = registerFunction(&SimpleGrammar::print, {INT}, VOID);
 }
 
 

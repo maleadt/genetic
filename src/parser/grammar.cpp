@@ -79,20 +79,20 @@ void Grammar::block() {
 //
 
 // Create a function
-unsigned char Grammar::createFunction(Value (*iPointer)(std::vector<Value>), const std::initializer_list<Type>& iParameterTypes, const Type& iReturnType) {
+unsigned char Grammar::createFunction(const std::vector<Type>& iParameterTypes, const Type& iReturnType) {
     unsigned char tByte = RESERVED_END;
     while (isFunction(tByte) && tByte < 254) {
         tByte++;
     }
     if (tByte >= 254)   // FIXME: 255? Hoe past laatste waarde detecteren?
         throw Exception(FUNCTION, "function definition possibilities exhausted");
-    createFunction(tByte, iPointer, iParameterTypes, iReturnType);
+    createFunction(tByte, iParameterTypes, iReturnType);
     return tByte;
 }
 
 // Create a function
-void Grammar::createFunction(unsigned char iByte, Value (*iPointer)(std::vector<Value>), const std::initializer_list<Type>& iParameterTypes, const Type& iReturnType) {
-    const Function* tFunction = new Function(iPointer, iParameterTypes, iReturnType);
+void Grammar::createFunction(unsigned char iByte, const std::vector<Type>& iParameterTypes, const Type& iReturnType) {
+    const Function* tFunction = new Function(iParameterTypes, iReturnType);
     setFunction(iByte, tFunction);
     mCreatedFunctions.push_back(tFunction);
 }
@@ -132,7 +132,7 @@ void Grammar::deleteFunction(unsigned char iByte) {
     if (!mSetup)
         throw Exception(GENERIC, "grammar isn't configured yet");
 
-    // The function must be defined
+    // Get the function pointer
     const Function* tFunction = getFunction(iByte);
     mFunctions.erase(iByte);
 
@@ -146,6 +146,18 @@ void Grammar::deleteFunction(unsigned char iByte) {
         }
         it2++;
     }
+}
+
+// Call a function
+Value Grammar::callFunction(unsigned char iByte, const std::vector<Value>& iParameters) {
+    // Get the function pointer
+    const Function* tFunction = getFunction(iByte);
+
+    // Check and execute the function
+    tFunction->checkParameters(iParameters);
+    Value tReturn = executeFunction(iByte, iParameters);
+    tFunction->checkReturn(tReturn);
+    return tReturn;
 }
 
 
