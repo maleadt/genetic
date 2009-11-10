@@ -37,3 +37,15 @@ TARGET_LINK_LIBRARIES(tetris_interactive tetris_pieces)
 TARGET_LINK_LIBRARIES(tetris_interactive tetris_board)
 TARGET_LINK_LIBRARIES(tetris_interactive tetris_game)
 
+
+
+#
+# Evolving client
+#
+
+# Executable
+ADD_EXECUTABLE(tetris tetris.cpp)
+TARGET_LINK_LIBRARIES(tetris tetris_input tetris_output tetris_pieces tetris_board tetris_game)
+TARGET_LINK_LIBRARIES(tetris parser)
+TARGET_LINK_LIBRARIES(tetris dna population environment)
+

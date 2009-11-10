@@ -166,6 +166,11 @@ Value Grammar::callFunction(unsigned char iByte, const std::vector<Value>& iPara
     return tReturn;
 }
 
+// Execute a function
+Value Grammar::executeFunction(unsigned char, const std::vector<Value>&) {
+    throw Exception(FUNCTION, "execution request for properly defined function not aknowledged by any derivative grammar class");
+}
+
 
 //
 // Test funcions

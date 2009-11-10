@@ -45,10 +45,11 @@
 class SimpleGrammar : public Grammar {
 public:
     // Grammar setup
-    void setup();
-    void block();
-    Value executeFunction(unsigned char, const std::vector<Value>&);
+    virtual void setup();
+    virtual void block();
+    virtual Value executeFunction(unsigned char, const std::vector<Value>&);
 
+protected:
     // Variable handling
     Value get(std::vector<Value> p);
     Value set(std::vector<Value> p);
@@ -70,6 +71,7 @@ public:
 
     // Other
     Value print(std::vector<Value> p);
+
 private:
     unsigned char setPointer(Value (SimpleGrammar::*)(std::vector<Value>), std::string, std::initializer_list<Type>, Type);
     std::map<unsigned char, Value (SimpleGrammar::*)(std::vector<Value>)> mPointers;
@@ -121,7 +123,12 @@ unsigned char SimpleGrammar::setPointer(Value (SimpleGrammar::*iPointer)(std::ve
 
 // Execute a function
 Value SimpleGrammar::executeFunction(unsigned char iByte, const std::vector<Value>& iParameters) {
-    return ((this)->*(mPointers[iByte]))(iParameters);
+    // Have we got a function definition?
+    std::map<unsigned char, Value (SimpleGrammar::*)(std::vector<Value>)>::iterator it = mPointers.find(iByte);
+    if (it != mPointers.end())
+        return ((this)->*(mPointers[iByte]))(iParameters);
+    else
+        return SimpleGrammar::executeFunction(iByte, iParameters);
 }
 
 //
@@ -195,7 +202,7 @@ Value SimpleGrammar::strictgreater(std::vector<Value> p) {
 
 unsigned char OTHER_PRINT;
 Value SimpleGrammar::print(std::vector<Value> p) {
-    std::cout << "Print: " << p[0].getInt() << std::endl;
+    //std::cout << "Print: " << p[0].getInt() << std::endl;
     return Value();
 }
 
@@ -206,7 +213,7 @@ Value SimpleGrammar::print(std::vector<Value> p) {
 
 
 void SimpleGrammar::block() {
-    // Parent block handling
+    // Call parent
     Grammar::block();
 
     // Reset the scope
@@ -214,7 +221,7 @@ void SimpleGrammar::block() {
 }
 
 void SimpleGrammar::setup() {
-    // Parent setup
+    // Call parent
     Grammar::setup();
 
     // Variable handling

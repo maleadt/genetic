@@ -101,7 +101,7 @@ public:
     void deleteFunction(unsigned char);
     std::string nameFunction(unsigned char) const;
     Value callFunction(unsigned char, const std::vector<Value>&);
-    virtual Value executeFunction(unsigned char, const std::vector<Value>&) = 0;
+    virtual Value executeFunction(unsigned char, const std::vector<Value>&);
 
     // Test funcions
     bool isReserved(unsigned char) const;

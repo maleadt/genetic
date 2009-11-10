@@ -100,21 +100,19 @@ void Parser::print_block(std::ostream& iStream, unsigned char* iBlock, unsigned 
 
     unsigned int tLoc = 0;
     bool tPrevArgEnd = false;
-    while (tLoc <= iSize) {
+    while (tLoc < iSize) {
 
         // Syntax
         if (mGrammar->isSyntax(iBlock[tLoc])) {
             switch (iBlock[tLoc]) {
                 case ARG_OPEN:
                     iStream << "(";
-                    tIndentation++;
                     break;
                 case ARG_SEP:
                     iStream << ", ";
                     break;
                 case ARG_CLOSE:
                     iStream << ")";
-                    tIndentation--;
                     tPrevArgEnd = true;
                     break;
                 case INSTR_OPEN:
