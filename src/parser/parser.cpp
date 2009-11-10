@@ -49,25 +49,156 @@ Parser::Parser(Grammar* iGrammar) {
 
 
 //
-// Parsing
+// Main functionality
 //
 
-// Execute DNA
-void Parser::execute(const DNA& iDNA) {
-    // Execute all instructions
+// Evaluate DNA
+void Parser::evaluate(const DNA& iDNA) {
+    // Evaluate all instructions
     for (unsigned int i = 0; i < iDNA.genes(); i++) {
         // Extract the gene
         unsigned char* tGene;
         unsigned int tSize;
         iDNA.extract_gene(i, tGene, tSize);
 
-        // Execute the block
+        // Evaluate the block
+        std::cout << "* Evaluating block " << i << ": ";
         evaluate_block(tGene, tSize);
 
         // Free the block
         free(tGene);
     }
 }
+
+
+// Output the DNA
+void Parser::print(std::ostream& iStream, const DNA& iDNA) {
+    // Print all instructions
+    for (unsigned int i = 0; i < iDNA.genes(); i++) {
+        // Extract the gene
+        unsigned char* tGene;
+        unsigned int tSize;
+        iDNA.extract_gene(i, tGene, tSize);
+
+        // Print the block
+        std::cout << "* Outputting block " << i << ": ";
+        print_block(iStream, tGene, tSize);
+
+        // Free the block
+        free(tGene);
+    }
+}
+
+
+//
+// Output helpers
+//
+
+void Parser::print_block(std::ostream& iStream, unsigned char* iBlock, unsigned int iSize) {
+    unsigned char tIndentation = 1;
+    print_newline(iStream, tIndentation);
+
+    unsigned int tLoc = 0;
+    bool tPrevArgEnd = false;
+    while (tLoc <= iSize) {
+
+        // Syntax
+        if (mGrammar->isSyntax(iBlock[tLoc])) {
+            switch (iBlock[tLoc]) {
+                case ARG_OPEN:
+                    iStream << "(";
+                    tIndentation++;
+                    break;
+                case ARG_SEP:
+                    iStream << ", ";
+                    break;
+                case ARG_CLOSE:
+                    iStream << ")";
+                    tIndentation--;
+                    tPrevArgEnd = true;
+                    break;
+                case INSTR_OPEN:
+                    if (tPrevArgEnd) {
+                        iStream << " ";
+                        tPrevArgEnd = false;
+                    }
+                    iStream << "{";
+                    tIndentation++;
+                    print_newline(iStream, tIndentation);
+                    break;
+                case INSTR_SEP:
+                    iStream << ";";
+                    print_newline(iStream, tIndentation);
+                    break;
+                case INSTR_CLOSE:
+                    tIndentation--;
+                    if (tPrevArgEnd) {
+                        iStream << ";";
+                        tPrevArgEnd = false;
+                    }
+                    print_newline(iStream, tIndentation);
+                    iStream << "}";
+                    break;
+            }
+        }
+
+        // Conditional
+        else if (mGrammar->isConditional(iBlock[tLoc])) {
+            switch (iBlock[tLoc]) {
+                case COND_IF:
+                    iStream << "if";
+                    break;
+                case COND_UNLESS:
+                    iStream << "unless";
+                    break;
+                case COND_WHILE:
+                    iStream << "while";
+                    break;
+            }
+        }
+
+        // Function
+        else if (mGrammar->isFunction(iBlock[tLoc])) {
+            iStream << mGrammar->nameFunction(iBlock[tLoc]);
+        }
+
+        // Data
+        else if (mGrammar->isData(iBlock[tLoc])) {
+            unsigned char tDataType = iBlock[tLoc++];
+            switch (tDataType) {
+                case DATA_VOID:
+                    iStream << Value();
+                    break;
+                case DATA_BOOL:
+                    if (tLoc >= iSize)
+                        throw Exception(SYNTAX, "boolean type needs 1 byte of data");
+                    iStream << toBool(iBlock[tLoc]);
+                    break;
+                case DATA_INT:
+                    if (tLoc >= iSize)
+                        throw Exception(SYNTAX, "integer type needs 1 byte of data");
+                    iStream << toInt(iBlock[tLoc]);
+                    break;
+            }
+        }
+
+        tLoc++;
+    }
+    iStream << std::endl;
+
+}
+
+void Parser::print_newline(std::ostream& iStream, unsigned int iIndentation) {
+    std::cout << std::endl;
+    for (unsigned int i = 0; i < iIndentation; i++) {
+        iStream << "    ";
+    }
+}
+
+
+//
+// Evaluation helpers
+//
 
 void Parser::evaluate_block(unsigned char* iBlock, unsigned int iSize) {
     // Extract all instructions
@@ -83,10 +214,28 @@ void Parser::evaluate_block(unsigned char* iBlock, unsigned int iSize) {
     }
 }
 
+Value Parser::evaluate_instruction(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
+    // Conditional
+    if (mGrammar->isConditional(iBlock[tLoc])) {
+        evaluate_conditional(iBlock, iSize, tLoc);
+        return Value();
+    }
 
-//
-// Auxiliary
-//
+    // Function
+    else if (mGrammar->isFunction(iBlock[tLoc])) {
+        return evaluate_function(iBlock, iSize, tLoc);
+    }
+
+    // Data
+    else if (mGrammar->isData(iBlock[tLoc])) {
+        return evaluate_data(iBlock, iSize, tLoc);
+    } else {
+        throw Exception(SYNTAX, "unknown byte identifier");
+    }
+
+
+    return Value();
+}
 
 void Parser::evaluate_conditional(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
     // Save conditional for later evaluation
@@ -100,7 +249,6 @@ void Parser::evaluate_conditional(unsigned char* iBlock, unsigned int iSize, uns
     std::vector<unsigned int> tInstructionBytecode = extract_instructions(iBlock, iSize, tLoc);
 
     // Check the evaluation type
-    bool tConditionalExecution;
     switch (tConditional) {
         case COND_IF:
         {
@@ -133,7 +281,6 @@ void Parser::evaluate_conditional(unsigned char* iBlock, unsigned int iSize, uns
             if (tTest.getType() != BOOL)
                 throw Exception(SYNTAX, "test passed to if-conditional did not produce boolean value");
 
-            tConditionalExecution = !(tTest.getBool());
             break;
         }
 
@@ -220,28 +367,10 @@ Value Parser::evaluate_data(unsigned char* iBlock, unsigned int iSize, unsigned 
     }
 }
 
-Value Parser::evaluate_instruction(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
-    // Conditional
-    if (mGrammar->isConditional(iBlock[tLoc])) {
-        evaluate_conditional(iBlock, iSize, tLoc);
-        return Value();
-    }
 
-    // Function
-    else if (mGrammar->isFunction(iBlock[tLoc])) {
-        return evaluate_function(iBlock, iSize, tLoc);
-    }
-
-    // Data
-    else if (mGrammar->isData(iBlock[tLoc])) {
-        return evaluate_data(iBlock, iSize, tLoc);
-    } else {
-        throw Exception(SYNTAX, "unknown byte identifier");
-    }
-
-    
-    return Value();
-}
+//
+// Auxiliary
+//
 
 std::vector<unsigned int> Parser::extract_syntax(std::initializer_list<unsigned char> iList, unsigned char* iBlock, unsigned int iSize, unsigned int& iLoc) {
     // Read syntaxis data

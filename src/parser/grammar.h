@@ -94,19 +94,21 @@ public:
     virtual void block();
 
     // Function handling
-    unsigned char createFunction(const std::vector<Type>&, const Type&);
-    void createFunction(unsigned char, const std::vector<Type>&, const Type&);
+    unsigned char createFunction(std::string, const std::vector<Type>&, const Type&);
+    void createFunction(unsigned char, std::string, const std::vector<Type>&, const Type&);
     void setFunction(unsigned char, const Function*);
     const Function* getFunction(unsigned char) const;
     void deleteFunction(unsigned char);
+    std::string nameFunction(unsigned char) const;
     Value callFunction(unsigned char, const std::vector<Value>&);
     virtual Value executeFunction(unsigned char, const std::vector<Value>&) = 0;
 
     // Test funcions
     bool isReserved(unsigned char) const;
-    bool isFunction(unsigned char) const;
+    bool isSyntax(unsigned char) const;
     bool isConditional(unsigned char) const;
     bool isData(unsigned char) const;
+    bool isFunction(unsigned char) const;
 
 private:
     bool mSetup;

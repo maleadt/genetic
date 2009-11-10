@@ -44,7 +44,8 @@
 //
 
 // Parameterisized constructor -- return value and parameters
-Function::Function(std::vector<Type> iParameters, const Type& iReturn) {
+Function::Function(std::string iName, std::vector<Type> iParameters, const Type& iReturn) {
+    mName = iName;
     mReturnType = iReturn;
     mParameterTypes = iParameters;
 }
@@ -93,4 +94,13 @@ void Function::checkReturn(const Value& iReturn) const {
         details << "function returned " << iReturn.getType() << " while function definition was " << mReturnType;
         throw Exception(FUNCTION, "function returned invalid value", details.str());
     }
+}
+
+
+//
+// Data IO
+//
+
+std::string Function::getName() const {
+    return mName;
 }

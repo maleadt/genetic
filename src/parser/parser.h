@@ -51,18 +51,23 @@ public:
     // Construction and destruction
     Parser(Grammar*);
 
-    // Parsing
-    void execute(const DNA&);
+    // Main functionality
+    void evaluate(const DNA&);
+    void print(std::ostream&, const DNA&);
 
 private:
-    // Evaluation of subparts
+    // Evaluation helpers
     void evaluate_block(unsigned char*, unsigned int);
     Value evaluate_instruction(unsigned char*, unsigned int, unsigned int&);
     void evaluate_conditional(unsigned char*, unsigned int, unsigned int&);
     Value evaluate_function(unsigned char*, unsigned int, unsigned int&);
     Value evaluate_data(unsigned char*, unsigned int, unsigned int&);
+
+    // Output helpers
+    void print_block(std::ostream&, unsigned char*, unsigned int);
+    void print_newline(std::ostream&, unsigned int);
     
-    // Auxiliary
+    // Auxiliary functions
     std::vector<unsigned int> extract_syntax(std::initializer_list<unsigned char>, unsigned char*, unsigned int, unsigned int&);
     std::vector<unsigned int> extract_arguments(unsigned char*, unsigned int, unsigned int&);
     std::vector<unsigned int> extract_instructions(unsigned char*, unsigned int, unsigned int&);

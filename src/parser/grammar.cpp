@@ -79,20 +79,20 @@ void Grammar::block() {
 //
 
 // Create a function
-unsigned char Grammar::createFunction(const std::vector<Type>& iParameterTypes, const Type& iReturnType) {
+unsigned char Grammar::createFunction(std::string iName, const std::vector<Type>& iParameterTypes, const Type& iReturnType) {
     unsigned char tByte = RESERVED_END;
     while (isFunction(tByte) && tByte < 254) {
         tByte++;
     }
     if (tByte >= 254)   // FIXME: 255? Hoe past laatste waarde detecteren?
         throw Exception(FUNCTION, "function definition possibilities exhausted");
-    createFunction(tByte, iParameterTypes, iReturnType);
+    createFunction(tByte, iName, iParameterTypes, iReturnType);
     return tByte;
 }
 
 // Create a function
-void Grammar::createFunction(unsigned char iByte, const std::vector<Type>& iParameterTypes, const Type& iReturnType) {
-    const Function* tFunction = new Function(iParameterTypes, iReturnType);
+void Grammar::createFunction(unsigned char iByte, std::string iName, const std::vector<Type>& iParameterTypes, const Type& iReturnType) {
+    const Function* tFunction = new Function(iName, iParameterTypes, iReturnType);
     setFunction(iByte, tFunction);
     mCreatedFunctions.push_back(tFunction);
 }
@@ -148,6 +148,12 @@ void Grammar::deleteFunction(unsigned char iByte) {
     }
 }
 
+// Get a functions name
+std::string Grammar::nameFunction(unsigned char iByte) const {
+    const Function* tFunction = getFunction(iByte);
+    return tFunction->getName();
+}
+
 // Call a function
 Value Grammar::callFunction(unsigned char iByte, const std::vector<Value>& iParameters) {
     // Get the function pointer
@@ -170,10 +176,9 @@ bool Grammar::isReserved(unsigned char iByte) const {
     return (iByte >= RESERVED_START && iByte < RESERVED_END);
 }
 
-// Test if a byte idnetifier is linked with a function
-bool Grammar::isFunction(unsigned char iByte) const {
-    std::map<unsigned char, const Function*>::const_iterator it = mFunctions.find(iByte);
-    return it != mFunctions.end();
+// Test if a byte identifier is syntaxis or not
+bool Grammar::isSyntax(unsigned char iByte) const {
+    return (iByte >= SYNT_START && iByte < SYNT_END);
 }
 
 // Test if a byte identifier corresponds with a conditional
@@ -184,4 +189,11 @@ bool Grammar::isConditional(unsigned char iByte) const {
 // Test if a byte identifier corresponds with data
 bool Grammar::isData(unsigned char iByte) const {
     return (iByte >= DATA_START && iByte < DATA_END);
+}
+
+
+// Test if a byte identifier is linked with a function
+bool Grammar::isFunction(unsigned char iByte) const {
+    std::map<unsigned char, const Function*>::const_iterator it = mFunctions.find(iByte);
+    return it != mFunctions.end();
 }

@@ -40,6 +40,7 @@
 #include <vector>
 #include <iostream>
 #include <initializer_list>
+#include <string>
 
 
 
@@ -52,13 +53,17 @@ class Grammar;
 class Function {
 public:
     // Construction and destruction
-    Function(std::vector<Type>, const Type&);
+    Function(std::string, std::vector<Type>, const Type&);
 
     // Data verification
     void checkParameters(const std::vector<Value>&) const;
     void checkReturn(const Value&) const;
 
+    // Data IO
+    std::string getName() const;
+
 private:
+    std::string mName;
     Type mReturnType;
     std::vector<Type> mParameterTypes;
 };

@@ -121,7 +121,14 @@ int main() {
         // Code execution
         //
 
-        tParser.execute(tDNA);
+        tParser.evaluate(tDNA);
+
+
+        //
+        // Code printing
+        //
+
+        tParser.print(std::cout, tDNA);
 
 
     }

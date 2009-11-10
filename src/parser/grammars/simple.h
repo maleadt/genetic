@@ -47,9 +47,6 @@ public:
     // Grammar setup
     void setup();
     void block();
-
-    // Function handling
-    unsigned char registerFunction(Value (SimpleGrammar::*)(std::vector<Value>), std::initializer_list<Type>, Type);
     Value executeFunction(unsigned char, const std::vector<Value>&);
 
     // Variable handling
@@ -74,6 +71,7 @@ public:
     // Other
     Value print(std::vector<Value> p);
 private:
+    unsigned char setPointer(Value (SimpleGrammar::*)(std::vector<Value>), std::string, std::initializer_list<Type>, Type);
     std::map<unsigned char, Value (SimpleGrammar::*)(std::vector<Value>)> mPointers;
 };
 
@@ -114,9 +112,9 @@ Value SimpleGrammar::set(std::vector<Value> p) {
 //
 
 // Save the function locally
-unsigned char SimpleGrammar::registerFunction(Value (SimpleGrammar::*iPointer)(std::vector<Value>), std::initializer_list<Type> iParameters, Type iReturn) {
+unsigned char SimpleGrammar::setPointer(Value (SimpleGrammar::*iPointer)(std::vector<Value>), std::string iName, std::initializer_list<Type> iParameters, Type iReturn) {
     unsigned char tByte;
-    tByte = createFunction(std::vector<Type>(iParameters), iReturn);
+    tByte = createFunction(iName, std::vector<Type>(iParameters), iReturn);
     mPointers[tByte] = iPointer;
     return tByte;
 }
@@ -220,25 +218,25 @@ void SimpleGrammar::setup() {
     Grammar::setup();
 
     // Variable handling
-    GET = registerFunction(&SimpleGrammar::get, {INT}, INT);
-    SET = registerFunction(&SimpleGrammar::set, {INT, INT}, VOID);
+    GET = setPointer(&SimpleGrammar::get, "get", {INT}, INT);
+    SET = setPointer(&SimpleGrammar::set, "set", {INT, INT}, VOID);
 
     // Mathematical functions
-    MATH_PLUS = registerFunction(&SimpleGrammar::plus, {INT, INT}, INT);
-    MATH_MIN = registerFunction(&SimpleGrammar::min, {INT, INT}, INT);
-    MATH_MULT = registerFunction(&SimpleGrammar::mult, {INT, INT}, INT);
-    MATH_DIV = registerFunction(&SimpleGrammar::div, {INT, INT}, INT);
+    MATH_PLUS = setPointer(&SimpleGrammar::plus, "plus", {INT, INT}, INT);
+    MATH_MIN = setPointer(&SimpleGrammar::min, "min", {INT, INT}, INT);
+    MATH_MULT = setPointer(&SimpleGrammar::mult, "mult", {INT, INT}, INT);
+    MATH_DIV = setPointer(&SimpleGrammar::div, "div", {INT, INT}, INT);
 
     // Test functions
-    TEST_EQUALS = registerFunction(&SimpleGrammar::equals, {INT, INT}, BOOL);
-    TEST_INEQUALS = registerFunction(&SimpleGrammar::inequals, {INT, INT}, BOOL);
-    TEST_LESSER = registerFunction(&SimpleGrammar::lesser, {INT, INT}, BOOL);
-    TEST_STRICTLESSER = registerFunction(&SimpleGrammar::strictlesser, {INT, INT}, BOOL);
-    TEST_GREATER = registerFunction(&SimpleGrammar::greater, {INT, INT}, BOOL);
-    TEST_STRICTGREATER = registerFunction(&SimpleGrammar::strictgreater, {INT, INT}, BOOL);
+    TEST_EQUALS = setPointer(&SimpleGrammar::equals, "equals", {INT, INT}, BOOL);
+    TEST_INEQUALS = setPointer(&SimpleGrammar::inequals, "inequals", {INT, INT}, BOOL);
+    TEST_LESSER = setPointer(&SimpleGrammar::lesser, "lesser", {INT, INT}, BOOL);
+    TEST_STRICTLESSER = setPointer(&SimpleGrammar::strictlesser, "strict_lesser", {INT, INT}, BOOL);
+    TEST_GREATER = setPointer(&SimpleGrammar::greater, "greater", {INT, INT}, BOOL);
+    TEST_STRICTGREATER = setPointer(&SimpleGrammar::strictgreater, "strict_greater", {INT, INT}, BOOL);
 
     // Other
-    OTHER_PRINT = registerFunction(&SimpleGrammar::print, {INT}, VOID);
+    OTHER_PRINT = setPointer(&SimpleGrammar::print, "print", {INT}, VOID);
 }
 
 
