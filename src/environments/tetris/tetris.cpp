@@ -67,7 +67,7 @@ int EnvTetris::alphabet() const {
 // Fitness function
 double EnvTetris::fitness(const DNA* inputDNA) {
     try {
-        mParser->evaluate(*inputDNA);
+        mParser->validate(*inputDNA);
     } catch (Exception e) {
         return 0;
     }

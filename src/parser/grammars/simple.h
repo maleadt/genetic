@@ -202,7 +202,7 @@ Value SimpleGrammar::strictgreater(std::vector<Value> p) {
 
 unsigned char OTHER_PRINT;
 Value SimpleGrammar::print(std::vector<Value> p) {
-    //std::cout << "Print: " << p[0].getInt() << std::endl;
+    std::cout << "Print: " << p[0].getInt() << std::endl;
     return Value();
 }
 

@@ -46,7 +46,8 @@ enum EXCEPTIONTYPE {
     GENERIC,
     SYNTAX,
     ARGUMENT,
-    FUNCTION
+    FUNCTION,
+    CONDITIONAL
 };
 
 
@@ -88,6 +89,12 @@ public:
                 break;
             case FUNCTION:
                 return "function error";
+                break;
+            case CONDITIONAL:
+                return "conditional error";
+                break;
+            default:
+                return "unknown error";
                 break;
         }
     }

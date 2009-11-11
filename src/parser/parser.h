@@ -52,10 +52,18 @@ public:
     Parser(Grammar*);
 
     // Main functionality
+    void validate(const DNA&);
     void evaluate(const DNA&);
     void print(std::ostream&, const DNA&);
 
 private:
+    // Validation helpers
+    void validate_block(unsigned char*, unsigned int);
+    void validate_instruction(unsigned char*, unsigned int, unsigned int&);
+    void validate_conditional(unsigned char*, unsigned int, unsigned int&);
+    void validate_function(unsigned char*, unsigned int, unsigned int&);
+    void validate_data(unsigned char*, unsigned int, unsigned int&);
+
     // Evaluation helpers
     void evaluate_block(unsigned char*, unsigned int);
     Value evaluate_instruction(unsigned char*, unsigned int, unsigned int&);
@@ -65,6 +73,7 @@ private:
 
     // Output helpers
     void print_block(std::ostream&, unsigned char*, unsigned int);
+    void print_indentation(std::ostream&, unsigned int);
     void print_newline(std::ostream&, unsigned int);
     
     // Auxiliary functions

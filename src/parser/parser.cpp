@@ -53,6 +53,26 @@ Parser::Parser(Grammar* iGrammar) {
 //
 
 // Evaluate DNA
+void Parser::validate(const DNA& iDNA) {
+    // Validate all instructions
+    for (unsigned int i = 0; i < iDNA.genes(); i++) {
+        // Extract the gene
+        unsigned char* tGene;
+        unsigned int tSize;
+        iDNA.extract_gene(i, tGene, tSize);
+
+        // Evaluate the block
+        std::cout << "* Validating block " << i << std::endl;
+        validate_block(tGene, tSize);
+
+        // Free the block
+        free(tGene);
+    }
+}
+
+
+
+// Evaluate DNA
 void Parser::evaluate(const DNA& iDNA) {
     // Evaluate all instructions
     for (unsigned int i = 0; i < iDNA.genes(); i++) {
@@ -62,14 +82,13 @@ void Parser::evaluate(const DNA& iDNA) {
         iDNA.extract_gene(i, tGene, tSize);
 
         // Evaluate the block
-        std::cout << "* Evaluating block " << i << ": ";
+        std::cout << "* Evaluating block " << i << std::endl;
         evaluate_block(tGene, tSize);
 
         // Free the block
         free(tGene);
     }
 }
-
 
 // Output the DNA
 void Parser::print(std::ostream& iStream, const DNA& iDNA) {
@@ -81,11 +100,245 @@ void Parser::print(std::ostream& iStream, const DNA& iDNA) {
         iDNA.extract_gene(i, tGene, tSize);
 
         // Print the block
-        std::cout << "* Outputting block " << i << ": ";
+        std::cout << "* Outputting block " << i << std::endl;
         print_block(iStream, tGene, tSize);
 
         // Free the block
         free(tGene);
+    }
+}
+
+//
+// Validation helpers
+//
+
+void Parser::validate_block(unsigned char* iBlock, unsigned int iSize) {
+    // Extract all instructions
+    unsigned int tLoc = 0;
+
+    // Validate all instructions
+    std::vector<unsigned int> tInstructionBytecode = extract_instructions(iBlock, iSize, tLoc);
+    for (unsigned int i = 0; i < tInstructionBytecode.size(); i++)
+        validate_instruction(iBlock, iSize, tInstructionBytecode[i]);
+}
+
+void Parser::validate_instruction(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
+    // Conditional
+    if (mGrammar->isConditional(iBlock[tLoc]))
+        validate_conditional(iBlock, iSize, tLoc);
+
+    // Function
+    else if (mGrammar->isFunction(iBlock[tLoc]))
+        validate_function(iBlock, iSize, tLoc);
+
+    // Data
+    else if (mGrammar->isData(iBlock[tLoc]))
+        return validate_data(iBlock, iSize, tLoc);
+    
+    // Unknown
+    else
+        throw Exception(SYNTAX, "unknown byte identifier");
+}
+
+void Parser::validate_conditional(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
+    // Save conditional for later evaluation
+    unsigned char tConditional = iBlock[tLoc++];
+
+    // Extract parameters and instructions
+    std::vector<unsigned int> tParameterBytecode = extract_arguments(iBlock, iSize, tLoc);
+    std::vector<unsigned int> tInstructionBytecode = extract_instructions(iBlock, iSize, tLoc);
+
+    // Check the evaluation type
+    switch (tConditional) {
+        case COND_IF:
+        case COND_UNLESS:
+        case COND_WHILE:
+        {
+            // Validate parameters
+            if (tParameterBytecode.size() != 1)
+                throw Exception(SYNTAX, "if-conditional only accepts one parameter");
+            validate_instruction(iBlock, iSize, tParameterBytecode[0]);
+
+            // Validate instruction block
+            for (unsigned int i = 0; i < tInstructionBytecode.size(); i++)
+                validate_instruction(iBlock, iSize, tInstructionBytecode[i]);
+            break;
+        }
+
+        default:
+        {
+            throw Exception(GENERIC, "conditional clause not implemented");
+        }
+    }
+}
+
+void Parser::validate_function(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
+    // Skip function definition
+    tLoc++;
+
+    // Validate all parameters
+    std::vector<unsigned int> tParameterBytecode = extract_arguments(iBlock, iSize, tLoc);
+    for (unsigned int i = 0; i < tParameterBytecode.size(); i++)
+        validate_instruction(iBlock, iSize, tParameterBytecode[i]);
+}
+
+void Parser::validate_data(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
+    unsigned char tDataType = iBlock[tLoc++];
+    switch (tDataType) {
+        case DATA_VOID:
+            break;
+
+        case DATA_BOOL:
+        case DATA_INT:
+            if (tLoc >= iSize)
+                throw Exception(SYNTAX, "boolean type needs 1 byte of data");
+            tLoc++;
+            break;
+
+        default:
+            throw Exception(SYNTAX, "unknown datatype");
+    }
+}
+
+//
+// Evaluation helpers
+//
+
+void Parser::evaluate_block(unsigned char* iBlock, unsigned int iSize) {
+    // Extract all instructions
+    unsigned int tLoc = 0;
+    std::vector<unsigned int> tInstructionBytecode = extract_instructions(iBlock, iSize, tLoc);
+
+    // Give the grammar a chance to do some stuff (variable handling, ...)
+    mGrammar->block();
+
+    // Evaluate all instructions
+    for (unsigned int i = 0; i < tInstructionBytecode.size(); i++) {
+        evaluate_instruction(iBlock, iSize, tInstructionBytecode[i]);
+    }
+}
+
+Value Parser::evaluate_instruction(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
+    // Conditional
+    if (mGrammar->isConditional(iBlock[tLoc])) {
+        evaluate_conditional(iBlock, iSize, tLoc);
+        return Value();
+    }
+
+    // Function
+    else if (mGrammar->isFunction(iBlock[tLoc]))
+        return evaluate_function(iBlock, iSize, tLoc);
+
+    // Data
+    else if (mGrammar->isData(iBlock[tLoc]))
+        return evaluate_data(iBlock, iSize, tLoc);
+
+
+    return Value();
+}
+
+void Parser::evaluate_conditional(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
+    // Save conditional for later evaluation
+    unsigned char tConditional = iBlock[tLoc];
+
+    // Extract the arguments
+    tLoc++;
+    std::vector<unsigned int> tParameterBytecode = extract_arguments(iBlock, iSize, tLoc);
+
+    // Extract the (conditional) instructions
+    std::vector<unsigned int> tInstructionBytecode = extract_instructions(iBlock, iSize, tLoc);
+
+    // Check the evaluation type
+    switch (tConditional) {
+        case COND_IF:
+        {
+            // Evaluate the parameter
+            Value tTest = evaluate_instruction(iBlock, iSize, tParameterBytecode[0]);
+            if (tTest.getType() != BOOL)
+                throw Exception(CONDITIONAL, "test passed to 'if' did not produce boolean value");
+
+            // Evaluate the instructions
+            if (tTest.getBool()) {
+                for (unsigned int i = 0; i < tInstructionBytecode.size(); i++) {
+                    evaluate_instruction(iBlock, iSize, tInstructionBytecode[i]);
+                }
+            }
+            break;
+        }
+
+        case COND_UNLESS:
+        {
+            // Evaluate the parameter
+            Value tTest = evaluate_instruction(iBlock, iSize, tParameterBytecode[0]);
+            if (tTest.getType() != BOOL)
+                throw Exception(CONDITIONAL, "test passed to 'unless' did not produce boolean value");
+
+            break;
+        }
+
+        case COND_WHILE:
+        {
+            while (1) {
+                // Evaluate the parameter
+                unsigned int tLocCond = tParameterBytecode[0];
+                Value tTest = evaluate_instruction(iBlock, iSize, tLocCond);
+                if (tTest.getType() != BOOL)
+                    throw Exception(CONDITIONAL, "test passed to 'while' did not produce boolean value");
+
+                // Evaluate the instructions
+                if (tTest.getBool()) {
+                    for (unsigned int i = 0; i < tInstructionBytecode.size(); i++) {
+                        unsigned int tLocInst = tInstructionBytecode[i];
+                        evaluate_instruction(iBlock, iSize, tLocInst);
+                    }
+                } else {
+                    break;
+                }
+            }
+            break;
+        }
+    }
+}
+
+Value Parser::evaluate_function(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
+    // Fetch the function
+    unsigned char tFunction = iBlock[tLoc];
+
+    // Extract the arguments
+    tLoc++;
+    std::vector<unsigned int> tParameterBytecode = extract_arguments(iBlock, iSize, tLoc);
+
+    // Evaluate all arguments
+    std::vector<Value> tParameters;
+    for (unsigned int i = 0; i < tParameterBytecode.size(); i++) {
+        Value tParameter = evaluate_instruction(iBlock, iSize, tParameterBytecode[i]);
+        if (tParameter.getType() == VOID)
+            throw Exception(FUNCTION, "function parameter returned void");
+        tParameters.push_back(tParameter);
+    }
+
+    // Call the function
+    return mGrammar->callFunction(tFunction, tParameters);
+}
+
+Value Parser::evaluate_data(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
+    unsigned char tDataType = iBlock[tLoc++];
+    switch (tDataType) {
+        case DATA_VOID:
+        {
+            return VOID;
+            break;
+        }
+        case DATA_BOOL:
+        {
+            return toBool(iBlock[tLoc++]);
+            break;
+        }
+        case DATA_INT:
+        {
+            return toInt(iBlock[tLoc++]);
+            break;
+        }
     }
 }
 
@@ -96,7 +349,7 @@ void Parser::print(std::ostream& iStream, const DNA& iDNA) {
 
 void Parser::print_block(std::ostream& iStream, unsigned char* iBlock, unsigned int iSize) {
     unsigned char tIndentation = 1;
-    print_newline(iStream, tIndentation);
+    print_indentation(iStream, tIndentation);
 
     unsigned int tLoc = 0;
     bool tPrevArgEnd = false;
@@ -168,13 +421,9 @@ void Parser::print_block(std::ostream& iStream, unsigned char* iBlock, unsigned 
                     iStream << Value();
                     break;
                 case DATA_BOOL:
-                    if (tLoc >= iSize)
-                        throw Exception(SYNTAX, "boolean type needs 1 byte of data");
                     iStream << toBool(iBlock[tLoc]);
                     break;
                 case DATA_INT:
-                    if (tLoc >= iSize)
-                        throw Exception(SYNTAX, "integer type needs 1 byte of data");
                     iStream << toInt(iBlock[tLoc]);
                     break;
             }
@@ -186,184 +435,17 @@ void Parser::print_block(std::ostream& iStream, unsigned char* iBlock, unsigned 
 
 }
 
-void Parser::print_newline(std::ostream& iStream, unsigned int iIndentation) {
-    std::cout << std::endl;
+void Parser::print_indentation(std::ostream& iStream, unsigned int iIndentation) {
     for (unsigned int i = 0; i < iIndentation; i++) {
         iStream << "    ";
     }
 }
 
-
-//
-// Evaluation helpers
-//
-
-void Parser::evaluate_block(unsigned char* iBlock, unsigned int iSize) {
-    // Extract all instructions
-    unsigned int tLoc = 0;
-    std::vector<unsigned int> tInstructionBytecode = extract_instructions(iBlock, iSize, tLoc);
-    
-    // Give the grammar a chance to do some stuff (variable handling, ...)
-    mGrammar->block();
-
-    // Evaluate all instructions
-    for (unsigned int i = 0; i < tInstructionBytecode.size(); i++) {
-        evaluate_instruction(iBlock, iSize, tInstructionBytecode[i]);
-    }
+void Parser::print_newline(std::ostream& iStream, unsigned int iIndentation) {
+    std::cout << std::endl;
+    print_indentation(iStream, iIndentation);
 }
 
-Value Parser::evaluate_instruction(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
-    // Conditional
-    if (mGrammar->isConditional(iBlock[tLoc])) {
-        evaluate_conditional(iBlock, iSize, tLoc);
-        return Value();
-    }
-
-    // Function
-    else if (mGrammar->isFunction(iBlock[tLoc])) {
-        return evaluate_function(iBlock, iSize, tLoc);
-    }
-
-    // Data
-    else if (mGrammar->isData(iBlock[tLoc])) {
-        return evaluate_data(iBlock, iSize, tLoc);
-    } else {
-        throw Exception(SYNTAX, "unknown byte identifier");
-    }
-
-
-    return Value();
-}
-
-void Parser::evaluate_conditional(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
-    // Save conditional for later evaluation
-    unsigned char tConditional = iBlock[tLoc];
-
-    // Extract the arguments
-    tLoc++;
-    std::vector<unsigned int> tParameterBytecode = extract_arguments(iBlock, iSize, tLoc);
-
-    // Extract the (conditional) instructions
-    std::vector<unsigned int> tInstructionBytecode = extract_instructions(iBlock, iSize, tLoc);
-
-    // Check the evaluation type
-    switch (tConditional) {
-        case COND_IF:
-        {
-            // Check amount of parameters
-            if (tParameterBytecode.size() != 1)
-                throw Exception(SYNTAX, "if-conditional only accepts one parameter");
-
-            // Evaluate the parameter
-            Value tTest = evaluate_instruction(iBlock, iSize, tParameterBytecode[0]);
-            if (tTest.getType() != BOOL)
-                throw Exception(SYNTAX, "test passed to if-conditional did not produce boolean value");
-
-            // Evaluate the instructions
-            if (tTest.getBool()) {
-                for (unsigned int i = 0; i < tInstructionBytecode.size(); i++) {
-                    evaluate_instruction(iBlock, iSize, tInstructionBytecode[i]);
-                }
-            }
-            break;
-        }
-
-        case COND_UNLESS:
-        {
-            // Check amount of parameters
-            if (tParameterBytecode.size() != 1)
-                throw Exception(SYNTAX, "if-conditional only accepts one parameter");
-
-            // Evaluate the parameter
-            Value tTest = evaluate_instruction(iBlock, iSize, tParameterBytecode[0]);
-            if (tTest.getType() != BOOL)
-                throw Exception(SYNTAX, "test passed to if-conditional did not produce boolean value");
-
-            break;
-        }
-
-        case COND_WHILE:
-        {
-            // Check amount of parameters
-            if (tParameterBytecode.size() != 1)
-                throw Exception(SYNTAX, "while-conditional only accepts one parameter");
-
-            while (1) {
-                // Evaluate the parameter
-                unsigned int tLocCond = tParameterBytecode[0];
-                Value tTest = evaluate_instruction(iBlock, iSize, tLocCond);
-                if (tTest.getType() != BOOL)
-                    throw Exception(SYNTAX, "test passed to if-conditional did not produce boolean value");
-
-                // Evaluate the instructions
-                if (tTest.getBool()) {
-                    for (unsigned int i = 0; i < tInstructionBytecode.size(); i++) {
-                        unsigned int tLocInst = tInstructionBytecode[i];
-                        evaluate_instruction(iBlock, iSize, tLocInst);
-                    }
-                } else {
-                    break;
-                }
-            }
-            break;
-        }
-
-        default:
-        {
-            throw Exception(GENERIC, "conditional clause not implemented");
-        }
-    }
-}
-
-Value Parser::evaluate_function(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
-    // Fetch the function
-    unsigned char tFunction = iBlock[tLoc];
-
-    // Extract the arguments
-    tLoc++;
-    std::vector<unsigned int> tParameterBytecode = extract_arguments(iBlock, iSize, tLoc);
-
-    // Evaluate all arguments
-    std::vector<Value> tParameters;
-    for (unsigned int i = 0; i < tParameterBytecode.size(); i++) {
-        Value tParameter = evaluate_instruction(iBlock, iSize, tParameterBytecode[i]);
-        if (tParameter.getType() == VOID)
-            throw Exception(FUNCTION, "function parameter returned void");
-        tParameters.push_back(tParameter);
-    }
-
-    // Call the function
-    return mGrammar->callFunction(tFunction, tParameters);
-}
-
-Value Parser::evaluate_data(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
-    unsigned char tDataType = iBlock[tLoc++];
-    switch (tDataType) {
-        case DATA_VOID:
-        {
-            return VOID;
-            break;
-        }
-        case DATA_BOOL:
-        {
-            if (tLoc >= iSize)
-                throw Exception(SYNTAX, "boolean type needs 1 byte of data");
-            return toBool(iBlock[tLoc++]);
-            break;
-        }
-        case DATA_INT:
-        {
-            if (tLoc >= iSize)
-                throw Exception(SYNTAX, "integer type needs 1 byte of data");
-            return toInt(iBlock[tLoc++]);
-            break;
-        }
-        default:
-        {
-            throw Exception(SYNTAX, "unknown datatype");
-        }
-    }
-}
 
 
 //
