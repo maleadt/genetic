@@ -61,6 +61,7 @@ public:
 
     // Data IO
     std::string getName() const;
+    unsigned int getParameterCount() const;
 
 private:
     std::string mName;

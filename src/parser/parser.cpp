@@ -62,7 +62,6 @@ void Parser::validate(const DNA& iDNA) {
         iDNA.extract_gene(i, tGene, tSize);
 
         // Evaluate the block
-        std::cout << "* Validating block " << i << std::endl;
         validate_block(tGene, tSize);
 
         // Free the block
@@ -82,7 +81,6 @@ void Parser::evaluate(const DNA& iDNA) {
         iDNA.extract_gene(i, tGene, tSize);
 
         // Evaluate the block
-        std::cout << "* Evaluating block " << i << std::endl;
         evaluate_block(tGene, tSize);
 
         // Free the block
@@ -100,7 +98,7 @@ void Parser::print(std::ostream& iStream, const DNA& iDNA) {
         iDNA.extract_gene(i, tGene, tSize);
 
         // Print the block
-        std::cout << "* Outputting block " << i << std::endl;
+        std::cout << "* Human-readable version of block " << i << std::endl;
         print_block(iStream, tGene, tSize);
 
         // Free the block
@@ -123,6 +121,9 @@ void Parser::validate_block(unsigned char* iBlock, unsigned int iSize) {
         if (tInstructionBytecode[i].first != tInstructionBytecode[i].second)
             throw Exception(SYNTAX, "garbage after instruction");
     }
+
+    if (tLoc < iSize)
+        throw Exception(SYNTAX, "garbage after block");
 }
 
 void Parser::validate_instruction(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
@@ -178,19 +179,32 @@ void Parser::validate_conditional(unsigned char* iBlock, unsigned int iSize, uns
             throw Exception(GENERIC, "conditional clause not implemented");
         }
     }
+
+    tLoc = tInstructionBytecode.back().second + 1;
 }
 
 void Parser::validate_function(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
-    // Skip function definition
-    tLoc++;
+    // Fetch the function
+    unsigned char tFunctionBytecode = iBlock[tLoc++];
 
-    // Validate all parameters
+    // Validate function
+    if (!mGrammar->isFunction(tFunctionBytecode))
+        throw Exception(SYNTAX, "unknown function");
+    const Function* tFunction = mGrammar->getFunction(tFunctionBytecode);
+
+    // Validate parameter count
     std::vector<std::pair<unsigned int, unsigned int> > tParameterBytecode = extract_arguments(iBlock, iSize, tLoc);
+    if (tParameterBytecode.size() != tFunction->getParameterCount())
+        throw Exception(SYNTAX, "invalid function parameter count");
+
+    // Validate parameter syntax
     for (unsigned int i = 0; i < tParameterBytecode.size(); i++) {
         validate_instruction(iBlock, iSize, tParameterBytecode[i].first);
-        if (tParameterBytecode[0].first != tParameterBytecode[0].second)
+        if (tParameterBytecode[i].first != tParameterBytecode[i].second)
             throw Exception(SYNTAX, "garbage after parameter");
     }
+
+    tLoc = tParameterBytecode.back().second + 1;
 }
 
 void Parser::validate_data(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
@@ -243,7 +257,6 @@ Value Parser::evaluate_instruction(unsigned char* iBlock, unsigned int iSize, un
     // Data
     else if (mGrammar->isData(iBlock[tLoc]))
         return evaluate_data(iBlock, iSize, tLoc);
-// TODO: move .first .second test to here? Specify instruction end by param?
 
     return Value();
 }
@@ -306,17 +319,16 @@ void Parser::evaluate_conditional(unsigned char* iBlock, unsigned int iSize, uns
             break;
         }
     }
+    
+    tLoc = tInstructionBytecode.back().second + 1;
 }
 
 Value Parser::evaluate_function(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
     // Fetch the function
-    unsigned char tFunction = iBlock[tLoc];
-
-    // Extract the arguments
-    tLoc++;
-    std::vector<std::pair<unsigned int, unsigned int> > tParameterBytecode = extract_arguments(iBlock, iSize, tLoc);
+    unsigned char tFunction = iBlock[tLoc++];
 
     // Evaluate all arguments
+    std::vector<std::pair<unsigned int, unsigned int> > tParameterBytecode = extract_arguments(iBlock, iSize, tLoc);
     std::vector<Value> tParameters;
     for (unsigned int i = 0; i < tParameterBytecode.size(); i++) {
         Value tParameter = evaluate_instruction(iBlock, iSize, tParameterBytecode[i].first);
@@ -326,6 +338,7 @@ Value Parser::evaluate_function(unsigned char* iBlock, unsigned int iSize, unsig
     }
 
     // Call the function
+    tLoc = tParameterBytecode.back().second + 1;
     return mGrammar->callFunction(tFunction, tParameters);
 }
 
@@ -450,7 +463,7 @@ void Parser::print_indentation(std::ostream& iStream, unsigned int iIndentation)
 }
 
 void Parser::print_newline(std::ostream& iStream, unsigned int iIndentation) {
-    std::cout << std::endl;
+    iStream << std::endl;
     print_indentation(iStream, iIndentation);
 }
 

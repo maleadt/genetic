@@ -104,3 +104,7 @@ void Function::checkReturn(const Value& iReturn) const {
 std::string Function::getName() const {
     return mName;
 }
+
+unsigned int Function::getParameterCount() const {
+    return mParameterTypes.size();
+}

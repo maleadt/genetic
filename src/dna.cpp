@@ -333,16 +333,17 @@ void DNA::debug_raw() const {
 	// Debug message
 	std::cout << "* DNA.debug_raw" << std::endl;
 
-        std::cout << "\t";
+        std::cout << "\t{";
         unsigned char* start = dataGenes;
         for (unsigned int i = 0; i < dataSize; i++) {
-            std::cout << " 0x" << std::hex << std::setfill('0') << std::setw(2) << (int)*start << std::dec;
-            if (*start == 0) {
+            if (start != dataGenes)
+                std::cout << ", ";
+            std::cout << "0x" << std::hex << std::setfill('0') << std::setw(2) << (int)*start << std::dec;
+            if (*start == 0)
                 std::cout << std::endl << "\t";
-            }
             start++;
         }
-        std::cout << std::endl;
+        std::cout << "}" << std::endl;
 }
 
 
