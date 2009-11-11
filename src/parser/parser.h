@@ -77,9 +77,9 @@ private:
     void print_newline(std::ostream&, unsigned int);
     
     // Auxiliary functions
-    std::vector<unsigned int> extract_syntax(std::initializer_list<unsigned char>, unsigned char*, unsigned int, unsigned int&);
-    std::vector<unsigned int> extract_arguments(unsigned char*, unsigned int, unsigned int&);
-    std::vector<unsigned int> extract_instructions(unsigned char*, unsigned int, unsigned int&);
+    std::vector<std::pair<unsigned int, unsigned int> > extract_syntax(std::initializer_list<unsigned char>, unsigned char*, unsigned int, unsigned int&);
+    std::vector<std::pair<unsigned int, unsigned int> > extract_arguments(unsigned char*, unsigned int, unsigned int&);
+    std::vector<std::pair<unsigned int, unsigned int> > extract_instructions(unsigned char*, unsigned int, unsigned int&);
     
     // Byte conversion
     bool toBool(unsigned char);

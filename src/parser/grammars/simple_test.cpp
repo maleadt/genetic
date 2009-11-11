@@ -121,6 +121,7 @@ int main() {
         // Code execution
         //
 
+        tParser.validate(tDNA);
         tParser.evaluate(tDNA);
 
 
