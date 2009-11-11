@@ -56,8 +56,38 @@ Game::Game(Board *pBoard, Pieces *pPieces, Output *pOutput, int pScreenHeight)
 
 
 //
+// Informational
+//
+
+int Game::getPieceCurrent() {
+    return mPiece;
+}
+
+int Game::getPieceNext() {
+    return mNextPiece;
+}
+
+int Game::getX() {
+    return mPosX;
+}
+
+int Game::getY() {
+    return mPosY;
+}
+
+int Game::getRotation() {
+    return mRotation;
+}
+
+
+//
 // Auxiliary
 //
+
+void Game::Reset() {
+    mBoard->Reset();
+    InitGame();
+}
 
 
 // Get a random integer from pA to pB (inclusive)

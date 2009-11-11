@@ -34,6 +34,7 @@
 
 // Headers
 #include "../grammar.h"
+#include "../../generic.h"
 #include <map>
 
 
@@ -51,26 +52,30 @@ public:
 
 protected:
     // Variable handling
-    Value get(std::vector<Value> p);
-    Value set(std::vector<Value> p);
+    Value get(std::vector<Value>);
+    Value set(std::vector<Value>);
 
     // Mathematical
-    Value plus(std::vector<Value> p);
-    Value min(std::vector<Value> p);
-    Value mult(std::vector<Value> p);
-    Value div(std::vector<Value> p);
-    Value mod(std::vector<Value> p);
+    Value plus(std::vector<Value>);
+    Value min(std::vector<Value>);
+    Value mult(std::vector<Value>);
+    Value div(std::vector<Value>);
+    Value mod(std::vector<Value>);
 
     // Tests
-    Value equals(std::vector<Value> p);
-    Value inequals(std::vector<Value> p);
-    Value greater(std::vector<Value> p);
-    Value strictgreater(std::vector<Value> p);
-    Value lesser(std::vector<Value> p);
-    Value strictlesser(std::vector<Value> p);
+    Value equals(std::vector<Value>);
+    Value inequals(std::vector<Value>);
+    Value greater(std::vector<Value>);
+    Value strictgreater(std::vector<Value>);
+    Value lesser(std::vector<Value>);
+    Value strictlesser(std::vector<Value>);
+
+    // Random data generators
+    Value rand_bool(std::vector<Value>);
+    Value rand_int(std::vector<Value>);
 
     // Other
-    Value print(std::vector<Value> p);
+    Value print(std::vector<Value>);
 
 private:
     unsigned char setPointer(Value (SimpleGrammar::*)(std::vector<Value>), std::string, std::initializer_list<Type>, Type);
@@ -197,6 +202,21 @@ Value SimpleGrammar::strictgreater(std::vector<Value> p) {
 
 
 //
+// Random data generators
+//
+
+unsigned char RAND_BOOL;
+Value SimpleGrammar::rand_bool(std::vector<Value> p) {
+    return Value(random_int(0, 2) == 1);
+}
+
+unsigned char RAND_INT;
+Value SimpleGrammar::rand_int(std::vector<Value> p) {
+    return Value(random_int(p[0].getInt(), p[1].getInt()));
+}
+
+
+//
 // Other
 //
 
@@ -205,6 +225,7 @@ Value SimpleGrammar::print(std::vector<Value> p) {
     std::cout << "Print: " << p[0].getInt() << std::endl;
     return Value();
 }
+
 
 
 //
@@ -241,6 +262,10 @@ void SimpleGrammar::setup() {
     TEST_STRICTLESSER = setPointer(&SimpleGrammar::strictlesser, "strict_lesser", {INT, INT}, BOOL);
     TEST_GREATER = setPointer(&SimpleGrammar::greater, "greater", {INT, INT}, BOOL);
     TEST_STRICTGREATER = setPointer(&SimpleGrammar::strictgreater, "strict_greater", {INT, INT}, BOOL);
+
+    // Random data generators
+    RAND_BOOL = setPointer(&SimpleGrammar::rand_bool, "rand_bool", {}, BOOL);
+    RAND_INT = setPointer(&SimpleGrammar::rand_int, "rand_int", {INT, INT}, INT);
 
     // Other
     OTHER_PRINT = setPointer(&SimpleGrammar::print, "print", {INT}, VOID);

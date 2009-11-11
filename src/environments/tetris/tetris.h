@@ -32,18 +32,41 @@
 #ifndef __TETRIS
 #define __TETRIS
 
-// Headers
+// Headers -- Genetic
 #include "../../dna.h"
 #include "../../population.h"
 #include "../../environment.h"
+
+// Headers -- Parser
 #include "../../parser/grammars/simple.h"
 #include "../../parser/parser.h"
 #include "../../parser/value.h"
 #include "../../parser/type.h"
 #include "../../parser/exception.h"
+
+// Headers -- Tetris
+#include "game.h"
+#include "pieces.h"
+#include "output.h"
+#include "board.h"
+
+// Headers -- System
 #include <initializer_list>
 #include <vector>
 #include <map>
+
+
+//
+// Constants
+//
+
+// Per-gene instruction limit
+const unsigned long LIMIT_INSTRUCTIONS = 10000;
+const unsigned long LIMIT_RUNS = 10000;
+const unsigned long RUNS = 100;
+const unsigned int GAME_DROPDELAY = 1000;
+const unsigned int GAME_USERDELAY = 1000;
+const unsigned int GAME_SPEED = 5;
 
 
 
@@ -69,13 +92,39 @@ public:
     void block();
     Value executeFunction(unsigned char, const std::vector<Value>&);
 
-private:
-    unsigned int mCounter;
-    
+protected:
+    // Board control
+    Value rotate(std::vector<Value>);
+    Value left(std::vector<Value>);
+    Value right(std::vector<Value>);
+    Value down(std::vector<Value>);
+    Value drop(std::vector<Value>);
+
+    // Informational
+    Value block_current(std::vector<Value>);
+    Value block_next(std::vector<Value>);
+    Value pos_x(std::vector<Value>);
+    Value pos_y(std::vector<Value>);
+    Value rotation(std::vector<Value>);
+    Value size_x(std::vector<Value>);
+    Value size_y(std::vector<Value>);
+
+    // Tests
+    Value is_block(std::vector<Value>);
+    Value is_free(std::vector<Value>);
+
+private:    
     // Grammar functionality
     Parser* mParser;
     std::map<unsigned char, Value (EnvTetris::*)(std::vector<Value>)> mPointers;
     unsigned char setPointer(Value (EnvTetris::*)(std::vector<Value>), std::string, std::initializer_list<Type>, Type);
+
+
+    // Tetris functionality
+    Output mTetrisOutput;
+    Pieces mTetrisPieces;
+    Board* mTetrisBoard;
+    Game* mTetrisGame;
 };
 
 

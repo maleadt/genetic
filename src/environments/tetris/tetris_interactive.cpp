@@ -90,6 +90,10 @@ int main() {
 			case (SDLK_ESCAPE):
 				exit(0);
 				break;
+			
+			case (SDLK_RETURN):
+				mGame.Reset();
+				break;
 		}
 
 		// Move downwards if the wait time is elapsed

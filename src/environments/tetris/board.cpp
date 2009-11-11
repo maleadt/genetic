@@ -50,6 +50,17 @@ Board::Board (Pieces *pPieces, int pScreenHeight)
 }
 
 
+void Board::Reset()
+{
+    InitBoard();
+}
+
+unsigned long Board::Score()
+{
+    return mScore;
+}
+
+
 /*
 ======================================									
 Init the board blocks with free positions
@@ -57,6 +68,7 @@ Init the board blocks with free positions
 */
 void Board::InitBoard()
 {
+        mScore = 0;
 	for (int i = 0; i < BOARD_WIDTH; i++)
 		for (int j = 0; j < BOARD_HEIGHT; j++)
 			mBoard[i][j] = POS_FREE;
@@ -146,7 +158,10 @@ void Board::DeletePossibleLines ()
 			i++;
 		}
 
-		if (i == BOARD_WIDTH) DeleteLine (j);
+		if (i == BOARD_WIDTH) {
+                    DeleteLine (j);
+                    mScore += 100;
+                }
 	}
 }
 

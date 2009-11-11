@@ -42,8 +42,16 @@
 //
 
 // Parameterized constructor
+Parser::Parser(Grammar* iGrammar, unsigned long iInstructions) {
+    mGrammar = iGrammar;
+    mInstructionLimit = true;
+    mInstructions = iInstructions;
+}
+
+// Parameterized constructor
 Parser::Parser(Grammar* iGrammar) {
     mGrammar = iGrammar;
+    mInstructionLimit = false;
 }
 
 
@@ -54,9 +62,12 @@ Parser::Parser(Grammar* iGrammar) {
 
 // Evaluate DNA
 void Parser::validate(const DNA& iDNA) {
-    // Validate all instructions
+    // Reset the quotum
+    mInstructionCounter = 0;
+
+    // Validate all blocks
     for (unsigned int i = 0; i < iDNA.genes(); i++) {
-        // Extract the gene
+        // Extract the blocks
         unsigned char* tGene;
         unsigned int tSize;
         iDNA.extract_gene(i, tGene, tSize);
@@ -73,9 +84,12 @@ void Parser::validate(const DNA& iDNA) {
 
 // Evaluate DNA
 void Parser::evaluate(const DNA& iDNA) {
-    // Evaluate all instructions
+    // Reset the quotum
+    mInstructionCounter = 0;
+    
+    // Evaluate all blocks
     for (unsigned int i = 0; i < iDNA.genes(); i++) {
-        // Extract the gene
+        // Extract the blocks
         unsigned char* tGene;
         unsigned int tSize;
         iDNA.extract_gene(i, tGene, tSize);
@@ -90,7 +104,6 @@ void Parser::evaluate(const DNA& iDNA) {
 
 // Output the DNA
 void Parser::print(std::ostream& iStream, const DNA& iDNA) {
-    // Print all instructions
     for (unsigned int i = 0; i < iDNA.genes(); i++) {
         // Extract the gene
         unsigned char* tGene;
@@ -127,6 +140,8 @@ void Parser::validate_block(unsigned char* iBlock, unsigned int iSize) {
 }
 
 void Parser::validate_instruction(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
+    tick();
+
     // Conditional
     if (mGrammar->isConditional(iBlock[tLoc]))
         validate_conditional(iBlock, iSize, tLoc);
@@ -151,6 +166,19 @@ void Parser::validate_conditional(unsigned char* iBlock, unsigned int iSize, uns
     // Extract tests and instructions
     std::vector<std::pair<unsigned int, unsigned int> > tTestBytecode = extract_arguments(iBlock, iSize, tLoc);
     std::vector<std::pair<unsigned int, unsigned int> > tInstructionBytecode = extract_instructions(iBlock, iSize, tLoc);
+    if (tInstructionBytecode.size() > 0)
+        tLoc = tInstructionBytecode.back().second + 1;
+
+    // Extract an eventual else-set of instructions
+    std::vector<std::pair<unsigned int, unsigned int> > tElseInstructionBytecode;
+    if (iBlock[tLoc] == COND_ELSE) {
+        tLoc++;
+        tElseInstructionBytecode = extract_instructions(iBlock, iSize, tLoc);
+        
+        if (tElseInstructionBytecode.size() > 0)
+            tLoc = tElseInstructionBytecode.back().second + 1;
+    }
+
 
     // Check the evaluation type
     switch (tConditional) {
@@ -171,7 +199,20 @@ void Parser::validate_conditional(unsigned char* iBlock, unsigned int iSize, uns
                 if (tInstructionBytecode[i].first != tInstructionBytecode[i].second)
                     throw Exception(SYNTAX, "garbage after instruction");
             }
+
+            // Validate else-instruction block
+            for (unsigned int i = 0; i < tElseInstructionBytecode.size(); i++) {
+                validate_instruction(iBlock, iSize, tElseInstructionBytecode[i].first);
+                if (tElseInstructionBytecode[i].first != tElseInstructionBytecode[i].second)
+                    throw Exception(SYNTAX, "garbage after else-instruction");
+            }
+
             break;
+        }
+
+        case COND_ELSE:
+        {
+            throw Exception(GENERIC, "else-conditional cannot exist by itself");
         }
 
         default:
@@ -179,8 +220,6 @@ void Parser::validate_conditional(unsigned char* iBlock, unsigned int iSize, uns
             throw Exception(GENERIC, "conditional clause not implemented");
         }
     }
-
-    tLoc = tInstructionBytecode.back().second + 1;
 }
 
 void Parser::validate_function(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
@@ -204,7 +243,9 @@ void Parser::validate_function(unsigned char* iBlock, unsigned int iSize, unsign
             throw Exception(SYNTAX, "garbage after parameter");
     }
 
-    tLoc = tParameterBytecode.back().second + 1;
+    
+    if (tParameterBytecode.size() > 0)
+        tLoc = tParameterBytecode.back().second + 1;
 }
 
 void Parser::validate_data(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
@@ -244,6 +285,8 @@ void Parser::evaluate_block(unsigned char* iBlock, unsigned int iSize) {
 }
 
 Value Parser::evaluate_instruction(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
+    tick();
+    
     // Conditional
     if (mGrammar->isConditional(iBlock[tLoc])) {
         evaluate_conditional(iBlock, iSize, tLoc);
@@ -268,6 +311,18 @@ void Parser::evaluate_conditional(unsigned char* iBlock, unsigned int iSize, uns
     // Extract tests and instructions
     std::vector<std::pair<unsigned int, unsigned int> > tTestBytecode = extract_arguments(iBlock, iSize, tLoc);
     std::vector<std::pair<unsigned int, unsigned int> > tInstructionBytecode = extract_instructions(iBlock, iSize, tLoc);
+    if (tInstructionBytecode.size() > 0)
+        tLoc = tInstructionBytecode.back().second + 1;
+
+    // Extract an eventual else-set of instructions
+    std::vector<std::pair<unsigned int, unsigned int> > tElseInstructionBytecode;
+    if (iBlock[tLoc] == COND_ELSE) {
+        tLoc++;
+        tElseInstructionBytecode = extract_instructions(iBlock, iSize, tLoc);
+
+        if (tElseInstructionBytecode.size() > 0)
+            tLoc = tElseInstructionBytecode.back().second + 1;
+    }
 
     // Check the evaluation type
     switch (tConditional) {
@@ -283,6 +338,10 @@ void Parser::evaluate_conditional(unsigned char* iBlock, unsigned int iSize, uns
                 for (unsigned int i = 0; i < tInstructionBytecode.size(); i++) {
                     evaluate_instruction(iBlock, iSize, tInstructionBytecode[i].first);
                 }
+            } else {
+                for (unsigned int i = 0; i < tElseInstructionBytecode.size(); i++) {
+                    evaluate_instruction(iBlock, iSize, tElseInstructionBytecode[i].first);
+                }
             }
             break;
         }
@@ -294,6 +353,16 @@ void Parser::evaluate_conditional(unsigned char* iBlock, unsigned int iSize, uns
             if (tTest.getType() != BOOL)
                 throw Exception(CONDITIONAL, "test passed to 'unless' did not produce boolean value");
 
+            // Evaluate the instructions
+            if (! tTest.getBool()) {
+                for (unsigned int i = 0; i < tInstructionBytecode.size(); i++) {
+                    evaluate_instruction(iBlock, iSize, tInstructionBytecode[i].first);
+                }
+            } else {
+                for (unsigned int i = 0; i < tElseInstructionBytecode.size(); i++) {
+                    evaluate_instruction(iBlock, iSize, tElseInstructionBytecode[i].first);
+                }
+            }
             break;
         }
 
@@ -319,8 +388,6 @@ void Parser::evaluate_conditional(unsigned char* iBlock, unsigned int iSize, uns
             break;
         }
     }
-    
-    tLoc = tInstructionBytecode.back().second + 1;
 }
 
 Value Parser::evaluate_function(unsigned char* iBlock, unsigned int iSize, unsigned int& tLoc) {
@@ -338,7 +405,8 @@ Value Parser::evaluate_function(unsigned char* iBlock, unsigned int iSize, unsig
     }
 
     // Call the function
-    tLoc = tParameterBytecode.back().second + 1;
+    if (tParameterBytecode.size() > 0)
+        tLoc = tParameterBytecode.back().second + 1;
     return mGrammar->callFunction(tFunction, tParameters);
 }
 
@@ -473,6 +541,14 @@ void Parser::print_newline(std::ostream& iStream, unsigned int iIndentation) {
 // Auxiliary
 //
 
+inline void Parser::tick() {
+    if (mInstructionLimit) {
+        mInstructionCounter++;
+        if (mInstructionCounter == mInstructions)
+            throw Exception(GENERIC, "instruction quotum reacher");
+    }
+}
+
 std::vector<std::pair<unsigned int, unsigned int> > Parser::extract_syntax(std::initializer_list<unsigned char> iList, unsigned char* iBlock, unsigned int iSize, unsigned int& iLoc) {
     // Read syntaxis data
     if (iList.size() != 3)
@@ -518,6 +594,10 @@ std::vector<std::pair<unsigned int, unsigned int> > Parser::extract_syntax(std::
                     if (tItems.back().second != 0)
                         throw Exception(SYNTAX, "unexpected list end");
                     tItems.back().second = iLoc;
+
+                    // Manage void function
+                    if (tItems.back().second - tItems.back().first == 0)
+                        tItems.pop_back();
                 }
             }
             tBracketBalance--;

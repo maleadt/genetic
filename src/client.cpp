@@ -82,6 +82,10 @@ void Client::mutate()
 	// Process all mutations
 	for (int i = 0; i < tempAmount; i++)
 	{
+                // We need DNA
+                if (dataDNA->length() == 0)
+                    return;
+
 		// Pick a mutation
 		int mutation = random_int(1, 6);
 

@@ -60,6 +60,14 @@ class Game {
 		// Game routines
 		void DrawScene();
 		void CreateNewPiece();
+                void Reset();
+
+                // Informational routines
+                int getPieceCurrent();
+                int getPieceNext();
+                int getX();
+                int getY();
+                int getRotation();
 		
 		// Action routines
 		bool left();

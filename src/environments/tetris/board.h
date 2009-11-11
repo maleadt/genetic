@@ -60,16 +60,18 @@ class Board {
 
 		Board						(Pieces *pPieces, int pScreenHeight);
 
-		int GetXPosInPixels			(int pPos);
+                void Reset();
+                int GetXPosInPixels			(int pPos);
 		int GetYPosInPixels			(int pPos);
 		bool IsFreeBlock			(int pX, int pY);
 		bool IsPossibleMovement		(int pX, int pY, int pPiece, int pRotation);
 		void StorePiece				(int pX, int pY, int pPiece, int pRotation);
 		void DeletePossibleLines	();
 		bool IsGameOver				();
+                unsigned long Score();
 
 	private:
-
+                unsigned long mScore;
 		enum { POS_FREE, POS_FILLED };			// POS_FREE = free position of the board; POS_FILLED = filled position of the board
 		int mBoard [BOARD_WIDTH][BOARD_HEIGHT];	// Board that contains the pieces
 		Pieces *mPieces;

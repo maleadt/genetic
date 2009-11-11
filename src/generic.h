@@ -57,7 +57,7 @@ swap(X &a, X &b)
 }
 */
 
-// Generate a number from lower up to (and with) upper
+// Generate a number from lower up to (exclusive) upper
 int random_int(int lowest_number, int highest_number);
 
 // Convert several types to a string

@@ -50,6 +50,7 @@ class Parser {
 public:
     // Construction and destruction
     Parser(Grammar*);
+    Parser(Grammar*, unsigned long);
 
     // Main functionality
     void validate(const DNA&);
@@ -77,6 +78,7 @@ private:
     void print_newline(std::ostream&, unsigned int);
     
     // Auxiliary functions
+    inline void tick();
     std::vector<std::pair<unsigned int, unsigned int> > extract_syntax(std::initializer_list<unsigned char>, unsigned char*, unsigned int, unsigned int&);
     std::vector<std::pair<unsigned int, unsigned int> > extract_arguments(unsigned char*, unsigned int, unsigned int&);
     std::vector<std::pair<unsigned int, unsigned int> > extract_instructions(unsigned char*, unsigned int, unsigned int&);
@@ -86,6 +88,9 @@ private:
     int toInt(unsigned char);
 
     // Data members
+    bool mInstructionLimit;
+    unsigned long mInstructionCounter;
+    unsigned long mInstructions;
     Grammar* mGrammar;
 };
 
