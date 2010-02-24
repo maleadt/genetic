@@ -30,6 +30,7 @@
 
 // Headers
 #include "../population.h"
+#include "../populations/singlestraight.h"
 #include "../environment.h"
 #include <queue>
 
@@ -101,20 +102,21 @@ int main()
     EnvDebug tempEnvironment;
 
     // Create a population with initial DNA
-    Population tempPopulation(&tempEnvironment, tempDNA);
+    Population* tempPopulation = new PopSingleStraight(&tempEnvironment, tempDNA);
     std::cout << "* Evolving" << std::endl;
 
     // Simulate
     try
     {
-            tempPopulation.evolve_single_straight();
-            tempPopulation.get()->debug();
+            tempPopulation->evolve();
+            tempPopulation->get()->debug();
     }
     catch (std::string error)
     {
             std::cout << "Caught error: " << error << std::endl;
     }
 
+    delete tempPopulation;
     return 0;
 }
 

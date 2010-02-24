@@ -35,6 +35,7 @@
 // Headers -- Genetic
 #include "../../dna.h"
 #include "../../population.h"
+#include "../../populations/singlestraight.h"
 #include "../../environment.h"
 
 // Headers -- Parser

@@ -61,7 +61,7 @@ DNA Tokenizer::tokenize(const std::string iCode) {
     std::string tBuffer;
 
     // Read char by char
-    for (int i = 0; i < iCode.length(); i++) {
+    for (unsigned int i = 0; i < iCode.length(); i++) {
         char tChar = iCode[i];
 
         switch (tChar) {

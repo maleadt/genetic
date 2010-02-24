@@ -23,5 +23,5 @@ ADD_LIBRARY(parser parser.h parser.cpp)
 TARGET_LINK_LIBRARIES(parser parser_grammar)
 
 # Tokenizer
-ADD_LIBRARY(tokenizer tokenizer.h tokenizer.cpp)
+#ADD_LIBRARY(tokenizer tokenizer.h tokenizer.cpp)
 

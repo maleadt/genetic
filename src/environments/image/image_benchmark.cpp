@@ -36,6 +36,9 @@
 #include <vector>
 #include <sstream>
 #include <ctime>
+#include "../../populations/groupstraight.h"
+#include "../../populations/populationstraight.h"
+#include "../../populations/populationdual.h"
 #include <cairo/cairo.h>
 #include "../../../lib/gnuplot/gnuplot.h"
 
@@ -248,9 +251,10 @@ int main(int argc, char** argv)
 	try
     {
         dataEnvironment.reset();
-        Population dataPopulation = Population(&dataEnvironment, tempDNA);
+        Population* dataPopulation = new PopSingleStraight(&dataEnvironment, tempDNA);
         dataEnvironment.setVector(&dataSingleStraightTime, &dataSingleStraightFitness);
-        dataPopulation.evolve_single_straight();
+        dataPopulation->evolve();
+        delete dataPopulation;
     }
     catch (std::string error)
     {
@@ -258,16 +262,17 @@ int main(int argc, char** argv)
         return 1;
     }
 
-	// Population
-	std::cout << "\t- Testing POPULATION evolution" << std::endl;
-	std::vector<double> dataPopulationTime;
-	std::vector<double> dataPopulationFitness;
+	// Group
+	std::cout << "\t- Testing GROUP STRAIGHT evolution" << std::endl;
+	std::vector<double> dataGroupStraightTimes;
+	std::vector<double> dataGroupStraightFitness;
 	try
     {
         dataEnvironment.reset();
-        Population dataPopulation = Population(&dataEnvironment, tempDNA);
-        dataEnvironment.setVector(&dataPopulationTime, &dataPopulationFitness);
-        dataPopulation.evolve_population();
+        Population* dataPopulation = new PopGroupStraight(&dataEnvironment, tempDNA);
+        dataEnvironment.setVector(&dataGroupStraightTimes, &dataGroupStraightFitness);
+        dataPopulation->evolve();
+        delete dataPopulation;
     }
     catch (std::string error)
     {
@@ -282,9 +287,10 @@ int main(int argc, char** argv)
 	try
     {
         dataEnvironment.reset();
-        Population  dataPopulation = Population(&dataEnvironment, tempDNA);
+        Population* dataPopulation = new PopPopulationStraight(&dataEnvironment, tempDNA);
         dataEnvironment.setVector(&dataPopulationStraightTime, &dataPopulationStraightFitness);
-        dataPopulation.evolve_population_straight();
+        dataPopulation->evolve();
+        delete dataPopulation;
     }
     catch (std::string error)
     {
@@ -299,9 +305,10 @@ int main(int argc, char** argv)
 	try
     {
         dataEnvironment.reset();
-        Population  dataPopulation = Population(&dataEnvironment, tempDNA);
+        Population* dataPopulation = new PopPopulationDual(&dataEnvironment, tempDNA);
         dataEnvironment.setVector(&dataPopulationDualTime, &dataPopulationDualFitness);
-        dataPopulation.evolve_population_dual();
+        dataPopulation->evolve();
+        delete dataPopulation;
     }
     catch (std::string error)
     {
@@ -324,7 +331,7 @@ int main(int argc, char** argv)
 
     // Add data sets
     plot.plot_xy(dataSingleStraightTime, dataSingleStraightFitness, "single-straight evolution");
-    plot.plot_xy(dataPopulationTime, dataPopulationFitness, "population evolution");
+    plot.plot_xy(dataGroupStraightTimes, dataGroupStraightFitness, "population evolution");
     plot.plot_xy(dataPopulationStraightTime, dataPopulationStraightFitness, "population-straight evolution");
     plot.plot_xy(dataPopulationDualTime, dataPopulationDualFitness, "population-dual evolution");
 

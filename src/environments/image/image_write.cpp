@@ -213,21 +213,22 @@ int main(int argc, char** argv) {
     dataEnvironment.explain(&tempDNA);
 
     // Create object
-    Population dataPopulation(&dataEnvironment, tempDNA);
+    Population* dataPopulation = new PopSingleStraight(&dataEnvironment, tempDNA);
 
     // Message
     std::cout << "NOTE: population created" << std::endl;
 
     // Evolve
     try {
-    dataPopulation.evolve_population();
+    dataPopulation->evolve();
     } catch (std::string e) {
         std::cout << "ERROR: " << e << std::endl;
     }
 
     // Fetch and print the resulting DNA
-    const DNA* outputDNA = dataPopulation.get();
+    const DNA* outputDNA = dataPopulation->get();
     dataEnvironment.explain(outputDNA);
 
+    delete dataPopulation;
     return 0;
 }

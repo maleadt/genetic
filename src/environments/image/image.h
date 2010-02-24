@@ -45,6 +45,7 @@
 
 // Headers
 #include "../../population.h"
+#include "../../populations/singlestraight.h"
 #include "../../environment.h"
 #include "../../dna.h"
 #include <vector>

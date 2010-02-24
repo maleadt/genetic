@@ -66,12 +66,9 @@ class Population
         const DNA* get() const;
 
         // Evolutionary methods
-        void evolve_single_straight();
-        void evolve_population();
-        void evolve_population_straight();
-        void evolve_population_dual();
+        virtual void evolve() = 0;
 
-    private:
+    protected:
         // Population helper methods
         void init(std::vector<CachedClient>& population, const DNA* dna, int amount);
         void clean(std::vector<CachedClient>& population, int start);

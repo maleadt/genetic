@@ -364,13 +364,13 @@ int main() {
     
     
     // Create a population with initial DNA
-    Population tPopulation(&tEnvironment, tDNA);
+    Population* tPopulation = new PopSingleStraight(&tEnvironment, tDNA);
     std::cout << "* Evolving" << std::endl;
 
     // Simulate
     try {
-        tPopulation.evolve_single_straight();
-        tEnvironment.explain(tPopulation.get());
+        tPopulation->evolve();
+        tEnvironment.explain(tPopulation->get());
     }
     catch (std::string error) {
         std::cout << "Caught error: " << error << std::endl;
@@ -379,6 +379,7 @@ int main() {
         std::cout << "FATAL EXCEPTION: " << e.what() << std::endl;
     }
 
+    delete tPopulation;
     return 0;
 }
 
