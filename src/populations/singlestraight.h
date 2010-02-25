@@ -43,10 +43,9 @@
 
 class PopSingleStraight: public Population {
 public:
-    // Construction and destruction
+    // Constructor
     PopSingleStraight(Environment* inputEnvironment, const DNA& inputDNA)
     : Population(inputEnvironment, inputDNA) { }
-    ~PopSingleStraight() { }
 
     // Required functions
     void evolve();
@@ -61,16 +60,17 @@ void PopSingleStraight::evolve() {
     while (dataEnvironment->condition())
     {
         // Create a client, and mutate the DNA
-        Client tempClient(dataDNA, dataEnvironment->alphabet());
+        Client tempClient(*dataDNA, dataEnvironment->alphabet());
         tempClient.mutate();
 
         // Compare the new DNA
-        const DNA& tempDNA = tempClient.get();
+        const DNA* tempDNA = tempClient.get();
         double tempFitness = dataEnvironment->fitness(tempDNA);
         if (tempFitness > dataFitness)
         {
             dataFitness = tempFitness;
-            dataDNA = DNA(tempClient.get());
+            delete dataDNA;
+            dataDNA = new DNA(*tempClient.get());
             dataEnvironment->update(dataDNA);
         }
     }

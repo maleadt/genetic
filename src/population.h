@@ -60,24 +60,24 @@ class Population
     public:
         // Construction and destruction
         Population(Environment* inputEnvironment, const DNA& inputDNA);
-        virtual ~Population() { };
+        ~Population();
 
         // Output routines
-        const DNA& get() const;
+        const DNA* get() const;
 
         // Evolutionary methods
         virtual void evolve() = 0;
 
     protected:
         // Population helper methods
-        void init(std::vector<CachedClient>& population, const DNA& dna, int amount);
+        void init(std::vector<CachedClient>& population, const DNA* dna, int amount);
         void clean(std::vector<CachedClient>& population, int start);
         void fill(std::vector<CachedClient>& population, int start);
         void mutate(std::vector<CachedClient>& population, int start);
         void recombine(std::vector<CachedClient>& population, int start);
 
         // Current DNA
-        DNA dataDNA;
+        const DNA* dataDNA;
         Environment* dataEnvironment;
 };
 
@@ -86,7 +86,8 @@ struct CachedClient
 {
     Client* client;
     double fitness;
-    friend bool operator<(const CachedClient& left, const CachedClient& right) {
+    friend bool operator<(const CachedClient& left, const CachedClient& right)
+    {
         return (left.fitness > right.fitness);
     }
 };

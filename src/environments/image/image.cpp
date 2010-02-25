@@ -65,9 +65,9 @@ EnvImage::~EnvImage()
 //
 
 // Fitness function
-double EnvImage::fitness(const DNA& inputDNA) {
+double EnvImage::fitness(const DNA* inputDNA) {
     // Check amount of polygons
-    unsigned int genes = inputDNA.genes();
+    unsigned int genes = inputDNA->genes();
     if (genes < 1 || genes > LIMIT_POLYGONS)
             return 0;   // TODO: define 0 or -1 as invalid
 
@@ -129,7 +129,7 @@ bool EnvImage::load(std::string inputFile)
 }
 
 // Render the DNA code onto a draw container
-void EnvImage::draw(cairo_surface_t* inputSurface, const DNA& inputDNA) const {
+void EnvImage::draw(cairo_surface_t* inputSurface, const DNA* inputDNA) const {
     // Create a Cairo context
     cairo_t *cr = cairo_create(inputSurface);
 
@@ -139,11 +139,11 @@ void EnvImage::draw(cairo_surface_t* inputSurface, const DNA& inputDNA) const {
     cairo_fill(cr);
 
     // Loop all genes
-    unsigned int genes = inputDNA.genes();
+    unsigned int genes = inputDNA->genes();
     for (unsigned int gene = 0; gene < genes; gene++) {
         // Get gene
         unsigned int size; unsigned char* data;
-        inputDNA.extract_gene(gene, data, size);
+        inputDNA->extract_gene(gene, data, size);
         unsigned char* gene_ptr = data;
         unsigned int gene_loc = 0;
 
@@ -223,20 +223,20 @@ void EnvImage::draw(cairo_surface_t* inputSurface, const DNA& inputDNA) const {
 }
 
 // Explain a given DNA set
-void EnvImage::explain(const DNA& inputDNA) const {
+void EnvImage::explain(const DNA* inputDNA) const {
     std::cout << "* DNA explanation" << std::endl;
 
     // Main characteristics
     std::cout << "\t- Main characteristics:" << std::endl;
-    std::cout << "\t\tamount of polygons: " << inputDNA.genes() << std::endl;
+    std::cout << "\t\tamount of polygons: " << inputDNA->genes() << std::endl;
 
     // Process all polygons
     std::cout << "\t- List of polygons" << std::endl;
-    unsigned int genes = inputDNA.genes();
+    unsigned int genes = inputDNA->genes();
     for (unsigned int gene = 0; gene < genes; gene++) {
         // Get gene
         unsigned int size; unsigned char* data;
-        inputDNA.extract_gene(gene, data, size);
+        inputDNA->extract_gene(gene, data, size);
         unsigned char* gene_ptr = data;
         unsigned int gene_loc = 0;
 

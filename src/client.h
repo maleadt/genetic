@@ -71,12 +71,14 @@ class Client
 		void clean();
 
 		// DNA output
-		const DNA& get() const;
+		const DNA* get() const;
+
+		// Alphabet
+		int dataAlphabet;
 
 	private:
-		// DNA properties
-		DNA dataDNA;
-		int dataAlphabet;
+		// DNA
+		DNA* dataDNA;
 
                 // Mutation methods
                 void mutate_point();

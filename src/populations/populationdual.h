@@ -43,10 +43,9 @@
 
 class PopPopulationDual: public Population {
 public:
-    // Construction and destruction
+    // Constructor
     PopPopulationDual(Environment* inputEnvironment, const DNA& inputDNA)
     : Population(inputEnvironment, inputDNA) { }
-    ~PopPopulationDual() { }
 
     // Required functions
     void evolve();
@@ -94,7 +93,7 @@ void PopPopulationDual::evolve() {
         if ((*population)[0].fitness > fitness_critical)
         {
             fitness_critical = (*population)[0].fitness;
-            dataDNA = DNA((*population)[0].client->get());
+            dataDNA = new DNA(*(*population)[0].client->get());
             dataEnvironment->update(dataDNA);    // TODO: pass fitness
         }
 
