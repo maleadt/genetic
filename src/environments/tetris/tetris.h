@@ -82,11 +82,11 @@ public:
     ~EnvTetris();
 
     // Environment functionality
-    double fitness(const DNA*);
+    double fitness(const DNA&);
     int alphabet() const;
-    void update(const DNA*);
+    void update(const DNA&);
     bool condition();
-    void explain(const DNA*);
+    void explain(const DNA&);
 
     // Grammar functionality
     void setup();

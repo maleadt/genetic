@@ -47,9 +47,9 @@ class EnvDebug : public Environment {
 		EnvDebug();
 
 		// Required functons
-		double fitness(const DNA* inputDNA);
+		double fitness(const DNA& inputDNA);
 		int alphabet() const;
-		void update(const DNA* inputDNA);
+		void update(const DNA& inputDNA);
 		bool condition();
 
 	private:
@@ -67,7 +67,7 @@ int EnvDebug::alphabet() const {
 }
 
 // Fitness function
-double EnvDebug::fitness(const DNA* inputDNA) {
+double EnvDebug::fitness(const DNA& inputDNA) {
 	return counter++;
 }
 
@@ -77,7 +77,7 @@ bool EnvDebug::condition() {
 }
 
 // Update function (does nothing)
-void EnvDebug::update(const DNA* inputDNA) {
+void EnvDebug::update(const DNA& inputDNA) {
 }
 
 
@@ -109,7 +109,7 @@ int main()
     try
     {
             tempPopulation->evolve();
-            tempPopulation->get()->debug();
+            tempPopulation->get().debug();
     }
     catch (std::string error)
     {

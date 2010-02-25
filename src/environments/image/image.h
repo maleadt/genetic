@@ -45,7 +45,6 @@
 
 // Headers
 #include "../../population.h"
-#include "../../populations/singlestraight.h"
 #include "../../environment.h"
 #include "../../dna.h"
 #include <vector>
@@ -103,13 +102,13 @@ class EnvImage : public Environment
 		~EnvImage();
 
 		// Required functons
-		double fitness(const DNA* inputDNA);
+		double fitness(const DNA& inputDNA);
 		int alphabet() const;
 
 		// Image functions
 		bool load(std::string inputFile);
-		void draw(cairo_surface_t* inputSurface, const DNA* inputDNA) const;
-                void explain(const DNA* inputDNA) const;
+		void draw(cairo_surface_t* inputSurface, const DNA& inputDNA) const;
+                void explain(const DNA& inputDNA) const;
 
                 // Comparison setup
                 void setup(cairo_surface_t* inputSurface);

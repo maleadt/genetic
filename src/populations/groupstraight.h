@@ -43,9 +43,10 @@
 
 class PopGroupStraight: public Population {
 public:
-    // Constructor
+    // Construction and destruction
     PopGroupStraight(Environment* inputEnvironment, const DNA& inputDNA)
     : Population(inputEnvironment, inputDNA) { }
+    ~PopGroupStraight() { }
 
     // Required functions
     void evolve();
@@ -80,7 +81,7 @@ void PopGroupStraight::evolve() {
         if (population[0].fitness > fitness_critical)
         {
             fitness_critical = population[0].fitness;
-            dataDNA = new DNA(*population[0].client->get());
+            dataDNA = DNA(population[0].client->get());
             dataEnvironment->update(dataDNA);    // TODO: pass fitness
         }
 

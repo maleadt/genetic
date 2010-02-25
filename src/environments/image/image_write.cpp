@@ -30,6 +30,7 @@
 
 // Headers
 #include "image.h"
+#include "../../populations/singlestraight.h"
 #include <iostream>
 #include <queue>
 #include <cmath>
@@ -50,7 +51,7 @@ public:
     EnvImgWrite();
 
     // Required functions
-    void update(const DNA* inputDNA);
+    void update(const DNA& inputDNA);
     bool condition();
 
     // Additional functions
@@ -90,7 +91,7 @@ EnvImgWrite::EnvImgWrite() {
 //
 
 // Update call
-void EnvImgWrite::update(const DNA* inputDNA) {
+void EnvImgWrite::update(const DNA& inputDNA) {
     // Create surface
     cairo_surface_t* tempSurface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, dataInputWidth, dataInputHeight);
 
@@ -210,7 +211,7 @@ int main(int argc, char** argv) {
                                  25, 25};
 
     DNA tempDNA(dnastring, 23);
-    dataEnvironment.explain(&tempDNA);
+    dataEnvironment.explain(tempDNA);
 
     // Create object
     Population* dataPopulation = new PopSingleStraight(&dataEnvironment, tempDNA);
@@ -226,7 +227,7 @@ int main(int argc, char** argv) {
     }
 
     // Fetch and print the resulting DNA
-    const DNA* outputDNA = dataPopulation->get();
+    const DNA& outputDNA = dataPopulation->get();
     dataEnvironment.explain(outputDNA);
 
     delete dataPopulation;

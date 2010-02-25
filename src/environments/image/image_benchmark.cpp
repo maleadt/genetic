@@ -36,6 +36,7 @@
 #include <vector>
 #include <sstream>
 #include <ctime>
+#include "../../populations/singlestraight.h"
 #include "../../populations/groupstraight.h"
 #include "../../populations/populationstraight.h"
 #include "../../populations/populationdual.h"
@@ -65,7 +66,7 @@ class EnvImgBenchmark : public EnvImage
         EnvImgBenchmark();
 
         // Required functions
-        void update(const DNA* inputDNA);
+        void update(const DNA& inputDNA);
         bool condition();
 
         // Additional functions
@@ -103,9 +104,9 @@ EnvImgBenchmark::EnvImgBenchmark()
 //
 
 // Update call
-void EnvImgBenchmark::update(const DNA* inputDNA) {
+void EnvImgBenchmark::update(const DNA& inputDNA) {
     // Ge the fitness and elapsed time
-    double tempFitness = 100*fitness(inputDNA);
+    double tempFitness = 100 * fitness(inputDNA);
     #ifdef WITH_OPENMP
     double tempTime = omp_get_wtime()-start;
     #else

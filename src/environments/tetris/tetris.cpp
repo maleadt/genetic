@@ -68,10 +68,10 @@ int EnvTetris::alphabet() const {
 }
 
 // Fitness function
-double EnvTetris::fitness(const DNA* inputDNA) {
+double EnvTetris::fitness(const DNA& inputDNA) {
     // Validate the syntax
     try {
-        mParser->validate(*inputDNA);
+        mParser->validate(inputDNA);
     } catch (Exception e) {
         return 0;
     }
@@ -102,7 +102,7 @@ double EnvTetris::fitness(const DNA* inputDNA) {
                         }
                 }
                 // Evaluate
-                mParser->evaluate(*inputDNA);
+                mParser->evaluate(inputDNA);
                 
                 // Manage counters
                 SDL_Delay(GAME_USERDELAY/GAME_SPEED);
@@ -139,19 +139,19 @@ bool EnvTetris::condition() {
 }
 
 // Update function (does nothing)
-void EnvTetris::update(const DNA* inputDNA) {
+void EnvTetris::update(const DNA& inputDNA) {
 }
 
 // Expain the DNA
-void EnvTetris::explain(const DNA* iDNA) {
+void EnvTetris::explain(const DNA& inputDNA) {
     try {
-        mParser->validate(*iDNA);
-        mParser->evaluate(*iDNA);
+        mParser->validate(inputDNA);
+        mParser->evaluate(inputDNA);
     }
     catch (Exception e) {
         std::cout << "! Initial DNA invalid" << std::endl << e << std::endl;
     }
-    mParser->print(std::cout, *iDNA);
+    mParser->print(std::cout, inputDNA);
 }
 
 
@@ -360,7 +360,7 @@ int main() {
             INSTR_CLOSE,
         INSTR_CLOSE
     });
-    tEnvironment.explain(&tDNA);
+    tEnvironment.explain(tDNA);
     
     
     // Create a population with initial DNA

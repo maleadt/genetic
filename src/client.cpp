@@ -42,21 +42,17 @@
 //
 
 // Copy constructor
-Client::Client(const Client& inputClient) {
-    dataDNA = new DNA(*inputClient.get());
-    dataAlphabet = inputClient.dataAlphabet;
+Client::Client(const Client& inputClient)
+: dataDNA(inputClient.get()), dataAlphabet(inputClient.dataAlphabet) {
 }
 
 // Create client with given DNA and alphabet
-Client::Client(const DNA& inputDNA, int inputAlphabet) {
-	dataDNA = new DNA(inputDNA);
-	dataAlphabet = inputAlphabet;
+Client::Client(const DNA& inputDNA, int inputAlphabet)
+: dataDNA(inputDNA), dataAlphabet(inputAlphabet) {
 }
 
 // Destructor
 Client::~Client() {
-    if (dataDNA != 0)
-        delete dataDNA;
 }
 
 
@@ -64,7 +60,7 @@ Client::~Client() {
 // DNA IO
 //
 
-const DNA* Client::get() const {
+const DNA& Client::get() const {
 	return dataDNA;
 }
 
@@ -83,7 +79,7 @@ void Client::mutate()
 	for (int i = 0; i < tempAmount; i++)
 	{
                 // We need DNA
-                if (dataDNA->length() == 0)
+                if (dataDNA.length() == 0)
                     return;
 
 		// Pick a mutation
@@ -153,12 +149,12 @@ void Client::clean()
 // Change one or more bytes randomly
 void Client::mutate_point() {
     // Pick a random byte to start
-    unsigned int start = random_int(0, dataDNA->length());
+    unsigned int start = random_int(0, dataDNA.length());
 
     // Determine the window size
     unsigned int window_size = random_int(1, 5);
-    if (start+window_size > dataDNA->length())
-        window_size = dataDNA->length() - start - 1;
+    if (start+window_size > dataDNA.length())
+        window_size = dataDNA.length() - start - 1;
 
     // Generate replacment gen
     unsigned char* replace = (unsigned char*) malloc(window_size * sizeof(unsigned char));
@@ -166,64 +162,64 @@ void Client::mutate_point() {
         replace[i] = (unsigned char) random_int(0, dataAlphabet);
 
     // Commit the replacment
-    dataDNA->replace(start, replace, window_size);
+    dataDNA.replace(start, replace, window_size);
     free(replace);
 }
 
 // Delete one or more bytes
 void Client::mutate_delete() {
     // Pick a random byte to start
-    unsigned int start = random_int(0, dataDNA->length());
+    unsigned int start = random_int(0, dataDNA.length());
 
     // Determine the window size
     unsigned int window_size = random_int(1, 5);
-    if (start+window_size > dataDNA->length())
-        window_size = dataDNA->length() - start - 1;
+    if (start+window_size > dataDNA.length())
+        window_size = dataDNA.length() - start - 1;
     int end = start + window_size;
 
     // Commit the deletion
-    dataDNA->erase(start, end);
+    dataDNA.erase(start, end);
 }
 
 // Copy a selection of bytes one time
 void Client::mutate_duplicate() {
     // Pick a random byte to start
-    unsigned int start = random_int(0, dataDNA->length());
+    unsigned int start = random_int(0, dataDNA.length());
 
     // Determine the window size
     unsigned int window_size = random_int(1, 5);
-    if (start+window_size >= dataDNA->length())
-        window_size = dataDNA->length() - start - 1;
+    if (start+window_size >= dataDNA.length())
+        window_size = dataDNA.length() - start - 1;
     unsigned int end = start + window_size;
 
     // Extract the window
     unsigned char* window;
-    dataDNA->extract(start, end, window);
+    dataDNA.extract(start, end, window);
     DNA tempDNA(window, window_size);
 
     // Commit the duplication
     end++;
-    if (end == dataDNA->length())
-        dataDNA->push_back(window, window_size);
+    if (end == dataDNA.length())
+        dataDNA.push_back(window, window_size);
     else
-        dataDNA->insert(end, window, window_size);
+        dataDNA.insert(end, window, window_size);
     free(window);
 }
 
 // Amplify a selection of bytes
 void Client::mutate_amplify() {
     // Pick a random byte to start
-    unsigned int start = random_int(0, dataDNA->length());
+    unsigned int start = random_int(0, dataDNA.length());
 
     // Determine the window size
     unsigned int window_size = random_int(1, 5);
-    if (start+window_size >= dataDNA->length())
-        window_size = dataDNA->length() - start - 1;
+    if (start+window_size >= dataDNA.length())
+        window_size = dataDNA.length() - start - 1;
     unsigned int end = start + window_size;
 
     // Extract the window
     unsigned char* window;
-    dataDNA->extract(start, end, window);
+    dataDNA.extract(start, end, window);
 
     // Amplify the window
     int amplify = random_int(2, 10);
@@ -233,27 +229,27 @@ void Client::mutate_amplify() {
 
     // Commit the duplication
     end++;
-    if (end == dataDNA->length())
-        dataDNA->push_back(window, window_size*amplify);
+    if (end == dataDNA.length())
+        dataDNA.push_back(window, window_size*amplify);
     else
-        dataDNA->insert(end, window, window_size*amplify);
+        dataDNA.insert(end, window, window_size*amplify);
     free(window);
 }
 
 // Inverse a selection of bytes
 void Client::mutate_inverse() {
     // Pick a random byte to start
-    unsigned int start = random_int(0, dataDNA->length());
+    unsigned int start = random_int(0, dataDNA.length());
 
     // Determine the window size
     unsigned int window_size = random_int(1, 5);
-    if (start+window_size >= dataDNA->length())
-        window_size = dataDNA->length() - start - 1;
+    if (start+window_size >= dataDNA.length())
+        window_size = dataDNA.length() - start - 1;
     unsigned int end = start + window_size;
 
     // Extract the window
     unsigned char* window;
-    dataDNA->extract(start, end, window);
+    dataDNA.extract(start, end, window);
 
     // Inverse the window order
     unsigned char* window_copy = (unsigned char*) malloc(window_size * sizeof(unsigned char));
@@ -263,7 +259,7 @@ void Client::mutate_inverse() {
     free(window_copy);
 
     // Commit the duplication
-    dataDNA->replace(start, window, window_size);
+    dataDNA.replace(start, window, window_size);
     free(window);
 }
 
@@ -277,26 +273,26 @@ void Client::recombine_insert(Client& inputClient) {
     // Extract foreign DNA //
 
     // Pick a random byte to start
-    unsigned int start = random_int(0, inputClient.get()->length());
+    unsigned int start = random_int(0, inputClient.get().length());
 
     // Determine the window size
     unsigned int window_size = random_int(1, 5);
-    if (start+window_size >= inputClient.get()->length())
-        window_size = inputClient.get()->length() - start - 1;
+    if (start+window_size >= inputClient.get().length())
+        window_size = inputClient.get().length() - start - 1;
     unsigned int end = start + window_size;
 
     // Extract the window
     unsigned char* window;
-    inputClient.get()->extract(start, end, window);
+    inputClient.get().extract(start, end, window);
 
 
     // Insert the DNA //
 
     // Pick a random byte to start
-    int i_start = random_int(0, dataDNA->length());
+    int i_start = random_int(0, dataDNA.length());
 
     // Insert the DNA
-    dataDNA->insert(i_start, window, window_size);
+    dataDNA.insert(i_start, window, window_size);
 
 
     // Clean //
@@ -307,19 +303,19 @@ void Client::recombine_insert(Client& inputClient) {
 // Perform a single crossover
 void Client::recombine_crossover_single(Client& inputClient) {
     // Determine crossover point
-    int max = std::min(dataDNA->length(), inputClient.get()->length());
+    int max = std::min(dataDNA.length(), inputClient.get().length());
     int crossover_point = random_int(0, max);
 
     // Wipe own DNA
-    dataDNA->erase(crossover_point, dataDNA->length());
+    dataDNA.erase(crossover_point, dataDNA.length());
 
     // Extract foreign DNA
-    int window_size = inputClient.get()->length() - crossover_point;
+    int window_size = inputClient.get().length() - crossover_point;
     unsigned char* window;
-    inputClient.get()->extract(crossover_point, crossover_point+window_size, window);
+    inputClient.get().extract(crossover_point, crossover_point+window_size, window);
 
     // Append foreign DNA
-    dataDNA->push_back(window, window_size);
+    dataDNA.push_back(window, window_size);
 
     // Clean
     free(window);
@@ -328,26 +324,26 @@ void Client::recombine_crossover_single(Client& inputClient) {
 // Perform a double crossover
 void Client::recombine_crossover_double(Client& inputClient) {
     // Determine starting crossover region
-    unsigned int max = std::min(dataDNA->length(), inputClient.get()->length());
+    unsigned int max = std::min(dataDNA.length(), inputClient.get().length());
     unsigned int crossover_start = random_int(0, max);
     unsigned int crossover_end = random_int(crossover_start, max);
     if (crossover_end <= crossover_start)
         return;
 
     // Wipe own DNA
-    dataDNA->erase(crossover_start, crossover_end);
+    dataDNA.erase(crossover_start, crossover_end);
 
     // Extract foreign DNA
     unsigned int window_size = crossover_end - crossover_start;
     unsigned char* window;
-    inputClient.get()->extract(crossover_start, crossover_end, window);
+    inputClient.get().extract(crossover_start, crossover_end, window);
 
     // Append foreign DNA
     crossover_end++;
-    if (crossover_end == dataDNA->length())
-        dataDNA->push_back(window, window_size);
+    if (crossover_end == dataDNA.length())
+        dataDNA.push_back(window, window_size);
     else
-        dataDNA->insert(crossover_start, window, window_size);
+        dataDNA.insert(crossover_start, window, window_size);
 
     // Clean
     free(window);
